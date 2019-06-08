@@ -17,19 +17,18 @@
 package eu.cdevreeze.yaidom.integrationtest
 
 import scala.collection.immutable
-import org.junit.runner.RunWith
-import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
-import eu.cdevreeze.yaidom.simple.ElemBuilder
-import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
-import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.simple.NodeBuilder
-import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
+
 import eu.cdevreeze.yaidom.core.EName
-import eu.cdevreeze.yaidom.simple.Elem
+import eu.cdevreeze.yaidom.core.QName
+import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
+import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingStax
 import eu.cdevreeze.yaidom.simple.Document
-import eu.cdevreeze.yaidom.core.QName
+import eu.cdevreeze.yaidom.simple.Elem
+import eu.cdevreeze.yaidom.simple.ElemBuilder
+import eu.cdevreeze.yaidom.simple.NodeBuilder
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * Test case using yaidom on files of airports.
@@ -40,8 +39,7 @@ import eu.cdevreeze.yaidom.core.QName
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
-class AirportExampleTest extends FunSuite {
+class AirportExampleTest extends AnyFunSuite {
 
   import AirportExampleTest._
 
@@ -125,7 +123,9 @@ class AirportExampleTest extends FunSuite {
     def highestAirport(root: Elem): Elem = {
       val tableElms = root \\ (_.localName == "Table")
       val sorted = tableElms sortBy { (e: Elem) =>
-        e findChildElem { _.localName == "RunwayElevationFeet" } map { e => e.trimmedText.toInt } getOrElse (0)
+        e findChildElem {
+          _.localName == "RunwayElevationFeet"
+        } map { e => e.trimmedText.toInt } getOrElse (0)
       }
       sorted.last
     }
@@ -366,7 +366,9 @@ class AirportExampleTest extends FunSuite {
 
     // The root child elements must all be named Table
     assertResult(Set(enameTable)) {
-      val elmNames = tableElms map { _.resolvedName }
+      val elmNames = tableElms map {
+        _.resolvedName
+      }
       elmNames.toSet
     }
 
@@ -392,13 +394,17 @@ class AirportExampleTest extends FunSuite {
 
     // The root grandchild elements must all have names mentioned above (in Set propertyENames)
     assertResult(propertyENames) {
-      val elmNames = tablePropertyElms map { _.resolvedName }
+      val elmNames = tablePropertyElms map {
+        _.resolvedName
+      }
       elmNames.toSet
     }
 
     // The root grandchild elements must have no child elements themselves
     assertResult(0) {
-      val elms = tablePropertyElms flatMap { _.findAllChildElems }
+      val elms = tablePropertyElms flatMap {
+        _.findAllChildElems
+      }
       elms.size
     }
   }
@@ -446,6 +452,7 @@ class AirportExampleTest extends FunSuite {
 object AirportExampleTest {
 
   final case class LatLon(val lat: Double, val lon: Double) {
+
     import scala.math._
 
     /**
@@ -469,4 +476,5 @@ object AirportExampleTest {
       d
     }
   }
+
 }

@@ -22,8 +22,8 @@ import java.net.URI
 
 import scala.collection.immutable
 
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
+
+
 
 import eu.cdevreeze.yaidom.dom.DomDocument
 import eu.cdevreeze.yaidom.dom.DomElem
@@ -35,7 +35,7 @@ import javax.xml.parsers.DocumentBuilderFactory
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
+
 class XmlBaseTest extends AbstractXmlBaseTest {
 
   type D = DomDocument

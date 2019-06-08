@@ -18,8 +18,8 @@ package eu.cdevreeze.yaidom.queryapitests.indexed
 
 import java.net.URI
 
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
+
+
 
 import eu.cdevreeze.yaidom.convert.ScalaXmlConversions.convertToElem
 import eu.cdevreeze.yaidom.indexed.Document
@@ -31,7 +31,7 @@ import eu.cdevreeze.yaidom.queryapitests.AbstractAlternativeQueryTest
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
+
 class AlternativeQueryTest extends AbstractAlternativeQueryTest {
 
   final type E = Elem

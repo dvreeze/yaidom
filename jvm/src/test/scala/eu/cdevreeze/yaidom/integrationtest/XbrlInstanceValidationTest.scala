@@ -19,28 +19,25 @@ package eu.cdevreeze.yaidom.integrationtest
 import scala.collection.immutable
 import scala.reflect.classTag
 
-import org.junit.runner.RunWith
-import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
-
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.indexed
-import eu.cdevreeze.yaidom.simple.Document
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
 import eu.cdevreeze.yaidom.queryapi.ElemApi.anyElem
 import eu.cdevreeze.yaidom.queryapi.IndexedScopedElemApi
 import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
 import eu.cdevreeze.yaidom.queryapi.SubtypeAwareElemLike
+import eu.cdevreeze.yaidom.simple.Document
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * Test case using yaidom XML dialect support for "schema validation" of XBRL instance w.r.t. the syntactic structure.
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
-class XbrlInstanceValidationTest extends FunSuite {
+class XbrlInstanceValidationTest extends AnyFunSuite {
+
   import XbrlInstanceValidationTest._
 
   test("testValidateInstance") {
@@ -83,11 +80,11 @@ class XbrlInstanceValidationTest extends FunSuite {
           atLeastZeroTimes(hasEName(LinkArcroleRefEName)),
           { elems =>
             val remainder = elems dropWhile {
-              case e: XbrliFactElem        => true
-              case e: XbrliContextElem     => true
-              case e: XbrliUnitElem        => true
+              case e: XbrliFactElem => true
+              case e: XbrliContextElem => true
+              case e: XbrliUnitElem => true
               case e: LinkFootnoteLinkElem => true
-              case e                       => false
+              case e => false
             }
             (remainder.isEmpty, remainder)
           }),
@@ -323,28 +320,28 @@ object XbrlInstanceValidationTest {
         if (e.attributeOption(ContextRefEName).isDefined) new XbrliItemElem(e) else new XbrliTupleElem(e)
       } else {
         e.resolvedName match {
-          case XbrliXbrlEName            => new XbrliXbrlElem(e)
-          case XbrliContextEName         => new XbrliContextElem(e)
-          case XbrliUnitEName            => new XbrliUnitElem(e)
-          case XbrliEntityEName          => new XbrliEntityElem(e)
-          case XbrliPeriodEName          => new XbrliPeriodElem(e)
-          case XbrliScenarioEName        => new XbrliScenarioElem(e)
-          case XbrliInstantEName         => new XbrliInstantElem(e)
-          case XbrliStartDateEName       => new XbrliStartDateElem(e)
-          case XbrliEndDateEName         => new XbrliEndDateElem(e)
-          case XbrliForeverEName         => new XbrliForeverElem(e)
-          case XbrliIdentifierEName      => new XbrliIdentifierElem(e)
-          case XbrliSegmentEName         => new XbrliSegmentElem(e)
-          case XbrliMeasureEName         => new XbrliMeasureElem(e)
-          case XbrliDivideEName          => new XbrliDivideElem(e)
-          case XbrliUnitNumeratorEName   => new XbrliUnitNumeratorElem(e)
+          case XbrliXbrlEName => new XbrliXbrlElem(e)
+          case XbrliContextEName => new XbrliContextElem(e)
+          case XbrliUnitEName => new XbrliUnitElem(e)
+          case XbrliEntityEName => new XbrliEntityElem(e)
+          case XbrliPeriodEName => new XbrliPeriodElem(e)
+          case XbrliScenarioEName => new XbrliScenarioElem(e)
+          case XbrliInstantEName => new XbrliInstantElem(e)
+          case XbrliStartDateEName => new XbrliStartDateElem(e)
+          case XbrliEndDateEName => new XbrliEndDateElem(e)
+          case XbrliForeverEName => new XbrliForeverElem(e)
+          case XbrliIdentifierEName => new XbrliIdentifierElem(e)
+          case XbrliSegmentEName => new XbrliSegmentElem(e)
+          case XbrliMeasureEName => new XbrliMeasureElem(e)
+          case XbrliDivideEName => new XbrliDivideElem(e)
+          case XbrliUnitNumeratorEName => new XbrliUnitNumeratorElem(e)
           case XbrliUnitDenominatorEName => new XbrliUnitDenominatorElem(e)
-          case LinkSchemaRefEName        => new LinkSchemaRefElem(e)
-          case LinkLinkbaseRefEName      => new LinkLinkbaseRefElem(e)
-          case LinkRoleRefEName          => new LinkRoleRefElem(e)
-          case LinkArcroleRefEName       => new LinkArcroleRefElem(e)
-          case LinkFootnoteLinkEName     => new LinkFootnoteLinkElem(e)
-          case _                         => new XbrliElem(e)
+          case LinkSchemaRefEName => new LinkSchemaRefElem(e)
+          case LinkLinkbaseRefEName => new LinkLinkbaseRefElem(e)
+          case LinkRoleRefEName => new LinkRoleRefElem(e)
+          case LinkArcroleRefEName => new LinkArcroleRefElem(e)
+          case LinkFootnoteLinkEName => new LinkFootnoteLinkElem(e)
+          case _ => new XbrliElem(e)
         }
       }
     }
@@ -412,4 +409,5 @@ object XbrlInstanceValidationTest {
       elem.resolvedName == ename
     }
   }
+
 }

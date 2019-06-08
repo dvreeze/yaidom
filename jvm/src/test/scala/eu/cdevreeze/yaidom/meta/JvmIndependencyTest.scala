@@ -18,12 +18,10 @@ package eu.cdevreeze.yaidom.meta
 
 import java.io.File
 
-import org.junit.runner.RunWith
-import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
-
 import scala.collection.immutable
 import scala.meta._
+
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * Test case checking that the "shared" code base can be used targeting Scala.js, by inspecting import statements.
@@ -33,8 +31,7 @@ import scala.meta._
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
-class JvmIndependencyTest extends FunSuite {
+class JvmIndependencyTest extends AnyFunSuite {
 
   import JvmIndependencyTest.ImportedName
 
@@ -536,13 +533,13 @@ class JvmIndependencyTest extends FunSuite {
       "AtomicLongArray",
       "AtomicReferencce",
       "AtomicReferenceArray").map(s =>
-        ImportedName(List(Term.Name("java"), Term.Name("util"), Term.Name("concurrent"), Term.Name("atomic")), Name.Indeterminate(s)))
+      ImportedName(List(Term.Name("java"), Term.Name("util"), Term.Name("concurrent"), Term.Name("atomic")), Name.Indeterminate(s)))
 
   private val allowedJavaUtilConcurrentLocksImporters: immutable.IndexedSeq[ImportedName] =
     immutable.IndexedSeq[String](
       "Lock",
       "ReentrantLock").map(s =>
-        ImportedName(List(Term.Name("java"), Term.Name("util"), Term.Name("concurrent"), Term.Name("locks")), Name.Indeterminate(s)))
+      ImportedName(List(Term.Name("java"), Term.Name("util"), Term.Name("concurrent"), Term.Name("locks")), Name.Indeterminate(s)))
 
   private val allowedJavaUtilRegexImporters: immutable.IndexedSeq[ImportedName] =
     immutable.IndexedSeq[String](
@@ -557,4 +554,5 @@ object JvmIndependencyTest {
 
     def names: immutable.IndexedSeq[Name] = termNames.toIndexedSeq :+ importeeName
   }
+
 }

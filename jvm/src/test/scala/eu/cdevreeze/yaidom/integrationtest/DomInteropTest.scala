@@ -16,18 +16,10 @@
 
 package eu.cdevreeze.yaidom.integrationtest
 
-import java.{ io => jio }
-import java.{ util => jutil }
+import java.{io => jio}
+import java.{util => jutil}
 
 import scala.collection.immutable
-
-import org.junit.runner.RunWith
-import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
-import org.xml.sax.EntityResolver
-import org.xml.sax.ErrorHandler
-import org.xml.sax.InputSource
-import org.xml.sax.SAXParseException
 
 import eu.cdevreeze.yaidom.convert.DomConversions
 import eu.cdevreeze.yaidom.convert.DomConversions.convertDocument
@@ -47,9 +39,13 @@ import eu.cdevreeze.yaidom.simple.Document
 import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.simple.EntityRef
 import eu.cdevreeze.yaidom.simple.NodeBuilder
-import eu.cdevreeze.yaidom.simple.NodeBuilder.textElem
 import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
+import org.scalatest.funsuite.AnyFunSuite
+import org.xml.sax.EntityResolver
+import org.xml.sax.ErrorHandler
+import org.xml.sax.InputSource
+import org.xml.sax.SAXParseException
 
 /**
  * DOM interoperability test case.
@@ -62,8 +58,7 @@ import javax.xml.parsers.DocumentBuilderFactory
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
-class DomInteropTest extends FunSuite {
+class DomInteropTest extends AnyFunSuite {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
@@ -1066,11 +1061,17 @@ class DomInteropTest extends FunSuite {
 
     class MyErrorHandler extends ErrorHandler {
 
-      override def error(exc: SAXParseException): Unit = { errorCount += 1 }
+      override def error(exc: SAXParseException): Unit = {
+        errorCount += 1
+      }
 
-      override def fatalError(exc: SAXParseException): Unit = { fatalErrorCount += 1 }
+      override def fatalError(exc: SAXParseException): Unit = {
+        fatalErrorCount += 1
+      }
 
-      override def warning(exc: SAXParseException): Unit = { warningCount += 1 }
+      override def warning(exc: SAXParseException): Unit = {
+        warningCount += 1
+      }
     }
 
     val dbf = DocumentBuilderFactory.newInstance
@@ -1125,7 +1126,7 @@ class DomInteropTest extends FunSuite {
       recordsElm.findAllElemsOrSelf.size
     }
 
-    val firstRecordElm = (recordsElm \ (_.localName == "car"))(0)
+    val firstRecordElm = (recordsElm \ (_.localName == "car")) (0)
 
     assertResult("car") {
       firstRecordElm.localName
@@ -1209,4 +1210,5 @@ class DomInteropTest extends FunSuite {
       null
     }
   }
+
 }

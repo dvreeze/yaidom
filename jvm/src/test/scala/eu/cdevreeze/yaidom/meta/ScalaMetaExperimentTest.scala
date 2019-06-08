@@ -16,11 +16,9 @@
 
 package eu.cdevreeze.yaidom.meta
 
-import org.junit.runner.RunWith
-import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
-
 import scala.meta._
+
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * Test case experimenting with Scala.meta. This experiment helps in writing a test case that checks for unidirectional
@@ -28,8 +26,7 @@ import scala.meta._
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
-class ScalaMetaExperimentTest extends FunSuite {
+class ScalaMetaExperimentTest extends AnyFunSuite {
 
   test("testSimplePackageImport") {
     // Building a Tree using quasi-quotes, and manually, and comparing the two
@@ -86,7 +83,9 @@ class ScalaMetaExperimentTest extends FunSuite {
     }
     assertResult(Seq("core")) {
       val importees = import1 collect { case imp: Importee => imp }
-      importees flatMap { _ collect { case Name.Indeterminate(n) => n } }
+      importees flatMap {
+        _ collect { case Name.Indeterminate(n) => n }
+      }
     }
   }
 
@@ -151,11 +150,13 @@ class ScalaMetaExperimentTest extends FunSuite {
         Importee.Name(Name.Indeterminate("Path")),
         Importee.Name(Name.Indeterminate("EName"))).map(_.structure)) {
 
-        import1 collect { case imp: Importee => imp } map (_.structure)
-      }
+      import1 collect { case imp: Importee => imp } map (_.structure)
+    }
     assertResult(Seq("Scope", "Path", "EName")) {
       val importees = import1 collect { case imp: Importee => imp }
-      importees flatMap { _ collect { case Name.Indeterminate(n) => n } }
+      importees flatMap {
+        _ collect { case Name.Indeterminate(n) => n }
+      }
     }
   }
 
@@ -216,11 +217,13 @@ class ScalaMetaExperimentTest extends FunSuite {
       List(
         Importee.Rename(Name.Indeterminate("Elem"), Name.Indeterminate("IndexedElem"))).map(_.structure)) {
 
-        import1 collect { case imp: Importee => imp } map (_.structure)
-      }
+      import1 collect { case imp: Importee => imp } map (_.structure)
+    }
     assertResult(Seq("Elem", "IndexedElem")) {
       val importees = import1 collect { case imp: Importee => imp }
-      importees flatMap { _ collect { case Name.Indeterminate(n) => n } }
+      importees flatMap {
+        _ collect { case Name.Indeterminate(n) => n }
+      }
     }
   }
 

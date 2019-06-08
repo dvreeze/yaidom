@@ -16,15 +16,8 @@
 
 package eu.cdevreeze.yaidom.integrationtest
 
-import java.{ io => jio }
-import java.{ util => jutil }
-
-import org.ccil.cowan.tagsoup.jaxp.SAXFactoryImpl
-import org.junit.runner.RunWith
-import org.scalatest.BeforeAndAfterAll
-import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
-import org.xml.sax.InputSource
+import java.{io => jio}
+import java.{util => jutil}
 
 import eu.cdevreeze.yaidom.convert.ScalaXmlConversions.convertToElem
 import eu.cdevreeze.yaidom.core.QName
@@ -33,14 +26,17 @@ import eu.cdevreeze.yaidom.print.DocumentPrinterUsingDom
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi.withNoNsEName
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.simple.Elem
+import org.ccil.cowan.tagsoup.jaxp.SAXFactoryImpl
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.funsuite.AnyFunSuite
+import org.xml.sax.InputSource
 
 /**
  * HTML support test case.
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
-class HtmlTest extends FunSuite with BeforeAndAfterAll {
+class HtmlTest extends AnyFunSuite with BeforeAndAfterAll {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
@@ -59,7 +55,9 @@ class HtmlTest extends FunSuite with BeforeAndAfterAll {
       firstLiOption.isDefined
     }
 
-    val expectedLi = convertToElem(<li><a href="index.html">Home page</a></li>)
+    val expectedLi = convertToElem(<li>
+      <a href="index.html">Home page</a>
+    </li>)
 
     def keepHref(elem: Elem): Elem = {
       require(elem.localName == "li")

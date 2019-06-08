@@ -16,12 +16,6 @@
 
 package eu.cdevreeze.yaidom.integrationtest
 
-import scala.Vector
-
-import org.junit.runner.RunWith
-import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
-
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
@@ -29,6 +23,7 @@ import eu.cdevreeze.yaidom.queryapi.ElemWithPath
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.simple.Node
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * Test case simulating XSLT. Thanks to Daniel K. Schneider for the examples.
@@ -36,8 +31,7 @@ import eu.cdevreeze.yaidom.simple.Node
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
-class SimulateXsltTest extends FunSuite {
+class SimulateXsltTest extends AnyFunSuite {
 
   import Node._
 
@@ -72,12 +66,12 @@ class SimulateXsltTest extends FunSuite {
                     scope,
                     Vector(
                       textElem(QName("title"), scope, title)))).
-                  plusChild(
-                    elem(
-                      QName("body"),
-                      Vector(QName("bgcolor") -> "#ffffff"),
-                      scope,
-                      elm.findAllChildElems))
+                plusChild(
+                  elem(
+                    QName("body"),
+                    Vector(QName("bgcolor") -> "#ffffff"),
+                    scope,
+                    elm.findAllChildElems))
             Some(html)
           case _ =>
             None
@@ -118,12 +112,12 @@ class SimulateXsltTest extends FunSuite {
                     scope,
                     Vector(
                       textElem(QName("title"), scope, title)))).
-                  plusChild(
-                    elem(
-                      QName("body"),
-                      Vector(QName("bgcolor") -> "#ffffff"),
-                      scope,
-                      elm.findAllChildElems))
+                plusChild(
+                  elem(
+                    QName("body"),
+                    Vector(QName("bgcolor") -> "#ffffff"),
+                    scope,
+                    elm.findAllChildElems))
             Vector(html)
           case _ =>
             Vector(elm)

@@ -16,17 +16,15 @@
 
 package eu.cdevreeze.yaidom.integrationtest
 
-import org.junit.runner.RunWith
-import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
-import eu.cdevreeze.yaidom.convert.ScalaXmlConversions._
 import eu.cdevreeze.yaidom.convert
+import eu.cdevreeze.yaidom.convert.ScalaXmlConversions._
+import eu.cdevreeze.yaidom.core.Path
+import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.dom
 import eu.cdevreeze.yaidom.indexed
 import eu.cdevreeze.yaidom.resolved
-import eu.cdevreeze.yaidom.core.Path
-import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.simple.Elem
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * Alternative updates test case. It demonstrates many ways of performing functional updates.
@@ -37,8 +35,7 @@ import eu.cdevreeze.yaidom.simple.Elem
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
-class AlternativeUpdatesTest extends FunSuite {
+class AlternativeUpdatesTest extends AnyFunSuite {
 
   test("testRetainFirstAuthorsUsingTransformElemsOrSelf") {
     val updatedElem = bookstore transformElemsOrSelf {

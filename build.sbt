@@ -10,7 +10,7 @@
 import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 
 val scalaVer = "2.12.8"
-val crossScalaVer = Seq(scalaVer, "2.11.12", "2.13.0-M5")
+val crossScalaVer = Seq(scalaVer, "2.11.12", "2.13.0-RC3")
 
 lazy val commonSettings = Seq(
   name         := "yaidom",
@@ -40,12 +40,19 @@ lazy val commonSettings = Seq(
   pomExtra := pomData,
   pomIncludeRepository := { _ => false },
 
-  libraryDependencies += "org.scala-lang.modules" %%% "scala-xml" % "1.1.0",
+  libraryDependencies += "org.scala-lang.modules" %%% "scala-xml" % "1.2.0",
 
   libraryDependencies ++= {
     scalaBinaryVersion.value match {
-      case "2.13.0-M5" => Seq("org.scalatest" %%% "scalatest" % "3.0.6-SNAP5" % "test")
-      case _           => Seq("org.scalatest" %%% "scalatest" % "3.0.5" % "test")
+      case "2.13.0-RC3" => Seq("org.scalatest" %%% "scalatest" % "3.1.0-SNAP12" % "test")
+      case _            => Seq("org.scalatest" %%% "scalatest" % "3.0.7" % "test")
+    }
+  },
+
+  libraryDependencies ++= {
+    scalaBinaryVersion.value match {
+      case "2.13.0-RC3" => Seq("org.scalatestplus" %%% "scalatestplus-scalacheck" % "1.0.0-SNAP7" % "test")
+      case _            => Seq("org.scalatestplus" %%% "scalatestplus-scalacheck" % "1.0.0-SNAP7" % "test")
     }
   }
 )
@@ -71,7 +78,12 @@ lazy val yaidom = crossProject(JSPlatform, JVMPlatform)
 
     libraryDependencies += "net.sf.saxon" % "Saxon-HE" % "9.8.0-14",
 
-    libraryDependencies += "org.scala-lang.modules" %%% "scala-java8-compat" % "0.9.0",
+    libraryDependencies ++= {
+      scalaBinaryVersion.value match {
+        case "2.13.0-RC3" => Seq()
+        case _            => Seq("org.scala-lang.modules" %%% "scala-java8-compat" % "0.9.0")
+      }
+    },
 
     libraryDependencies += "com.github.ben-manes.caffeine" % "caffeine" % "2.6.2",
 
@@ -87,8 +99,8 @@ lazy val yaidom = crossProject(JSPlatform, JVMPlatform)
 
     libraryDependencies ++= {
       scalaBinaryVersion.value match {
-        case "2.13.0-M5" => Seq()
-        case _           => Seq("org.scalameta" %%% "scalameta" % "3.7.4" % "test")
+        case "2.13.0-RC3" => Seq()
+        case _            => Seq("org.scalameta" %%% "scalameta" % "3.7.4" % "test")
       }
     },
 
@@ -102,12 +114,29 @@ lazy val yaidom = crossProject(JSPlatform, JVMPlatform)
 
     libraryDependencies += "org.codehaus.woodstox" % "stax2-api" % "4.1" % "test",
 
+    Compile / unmanagedSourceDirectories += {
+      val sourceDir = (Compile / sourceDirectory).value
+      CrossVersion.partialVersion(scalaVersion.value) match {
+        case Some((2, n)) if n >= 13 => sourceDir / "scala-2.13+"
+        case _                       => sourceDir / "scala-2.13-"
+      }
+    },
+
+    Test / unmanagedSourceDirectories += {
+      val sourceDir = (Test / sourceDirectory).value
+      CrossVersion.partialVersion(scalaVersion.value) match {
+        case Some((2, n)) if n >= 13 => sourceDir / "scala-2.13+"
+        case _                       => sourceDir / "scala-2.13-"
+      }
+    },
+
     // Excluding UpdateTest in Scala 2.13.0-M5 build due to regression:
     // "inferred type ... contains type selection from volatile type ..."
 
     Test / unmanagedSources / excludeFilter := {
-      if (scalaBinaryVersion.value == "2.13.0-M5") {
+      if (scalaBinaryVersion.value == "2.13.0-RC3") {
         new SimpleFileFilter(f =>
+          f.toString.contains("java8") ||
           f.toString.contains("ScalaMetaExperimentTest") ||
           f.toString.contains("JvmIndependencyTest") ||
           f.toString.contains("PackageDependencyTest") ||
@@ -134,8 +163,8 @@ lazy val yaidom = crossProject(JSPlatform, JVMPlatform)
 
     libraryDependencies ++= {
       scalaBinaryVersion.value match {
-        case "2.13.0-M5" => Seq()
-        case _           =>
+        case "2.13.0-RC3" => Seq()
+        case _            =>
           Seq(
             "com.zoepepper" %%% "scalajs-jsjoda" % "1.1.1",
             "com.zoepepper" %%% "scalajs-jsjoda-as-java-time" % "1.1.1")
@@ -144,28 +173,28 @@ lazy val yaidom = crossProject(JSPlatform, JVMPlatform)
 
     jsDependencies ++= {
       scalaBinaryVersion.value match {
-        case "2.13.0-M5" => Seq()
-        case _           =>
+        case "2.13.0-RC3" => Seq()
+        case _            =>
           Seq(
             "org.webjars.npm" % "js-joda" % "1.3.0" / "dist/js-joda.js" minified "dist/js-joda.min.js",
             "org.webjars.npm" % "js-joda-timezone" % "1.0.0" / "dist/js-joda-timezone.js" minified "dist/js-joda-timezone.min.js")
       }
     },
 
-    libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "0.9.6",
+    libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "0.9.7",
 
     libraryDependencies ++= {
       scalaBinaryVersion.value match {
-        case "2.13.0-M5" => Seq()
-        case _           => Seq("com.lihaoyi" %%% "scalatags" % "0.6.7" % "optional")
+        case "2.13.0-RC3" => Seq()
+        case _            => Seq("com.lihaoyi" %%% "scalatags" % "0.6.7" % "optional")
       }
     },
 
     Test / parallelExecution := false,
 
     Compile / unmanagedSources / excludeFilter := {
-      if (scalaBinaryVersion.value == "2.13.0-M5") {
-        new SimpleFileFilter(f => f.toString.contains("jsdemoapp"))
+      if (scalaBinaryVersion.value == "2.13.0-RC3") {
+        new SimpleFileFilter(f => f.toString.contains("java8") || f.toString.contains("jsdemoapp"))
       } else {
         NothingFilter
       }

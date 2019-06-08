@@ -18,9 +18,9 @@ package eu.cdevreeze.yaidom.queryapitests.scalaxml
 
 import java.{ util => jutil }
 
-import org.junit.runner.RunWith
+
 import org.xml.sax.InputSource
-import org.scalatest.junit.JUnitRunner
+
 
 import eu.cdevreeze.yaidom.queryapitests.AbstractScopedElemLikeQueryTest
 import eu.cdevreeze.yaidom.scalaxml.ScalaXmlElem
@@ -31,7 +31,7 @@ import eu.cdevreeze.yaidom.scalaxml.ScalaXmlNode
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
+
 class ScopedElemLikeQueryTest extends AbstractScopedElemLikeQueryTest {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.queryapitests.scalaxml")

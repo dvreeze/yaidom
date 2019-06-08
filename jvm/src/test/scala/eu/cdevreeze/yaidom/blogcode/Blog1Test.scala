@@ -16,10 +16,8 @@
 
 package eu.cdevreeze.yaidom.blogcode
 
-import org.junit.runner.RunWith
-import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * Code of yaidom blog 1 ("yaidom querying"). The blog uses examples from the coursera course Introduction to Databases,
@@ -43,8 +41,7 @@ import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
-class Blog1Test extends FunSuite {
+class Blog1Test extends AnyFunSuite {
 
   private val pathToParentDir: java.io.File =
     (new java.io.File(classOf[Blog1Test].getResource("books.xml").toURI)).getParentFile
@@ -54,8 +51,9 @@ class Blog1Test extends FunSuite {
    */
   test("testIntroductionToYaidomQuerying") {
     import java.io.File
-    import eu.cdevreeze.yaidom.simple._
+
     import eu.cdevreeze.yaidom.parse._
+    import eu.cdevreeze.yaidom.simple._
 
     // Using a yaidom DocumentParser that used DOM internally
     val docParser = DocumentParserUsingDom.newInstance
@@ -105,13 +103,15 @@ class Blog1Test extends FunSuite {
     // Start of section that does not need to be copied again
 
     import java.io.File
-    import javax.xml.parsers._
+
     import scala.collection.immutable
-    import eu.cdevreeze.yaidom.simple._
-    import eu.cdevreeze.yaidom.parse._
-    import eu.cdevreeze.yaidom.resolved
+
     import eu.cdevreeze.yaidom.dom
     import eu.cdevreeze.yaidom.indexed
+    import eu.cdevreeze.yaidom.parse._
+    import eu.cdevreeze.yaidom.resolved
+    import eu.cdevreeze.yaidom.simple._
+    import javax.xml.parsers._
 
     val ns = "http://bookstore"
 
@@ -202,8 +202,9 @@ class Blog1Test extends FunSuite {
     // Start of section that does not need to be copied again
 
     import java.io.File
-    import eu.cdevreeze.yaidom.simple._
+
     import eu.cdevreeze.yaidom.parse._
+    import eu.cdevreeze.yaidom.simple._
 
     // Using a yaidom DocumentParser that used DOM internally
     val docParser = DocumentParserUsingDom.newInstance

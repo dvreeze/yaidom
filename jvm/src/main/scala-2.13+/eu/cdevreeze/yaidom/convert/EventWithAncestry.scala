@@ -16,9 +16,9 @@
 
 package eu.cdevreeze.yaidom.convert
 
-import scala.collection.BufferedIterator
-import scala.collection.JavaConverters.asScalaIteratorConverter
+import scala.jdk.CollectionConverters._
 import scala.collection.immutable
+import scala.collection.BufferedIterator
 
 import eu.cdevreeze.yaidom.core.AncestryPath
 import eu.cdevreeze.yaidom.core.Declarations
@@ -27,7 +27,7 @@ import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.QNameProvider
 import eu.cdevreeze.yaidom.core.Scope
 import javax.xml.XMLConstants
-import javax.xml.namespace.{ QName => JQName }
+import javax.xml.namespace.{QName => JQName}
 import javax.xml.stream.events.Attribute
 import javax.xml.stream.events.Namespace
 import javax.xml.stream.events.StartElement

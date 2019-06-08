@@ -18,11 +18,6 @@ package eu.cdevreeze.yaidom.integrationtest
 
 import java.io.StringReader
 
-import org.junit.runner.RunWith
-import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
-import org.xml.sax.InputSource
-
 import eu.cdevreeze.yaidom.convert.DomConversions
 import eu.cdevreeze.yaidom.convert.ScalaXmlConversions
 import eu.cdevreeze.yaidom.core.EName
@@ -39,14 +34,15 @@ import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.scalaxml.ScalaXmlElem
 import eu.cdevreeze.yaidom.simple.Document
 import eu.cdevreeze.yaidom.simple.Elem
+import org.scalatest.funsuite.AnyFunSuite
+import org.xml.sax.InputSource
 
 /**
  * Indexed element test.
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
-class IndexedElemTest extends FunSuite {
+class IndexedElemTest extends AnyFunSuite {
 
   test("testIndexingForSimpleElem") {
     doTestIndexing[Elem, indexed.Elem](IndexedScopedElem(docWithCommentAtEnd.documentElement))

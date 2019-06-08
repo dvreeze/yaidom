@@ -16,10 +16,7 @@
 
 package eu.cdevreeze.yaidom.integrationtest
 
-import java.{ io => jio }
-
-import org.scalatest.FunSuite
-import org.xml.sax.InputSource
+import java.{io => jio}
 
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
@@ -30,6 +27,8 @@ import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.simple.Document
 import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.simple.NodeBuilder
+import org.scalatest.funsuite.AnyFunSuite
+import org.xml.sax.InputSource
 
 /**
  * Test case testing the use of namespaces in immutable Documents.
@@ -39,7 +38,7 @@ import eu.cdevreeze.yaidom.simple.NodeBuilder
  *
  * @author Chris de Vreeze
  */
-abstract class AbstractOtherNamespaceTest extends FunSuite {
+abstract class AbstractOtherNamespaceTest extends AnyFunSuite {
 
   def documentParser: DocumentParser
 
@@ -56,13 +55,17 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
     val doc = documentParser.parse(new InputSource(new jio.StringReader(xml)))
 
     assertResult(List(QName("prod", "product"), QName("prod", "number"), QName("prod", "size"))) {
-      doc.documentElement.findAllElemsOrSelf map { _.qname }
+      doc.documentElement.findAllElemsOrSelf map {
+        _.qname
+      }
     }
 
     val ns = "http://datypic.com/prod"
 
     assertResult(List(EName(ns, "product"), EName(ns, "number"), EName(ns, "size"))) {
-      doc.documentElement.findAllElemsOrSelf map { _.resolvedName }
+      doc.documentElement.findAllElemsOrSelf map {
+        _.resolvedName
+      }
     }
 
     assertResult(Nil) {
@@ -113,8 +116,10 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
         QName("prod", "product"),
         QName("prod", "number"),
         QName("prod", "size"))) {
-        doc.documentElement.findAllElemsOrSelf map { _.qname }
+      doc.documentElement.findAllElemsOrSelf map {
+        _.qname
       }
+    }
 
     val nsOrd = "http://datypic.com/ord"
     val nsProd = "http://datypic.com/prod"
@@ -127,8 +132,10 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
         EName(nsProd, "product"),
         EName(nsProd, "number"),
         EName(nsProd, "size"))) {
-        doc.documentElement.findAllElemsOrSelf map { _.resolvedName }
+      doc.documentElement.findAllElemsOrSelf map {
+        _.resolvedName
       }
+    }
 
     assertResult(Nil) {
       doc.documentElement.attributes
@@ -183,8 +190,10 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
         QName("prod", "product"),
         QName("prod", "number"),
         QName("prod", "size"))) {
-        doc.documentElement.findAllElemsOrSelf map { _.qname }
+      doc.documentElement.findAllElemsOrSelf map {
+        _.qname
       }
+    }
 
     val nsOrd = "http://datypic.com/ord"
     val nsProd = "http://datypic.com/prod"
@@ -197,8 +206,10 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
         EName(nsProd, "product"),
         EName(nsProd, "number"),
         EName(nsProd, "size"))) {
-        doc.documentElement.findAllElemsOrSelf map { _.resolvedName }
+      doc.documentElement.findAllElemsOrSelf map {
+        _.resolvedName
       }
+    }
 
     assertResult(Nil) {
       doc.documentElement.attributes
@@ -257,11 +268,15 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
         EName(nsProd, "product"),
         EName(nsProd, "number"),
         EName(nsProd, "size"))) {
-        resolvedEquivalentElem.findAllElemsOrSelf map { _.resolvedName }
+      resolvedEquivalentElem.findAllElemsOrSelf map {
+        _.resolvedName
       }
+    }
 
     assertResult(resolvedEquivalentElem.findAllElemsOrSelf map (_.resolvedName)) {
-      resolvedElem.findAllElemsOrSelf map { _.resolvedName }
+      resolvedElem.findAllElemsOrSelf map {
+        _.resolvedName
+      }
     }
 
     assertResult(resolvedEquivalentElem) {
@@ -292,8 +307,10 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
         QName("prod", "product"),
         QName("prod", "number"),
         QName("prod", "size"))) {
-        doc.documentElement.findAllElemsOrSelf map { _.qname }
+      doc.documentElement.findAllElemsOrSelf map {
+        _.qname
       }
+    }
 
     val nsOrd = "http://datypic.com/ord"
     val nsProd = "http://datypic.com/prod"
@@ -306,8 +323,10 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
         EName(nsProd, "product"),
         EName(nsProd, "number"),
         EName(nsProd, "size"))) {
-        doc.documentElement.findAllElemsOrSelf map { _.resolvedName }
+      doc.documentElement.findAllElemsOrSelf map {
+        _.resolvedName
       }
+    }
 
     assertResult(Nil) {
       doc.documentElement.attributes
@@ -366,11 +385,15 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
         EName(nsProd, "product"),
         EName(nsProd, "number"),
         EName(nsProd, "size"))) {
-        resolvedEquivalentElem.findAllElemsOrSelf map { _.resolvedName }
+      resolvedEquivalentElem.findAllElemsOrSelf map {
+        _.resolvedName
       }
+    }
 
     assertResult(resolvedEquivalentElem.findAllElemsOrSelf map (_.resolvedName)) {
-      resolvedElem.findAllElemsOrSelf map { _.resolvedName }
+      resolvedElem.findAllElemsOrSelf map {
+        _.resolvedName
+      }
     }
 
     assertResult(resolvedEquivalentElem) {
@@ -425,8 +448,10 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
         QName("prod", "product"),
         QName("prod", "number"),
         QName("prod", "size"))) {
-        doc.documentElement.findAllElemsOrSelf map { _.qname }
+      doc.documentElement.findAllElemsOrSelf map {
+        _.qname
       }
+    }
 
     val nsOrd = "http://datypic.com/ord"
     val nsProd = "http://datypic.com/prod"
@@ -440,8 +465,10 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
         EName(nsProd, "product"),
         EName(nsProd2, "number"),
         EName(nsProd, "size"))) {
-        doc.documentElement.findAllElemsOrSelf map { _.resolvedName }
+      doc.documentElement.findAllElemsOrSelf map {
+        _.resolvedName
       }
+    }
 
     assertResult(Nil) {
       doc.documentElement.attributes
@@ -510,11 +537,15 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
         EName(nsProd, "product"),
         EName(nsProd2, "number"),
         EName(nsProd, "size"))) {
-        resolvedEquivalentElem.findAllElemsOrSelf map { _.resolvedName }
+      resolvedEquivalentElem.findAllElemsOrSelf map {
+        _.resolvedName
       }
+    }
 
     assertResult(resolvedEquivalentElem.findAllElemsOrSelf map (_.resolvedName)) {
-      resolvedElem.findAllElemsOrSelf map { _.resolvedName }
+      resolvedElem.findAllElemsOrSelf map {
+        _.resolvedName
+      }
     }
 
     assertResult(resolvedEquivalentElem) {
@@ -545,8 +576,10 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
         QName("product"),
         QName("number"),
         QName("size"))) {
-        doc.documentElement.findAllElemsOrSelf map { _.qname }
+      doc.documentElement.findAllElemsOrSelf map {
+        _.qname
       }
+    }
 
     val nsOrd = "http://datypic.com/ord"
     val nsProd = "http://datypic.com/prod"
@@ -559,8 +592,10 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
         EName(nsProd, "product"),
         EName(nsProd, "number"),
         EName(nsProd, "size"))) {
-        doc.documentElement.findAllElemsOrSelf map { _.resolvedName }
+      doc.documentElement.findAllElemsOrSelf map {
+        _.resolvedName
       }
+    }
 
     assertResult(Nil) {
       doc.documentElement.attributes
@@ -619,11 +654,15 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
         EName(nsProd, "product"),
         EName(nsProd, "number"),
         EName(nsProd, "size"))) {
-        resolvedEquivalentElem.findAllElemsOrSelf map { _.resolvedName }
+      resolvedEquivalentElem.findAllElemsOrSelf map {
+        _.resolvedName
       }
+    }
 
     assertResult(resolvedEquivalentElem.findAllElemsOrSelf map (_.resolvedName)) {
-      resolvedElem.findAllElemsOrSelf map { _.resolvedName }
+      resolvedElem.findAllElemsOrSelf map {
+        _.resolvedName
+      }
     }
 
     assertResult(resolvedEquivalentElem) {
@@ -654,8 +693,10 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
         QName("product"),
         QName("number"),
         QName("size"))) {
-        doc.documentElement.findAllElemsOrSelf map { _.qname }
+      doc.documentElement.findAllElemsOrSelf map {
+        _.qname
       }
+    }
 
     val nsOrd = "http://datypic.com/ord"
 
@@ -667,8 +708,10 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
         EName("product"),
         EName("number"),
         EName("size"))) {
-        doc.documentElement.findAllElemsOrSelf map { _.resolvedName }
+      doc.documentElement.findAllElemsOrSelf map {
+        _.resolvedName
       }
+    }
 
     assertResult(Nil) {
       doc.documentElement.attributes
@@ -723,8 +766,10 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
         QName("prod", "product"),
         QName("prod", "number"),
         QName("prod", "size"))) {
-        doc.documentElement.findAllElemsOrSelf map { _.qname }
+      doc.documentElement.findAllElemsOrSelf map {
+        _.qname
       }
+    }
 
     val nsOrd = "http://datypic.com/ord"
     val nsProd = "http://datypic.com/prod"
@@ -737,8 +782,10 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
         EName(nsProd, "product"),
         EName(nsProd, "number"),
         EName(nsProd, "size"))) {
-        doc.documentElement.findAllElemsOrSelf map { _.resolvedName }
+      doc.documentElement.findAllElemsOrSelf map {
+        _.resolvedName
       }
+    }
 
     assertResult(Nil) {
       doc.documentElement.attributes
@@ -797,11 +844,15 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
         EName(nsProd, "product"),
         EName(nsProd, "number"),
         EName(nsProd, "size"))) {
-        resolvedEquivalentElem.findAllElemsOrSelf map { _.resolvedName }
+      resolvedEquivalentElem.findAllElemsOrSelf map {
+        _.resolvedName
       }
+    }
 
     assertResult(resolvedEquivalentElem.findAllElemsOrSelf map (_.resolvedName)) {
-      resolvedElem.findAllElemsOrSelf map { _.resolvedName }
+      resolvedElem.findAllElemsOrSelf map {
+        _.resolvedName
+      }
     }
 
     assertResult(resolvedEquivalentElem) {
@@ -821,14 +872,18 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
     val doc = documentParser.parse(new InputSource(new jio.StringReader(xml)))
 
     assertResult(List(QName("product"), QName("number"), QName("size"))) {
-      doc.documentElement.findAllElemsOrSelf map { _.qname }
+      doc.documentElement.findAllElemsOrSelf map {
+        _.qname
+      }
     }
 
     val ns = "http://datypic.com/prod"
     val nsApp = "http://datypic.com/app"
 
     assertResult(List(EName(ns, "product"), EName(ns, "number"), EName(ns, "size"))) {
-      doc.documentElement.findAllElemsOrSelf map { _.resolvedName }
+      doc.documentElement.findAllElemsOrSelf map {
+        _.resolvedName
+      }
     }
 
     assertResult(Nil) {
@@ -867,13 +922,17 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
     val doc = documentParser.parse(new InputSource(new jio.StringReader(xml)))
 
     assertResult(List(QName("product"), QName("number"), QName("size"))) {
-      doc.documentElement.findAllElemsOrSelf map { _.qname }
+      doc.documentElement.findAllElemsOrSelf map {
+        _.qname
+      }
     }
 
     val ns = "http://datypic.com/prod"
 
     assertResult(List(EName(ns, "product"), EName(ns, "number"), EName(ns, "size"))) {
-      doc.documentElement.findAllElemsOrSelf map { _.resolvedName }
+      doc.documentElement.findAllElemsOrSelf map {
+        _.resolvedName
+      }
     }
 
     assertResult(Nil) {
@@ -946,8 +1005,10 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
         QName("name"),
         QName("prod", "size"),
         QName("prod", "color"))) {
-        doc.documentElement.findAllElemsOrSelf map { _.qname }
+      doc.documentElement.findAllElemsOrSelf map {
+        _.qname
       }
+    }
 
     val nsOrd = "http://datypic.com/ord"
     val nsProd = "http://datypic.com/prod"
@@ -964,8 +1025,10 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
         EName("name"),
         EName(nsProd, "size"),
         EName(nsProd2, "color"))) {
-        doc.documentElement.findAllElemsOrSelf map { _.resolvedName }
+      doc.documentElement.findAllElemsOrSelf map {
+        _.resolvedName
       }
+    }
 
     assertResult(Nil) {
       doc.documentElement.attributes
@@ -1047,11 +1110,15 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
         EName("name"),
         EName(nsProd, "size"),
         EName(nsProd2, "color"))) {
-        resolvedEquivalentElem.findAllElemsOrSelf map { _.resolvedName }
+      resolvedEquivalentElem.findAllElemsOrSelf map {
+        _.resolvedName
       }
+    }
 
     assertResult(resolvedEquivalentElem.findAllElemsOrSelf map (_.resolvedName)) {
-      resolvedElem.findAllElemsOrSelf map { _.resolvedName }
+      resolvedElem.findAllElemsOrSelf map {
+        _.resolvedName
+      }
     }
 
     assertResult(resolvedEquivalentElem) {
@@ -1070,13 +1137,17 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
     val doc = documentParser.parse(new InputSource(new jio.StringReader(xml)))
 
     assertResult(List(QName("prod", "product"), QName("prod", "number"), QName("prod", "size"))) {
-      doc.documentElement.findAllElemsOrSelf map { _.qname }
+      doc.documentElement.findAllElemsOrSelf map {
+        _.qname
+      }
     }
 
     val ns = "http://datypic.com/prod"
 
     assertResult(List(EName(ns, "product"), EName(ns, "number"), EName(ns, "size"))) {
-      doc.documentElement.findAllElemsOrSelf map { _.resolvedName }
+      doc.documentElement.findAllElemsOrSelf map {
+        _.resolvedName
+      }
     }
 
     val fixedDoc = organizeNamespaces(doc)
@@ -1114,8 +1185,10 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
         QName("prod", "product"),
         QName("prod", "number"),
         QName("prod", "size"))) {
-        doc.documentElement.findAllElemsOrSelf map { _.qname }
+      doc.documentElement.findAllElemsOrSelf map {
+        _.qname
       }
+    }
 
     val nsOrd = "http://datypic.com/ord"
     val nsProd = "http://datypic.com/prod"
@@ -1128,8 +1201,10 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
         EName(nsProd, "product"),
         EName(nsProd, "number"),
         EName(nsProd, "size"))) {
-        doc.documentElement.findAllElemsOrSelf map { _.resolvedName }
+      doc.documentElement.findAllElemsOrSelf map {
+        _.resolvedName
       }
+    }
 
     val fixedDoc = organizeNamespaces(doc)
 
@@ -1166,8 +1241,10 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
         QName("prod", "product"),
         QName("prod", "number"),
         QName("prod", "size"))) {
-        doc.documentElement.findAllElemsOrSelf map { _.qname }
+      doc.documentElement.findAllElemsOrSelf map {
+        _.qname
       }
+    }
 
     val nsOrd = "http://datypic.com/ord"
     val nsProd = "http://datypic.com/prod"
@@ -1180,8 +1257,10 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
         EName(nsProd, "product"),
         EName(nsProd, "number"),
         EName(nsProd, "size"))) {
-        doc.documentElement.findAllElemsOrSelf map { _.resolvedName }
+      doc.documentElement.findAllElemsOrSelf map {
+        _.resolvedName
       }
+    }
 
     val fixedDoc = organizeNamespaces(doc)
 
@@ -1217,8 +1296,10 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
         QName("prod", "product"),
         QName("prod", "number"),
         QName("prod", "size"))) {
-        doc.documentElement.findAllElemsOrSelf map { _.qname }
+      doc.documentElement.findAllElemsOrSelf map {
+        _.qname
       }
+    }
 
     val nsOrd = "http://datypic.com/ord"
     val nsProd = "http://datypic.com/prod"
@@ -1231,8 +1312,10 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
         EName(nsProd, "product"),
         EName(nsProd, "number"),
         EName(nsProd, "size"))) {
-        doc.documentElement.findAllElemsOrSelf map { _.resolvedName }
+      doc.documentElement.findAllElemsOrSelf map {
+        _.resolvedName
       }
+    }
 
     val fixedDoc = organizeNamespaces(doc)
 
@@ -1274,8 +1357,10 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
         QName("prod", "product"),
         QName("prod", "number"),
         QName("prod", "size"))) {
-        doc.documentElement.findAllElemsOrSelf map { _.qname }
+      doc.documentElement.findAllElemsOrSelf map {
+        _.qname
       }
+    }
 
     val nsOrd = "http://datypic.com/ord"
     val nsProd = "http://datypic.com/prod"
@@ -1289,8 +1374,10 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
         EName(nsProd, "product"),
         EName(nsProd2, "number"),
         EName(nsProd, "size"))) {
-        doc.documentElement.findAllElemsOrSelf map { _.resolvedName }
+      doc.documentElement.findAllElemsOrSelf map {
+        _.resolvedName
       }
+    }
 
     val fixedDoc = organizeNamespaces(doc)
 
@@ -1330,8 +1417,10 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
         QName("product"),
         QName("number"),
         QName("size"))) {
-        doc.documentElement.findAllElemsOrSelf map { _.qname }
+      doc.documentElement.findAllElemsOrSelf map {
+        _.qname
       }
+    }
 
     val nsOrd = "http://datypic.com/ord"
     val nsProd = "http://datypic.com/prod"
@@ -1344,8 +1433,10 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
         EName(nsProd, "product"),
         EName(nsProd, "number"),
         EName(nsProd, "size"))) {
-        doc.documentElement.findAllElemsOrSelf map { _.resolvedName }
+      doc.documentElement.findAllElemsOrSelf map {
+        _.resolvedName
       }
+    }
 
     val fixedDoc = organizeNamespaces(doc)
 
@@ -1385,8 +1476,10 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
         QName("product"),
         QName("number"),
         QName("size"))) {
-        doc.documentElement.findAllElemsOrSelf map { _.qname }
+      doc.documentElement.findAllElemsOrSelf map {
+        _.qname
       }
+    }
 
     val nsOrd = "http://datypic.com/ord"
 
@@ -1398,8 +1491,10 @@ abstract class AbstractOtherNamespaceTest extends FunSuite {
         EName("product"),
         EName("number"),
         EName("size"))) {
-        doc.documentElement.findAllElemsOrSelf map { _.resolvedName }
+      doc.documentElement.findAllElemsOrSelf map {
+        _.resolvedName
       }
+    }
 
     val fixedDoc = organizeNamespaces(doc)
 

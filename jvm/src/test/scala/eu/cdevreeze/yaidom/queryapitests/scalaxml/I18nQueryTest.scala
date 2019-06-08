@@ -16,8 +16,8 @@
 
 package eu.cdevreeze.yaidom.queryapitests.scalaxml
 
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
+
+
 
 import eu.cdevreeze.yaidom.queryapitests.AbstractI18nQueryTest
 import eu.cdevreeze.yaidom.scalaxml.ScalaXmlElem
@@ -28,7 +28,7 @@ import eu.cdevreeze.yaidom.scalaxml.ScalaXmlNode
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
+
 class I18nQueryTest extends AbstractI18nQueryTest {
 
   final type E = ScalaXmlElem

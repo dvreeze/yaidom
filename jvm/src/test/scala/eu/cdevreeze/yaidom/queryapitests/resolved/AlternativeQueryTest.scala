@@ -16,8 +16,8 @@
 
 package eu.cdevreeze.yaidom.queryapitests.resolved
 
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
+
+
 
 import eu.cdevreeze.yaidom.convert.ScalaXmlConversions.convertToElem
 import eu.cdevreeze.yaidom.queryapitests.AbstractAlternativeQueryTest
@@ -28,7 +28,7 @@ import eu.cdevreeze.yaidom.resolved.Elem
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
+
 class AlternativeQueryTest extends AbstractAlternativeQueryTest {
 
   final type E = Elem

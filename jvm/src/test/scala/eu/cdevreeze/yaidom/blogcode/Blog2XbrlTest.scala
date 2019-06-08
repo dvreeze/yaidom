@@ -18,12 +18,6 @@ package eu.cdevreeze.yaidom.blogcode
 
 import java.time.LocalDate
 
-import scala.Vector
-
-import org.junit.runner.RunWith
-import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
-
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.core.QName
@@ -35,6 +29,7 @@ import eu.cdevreeze.yaidom.queryapi.ClarkElemApi.withEName
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.simple
 import eu.cdevreeze.yaidom.utils.NamespaceUtils
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * Code of yaidom XBRL blog ("XBRL, Scala and yaidom"). The blog introduces yaidom in the context
@@ -46,8 +41,7 @@ import eu.cdevreeze.yaidom.utils.NamespaceUtils
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
-class Blog2XbrlTest extends FunSuite {
+class Blog2XbrlTest extends AnyFunSuite {
 
   private val sampleXbrlInstanceFile: java.io.File =
     (new java.io.File(classOf[Blog2XbrlTest].getResource("company-instance.xml").toURI))
@@ -120,8 +114,8 @@ class Blog2XbrlTest extends FunSuite {
 
     assertResult(
       Set("D-2006", "D-2007", "D-2008", "D-2009", "D-2010", "D-2010-BS1", "D-2010-BS2", "D-2010-CON", "D-2010-E", "D-2010-ALL")) {
-        avgNumEmployeesFactsByContext.keySet
-      }
+      avgNumEmployeesFactsByContext.keySet
+    }
     assertResult("220") {
       avgNumEmployeesFactsByContext("D-2006").text
     }
@@ -239,36 +233,36 @@ class Blog2XbrlTest extends FunSuite {
         dimensions.forall(dim =>
           currFacts.map(e => explicitDimensionAspectOption(e, dim)).toSet.size == 1) &&
         currFacts.map(e => unitAspectOption(e)).distinct.size == 1 && {
-          // Instant-duration
-          // The comparison is naive, but still verbose
+        // Instant-duration
+        // The comparison is naive, but still verbose
 
-          import LocalDate.parse
+        import LocalDate.parse
 
-          val balanceStartInstantOption =
-            periodAspectOption(balanceStartFact).flatMap(
-              _.findElem(withEName(XbrliNs, "instant"))).map(e => parse(e.text))
-          val balanceEndInstantOption =
-            periodAspectOption(balanceEndFact).flatMap(
-              _.findElem(withEName(XbrliNs, "instant"))).map(e => parse(e.text))
-          val changeStartOption =
-            periodAspectOption(changeFact).flatMap(
-              _.findElem(withEName(XbrliNs, "startDate"))).map(e => parse(e.text))
-          val changeEndOption =
-            periodAspectOption(changeFact).flatMap(
-              _.findElem(withEName(XbrliNs, "endDate"))).map(e => parse(e.text))
+        val balanceStartInstantOption =
+          periodAspectOption(balanceStartFact).flatMap(
+            _.findElem(withEName(XbrliNs, "instant"))).map(e => parse(e.text))
+        val balanceEndInstantOption =
+          periodAspectOption(balanceEndFact).flatMap(
+            _.findElem(withEName(XbrliNs, "instant"))).map(e => parse(e.text))
+        val changeStartOption =
+          periodAspectOption(changeFact).flatMap(
+            _.findElem(withEName(XbrliNs, "startDate"))).map(e => parse(e.text))
+        val changeEndOption =
+          periodAspectOption(changeFact).flatMap(
+            _.findElem(withEName(XbrliNs, "endDate"))).map(e => parse(e.text))
 
-          balanceStartInstantOption.isDefined && balanceEndInstantOption.isDefined &&
-            changeStartOption.isDefined && changeEndOption.isDefined && {
+        balanceStartInstantOption.isDefined && balanceEndInstantOption.isDefined &&
+          changeStartOption.isDefined && changeEndOption.isDefined && {
 
-              val balanceStart = balanceStartInstantOption.get
-              val balanceEnd = balanceEndInstantOption.get
-              val changeStart = changeStartOption.get
-              val changeEnd = changeEndOption.get
+          val balanceStart = balanceStartInstantOption.get
+          val balanceEnd = balanceEndInstantOption.get
+          val changeStart = changeStartOption.get
+          val changeEnd = changeEndOption.get
 
-              (balanceStart == changeStart || balanceStart.plusDays(1) == changeStart) &&
-                (balanceEnd == changeEnd)
-            }
+          (balanceStart == changeStart || balanceStart.plusDays(1) == changeStart) &&
+            (balanceEnd == changeEnd)
         }
+      }
     }
 
     // The assertion test itself
@@ -455,4 +449,5 @@ object Blog2XbrlTest {
       s"EvaluationResult(result: $result, facts: ${facts.map { case (k, fact) => k -> fact.underlyingElem }})"
     }
   }
+
 }

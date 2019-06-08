@@ -18,8 +18,8 @@ package eu.cdevreeze.yaidom.queryapitests.indexed
 
 import java.net.URI
 
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
+
+
 
 import eu.cdevreeze.yaidom.indexed.Document
 import eu.cdevreeze.yaidom.indexed.Elem
@@ -32,7 +32,7 @@ import eu.cdevreeze.yaidom.simple
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
+
 class XmlBaseOnIndexedClarkElemApiTest extends AbstractXmlBaseOnIndexedClarkElemApiTest {
 
   type U = simple.Elem

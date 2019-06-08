@@ -17,16 +17,11 @@
 package eu.cdevreeze.yaidom.integrationtest
 
 import java.time.DayOfWeek
-import java.time.Month
 import java.time.LocalDate
+import java.time.Month
 
 import scala.collection.immutable
 import scala.reflect.classTag
-
-import org.junit.runner.RunWith
-import org.scalatest.BeforeAndAfterAll
-import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
@@ -40,14 +35,15 @@ import eu.cdevreeze.yaidom.queryapi.ScopedNodes
 import eu.cdevreeze.yaidom.queryapi.SubtypeAwareElemLike
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.simple
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * XML creation test, using resolved elements to quickly and easily create some XML snippet.
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
-class XmlCreationTest extends FunSuite with BeforeAndAfterAll {
+class XmlCreationTest extends AnyFunSuite with BeforeAndAfterAll {
 
   import XmlCreationTest._
 
@@ -530,7 +526,7 @@ object XmlCreationTest {
       LocalDate.of(2017, 12, 14) -> Map("meeting-performance-reviews" -> 2, "chapter-meeeting" -> 1),
       LocalDate.of(2017, 12, 18) -> Map("bila" -> 1),
       LocalDate.of(2017, 12, 19) -> Map("organisation-change" -> 2))
-  } ensuring (_.keySet.forall(d => !isWeekend(d)), s"No weekend days allowed")
+  } ensuring(_.keySet.forall(d => !isWeekend(d)), s"No weekend days allowed")
 
   // Timesheet data 2018
 

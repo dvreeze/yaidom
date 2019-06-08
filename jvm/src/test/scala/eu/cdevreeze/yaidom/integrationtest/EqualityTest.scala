@@ -16,24 +16,26 @@
 
 package eu.cdevreeze.yaidom.integrationtest
 
-import java.{ util => jutil }
-import org.xml.sax.{ EntityResolver, InputSource }
-import javax.xml.parsers.{ DocumentBuilderFactory, DocumentBuilder }
+import java.{util => jutil}
+
 import scala.collection.immutable
-import org.junit.runner.RunWith
-import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
-import eu.cdevreeze.yaidom.resolved
-import eu.cdevreeze.yaidom.parse
-import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.simple.NodeBuilder
+
 import eu.cdevreeze.yaidom.core.EName
-import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.PathBuilder
+import eu.cdevreeze.yaidom.core.QName
+import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.parse
+import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.simple.Document
 import eu.cdevreeze.yaidom.simple.EntityRef
 import eu.cdevreeze.yaidom.simple.Node
+import eu.cdevreeze.yaidom.simple.NodeBuilder
 import eu.cdevreeze.yaidom.simple.Text
+import javax.xml.parsers.DocumentBuilder
+import javax.xml.parsers.DocumentBuilderFactory
+import org.scalatest.funsuite.AnyFunSuite
+import org.xml.sax.EntityResolver
+import org.xml.sax.InputSource
 
 /**
  * Node equality test case.
@@ -42,8 +44,7 @@ import eu.cdevreeze.yaidom.simple.Text
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
-class EqualityTest extends FunSuite {
+class EqualityTest extends AnyFunSuite {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
@@ -122,7 +123,9 @@ class EqualityTest extends FunSuite {
     val resolvedRoot = resolved.Elem.from(root)
 
     assertResult(Set(EName("bar"), EName("http://www.google.com", "foo"))) {
-      val result = resolvedRoot.findAllElemsOrSelf map { _.resolvedName }
+      val result = resolvedRoot.findAllElemsOrSelf map {
+        _.resolvedName
+      }
       result.toSet
     }
   }
@@ -269,8 +272,8 @@ class EqualityTest extends FunSuite {
           n match {
             case er: EntityRef if er.entity == "hello" => Some(Text("hi", false))
             // This is very counter-intuitive, but it seems that the entity reference is there as well as (!) the expansion
-            case t: Text if t.text.startsWith("hi")    => Some(Text(t.text.drop(2), t.isCData))
-            case n: Node                               => Some(n)
+            case t: Text if t.text.startsWith("hi") => Some(Text(t.text.drop(2), t.isCData))
+            case n: Node => Some(n)
           }
         }
         e.withChildren(newChildren)

@@ -21,8 +21,8 @@ import java.net.URI
 
 import scala.collection.immutable
 
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
+
+
 import org.xml.sax.InputSource
 
 import eu.cdevreeze.yaidom
@@ -42,7 +42,7 @@ import net.sf.saxon.s9api.Processor
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
+
 class AlternativeXmlBaseTest extends AbstractAlternativeXmlBaseTest {
 
   type D = SaxonDocument

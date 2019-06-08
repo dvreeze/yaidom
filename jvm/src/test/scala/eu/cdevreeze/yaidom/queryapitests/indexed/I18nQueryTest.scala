@@ -16,8 +16,8 @@
 
 package eu.cdevreeze.yaidom.queryapitests.indexed
 
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
+
+
 
 import eu.cdevreeze.yaidom.convert
 import eu.cdevreeze.yaidom.core.Scope
@@ -31,7 +31,7 @@ import javax.xml.parsers.DocumentBuilderFactory
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
+
 class I18nQueryTest extends AbstractI18nQueryTest {
 
   final type E = Elem

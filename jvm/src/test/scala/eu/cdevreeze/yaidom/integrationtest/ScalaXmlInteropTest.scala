@@ -16,25 +16,21 @@
 
 package eu.cdevreeze.yaidom.integrationtest
 
-import org.junit.runner.RunWith
-import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
-
 import eu.cdevreeze.yaidom.convert.ScalaXmlConversions.convertElem
 import eu.cdevreeze.yaidom.convert.ScalaXmlConversions.convertToElem
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.PathBuilder
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.queryapi.ClarkElemApi._
+import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.simple.Comment
 import eu.cdevreeze.yaidom.simple.DocBuilder
 import eu.cdevreeze.yaidom.simple.Document
 import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.simple.EntityRef
 import eu.cdevreeze.yaidom.simple.NodeBuilder
-import eu.cdevreeze.yaidom.simple.NodeBuilder.textElem
-import eu.cdevreeze.yaidom.queryapi.ClarkElemApi._
-import eu.cdevreeze.yaidom.resolved
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * Scala XML interoperability test case.
@@ -45,8 +41,7 @@ import eu.cdevreeze.yaidom.resolved
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
-class ScalaXmlInteropTest extends FunSuite {
+class ScalaXmlInteropTest extends AnyFunSuite {
 
   private val nsBookstore = "http://bookstore"
   private val nsGoogle = "http://www.google.com"

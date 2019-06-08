@@ -16,38 +16,32 @@
 
 package eu.cdevreeze.yaidom.integrationtest
 
-import java.{ util => jutil }
-
-import scala.Vector
-
-import org.junit.runner.RunWith
-import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
+import java.{util => jutil}
 
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.indexed
-import eu.cdevreeze.yaidom.simple.Document
-import eu.cdevreeze.yaidom.simple.Elem
-import eu.cdevreeze.yaidom.simple.Node
-import eu.cdevreeze.yaidom.simple.NodeBuilder
-import eu.cdevreeze.yaidom.simple.Text
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
 import eu.cdevreeze.yaidom.print.DocumentPrinterUsingDom
 import eu.cdevreeze.yaidom.queryapi.ClarkElemLike
 import eu.cdevreeze.yaidom.queryapi.UpdatableElemLike
 import eu.cdevreeze.yaidom.resolved
+import eu.cdevreeze.yaidom.simple.Document
+import eu.cdevreeze.yaidom.simple.Elem
+import eu.cdevreeze.yaidom.simple.Node
+import eu.cdevreeze.yaidom.simple.NodeBuilder
+import eu.cdevreeze.yaidom.simple.Text
 import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.transform.TransformerFactory
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * XML functional update test case.
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
-class UpdateTest extends FunSuite {
+class UpdateTest extends AnyFunSuite {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
@@ -173,7 +167,7 @@ class UpdateTest extends FunSuite {
     // 4. Element salary added (with value 10000)
 
     val f: Elem => Elem = {
-      case e @ Elem(QName(_, "Employee"), _, _, _) =>
+      case e@Elem(QName(_, "Employee"), _, _, _) =>
         val gender = (e \ (_.localName == "gender")) map (_.text) mkString ""
         val genderPrefix = if (gender == "Male") "M" else "F"
         val newId = genderPrefix + (e \@ EName("id")).head
@@ -182,7 +176,7 @@ class UpdateTest extends FunSuite {
         val salaryElem = textElem(QName("salary"), "10000").build(scope)
         val newChildren = (e.children collect { case che: Elem if che.localName != "gender" => che }) :+ salaryElem
         e.plusAttribute(QName("id"), newId).withChildren(newChildren)
-      case e @ Elem(QName(_, "name"), _, _, _) =>
+      case e@Elem(QName(_, "name"), _, _, _) =>
         e.withChildren(Vector(Text(e.text.toUpperCase, false)))
       case e: Elem => e
     }
@@ -240,7 +234,7 @@ class UpdateTest extends FunSuite {
     // 4. Element salary added (with value 10000)
 
     val f: Elem => Elem = {
-      case e @ Elem(QName(_, "Employee"), _, _, _) =>
+      case e@Elem(QName(_, "Employee"), _, _, _) =>
         val gender = (e \ (_.localName == "gender")) map (_.text) mkString ""
         val genderPrefix = if (gender == "Male") "M" else "F"
         val newId = genderPrefix + (e \@ EName("id")).head
@@ -249,7 +243,7 @@ class UpdateTest extends FunSuite {
         val salaryElem = textElem(QName("salary"), "10000").build(scope)
         val newChildren = (e.children collect { case che: Elem if che.localName != "gender" => che }) :+ salaryElem
         e.plusAttribute(QName("id"), newId).withChildren(newChildren)
-      case e @ Elem(QName(_, "name"), _, _, _) =>
+      case e@Elem(QName(_, "name"), _, _, _) =>
         e.withChildren(Vector(Text(e.text.toUpperCase, false)))
       case e: Elem => e
     }

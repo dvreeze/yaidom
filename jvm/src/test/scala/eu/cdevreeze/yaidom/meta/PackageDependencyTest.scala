@@ -18,20 +18,17 @@ package eu.cdevreeze.yaidom.meta
 
 import java.io.File
 
-import org.junit.runner.RunWith
-import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
-
 import scala.collection.immutable
 import scala.meta._
+
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * Test case checking for unidirectional package dependencies in yaidom, by inspecting import statements.
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
-class PackageDependencyTest extends FunSuite {
+class PackageDependencyTest extends AnyFunSuite {
 
   /**
    * Sub-package of yaidom, for example List("core") or List("java8", "indexed").
@@ -45,11 +42,12 @@ class PackageDependencyTest extends FunSuite {
     assert(testClassDir.isDirectory)
     val projDir = getProjectDir(testClassDir).ensuring(_.getName == "jvm")
     val jvmResultDir = new File(projDir, "src/main/scala")
+    val otherJvmResultDir = new File(projDir, "src/main/scala-2.13-")
 
     val sharedProjectDir = new File(projDir.getParentFile, "shared")
     val sharedResultDir = new File(sharedProjectDir, "src/main/scala")
 
-    immutable.IndexedSeq(jvmResultDir, sharedResultDir).ensuring(_.forall(_.isDirectory))
+    immutable.IndexedSeq(jvmResultDir, otherJvmResultDir, sharedResultDir).ensuring(_.forall(_.isDirectory))
   }
 
   test("testParentPackage") {
@@ -92,7 +90,7 @@ class PackageDependencyTest extends FunSuite {
     testPackageDependencies(
       Some(List("convert")),
       Set(List("core"), List("simple")),
-      Set(List("core"), List("queryapi"), List("resolved"), List("simple")))
+      Set(List("core"), List("convert"), List("queryapi"), List("resolved"), List("simple")))
   }
 
   test("testParsePackage") {
@@ -188,8 +186,8 @@ class PackageDependencyTest extends FunSuite {
 
   private def testPackageDependencies(
     yaidomSubPackageOption: Option[SubPackage],
-    minimalSubPackages:     Set[SubPackage],
-    allowedSubPackages:     Set[SubPackage]): Unit = {
+    minimalSubPackages: Set[SubPackage],
+    allowedSubPackages: Set[SubPackage]): Unit = {
 
     require(minimalSubPackages.subsetOf(allowedSubPackages))
 

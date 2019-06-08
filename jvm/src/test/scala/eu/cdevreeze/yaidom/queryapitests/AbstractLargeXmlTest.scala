@@ -16,11 +16,8 @@
 
 package eu.cdevreeze.yaidom.queryapitests
 
-import java.{ io => jio }
-import java.{ util => jutil }
-
-import org.scalatest.BeforeAndAfterAll
-import org.scalatest.FunSuite
+import java.{io => jio}
+import java.{util => jutil}
 
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.ENameProvider
@@ -31,8 +28,10 @@ import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.core.jvm.CaffeineENameProvider
 import eu.cdevreeze.yaidom.core.jvm.CaffeineQNameProvider
 import eu.cdevreeze.yaidom.queryapi.BackingElemApi
-import eu.cdevreeze.yaidom.queryapi.DocumentApi
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi._
+import eu.cdevreeze.yaidom.queryapi.DocumentApi
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * Large XML test case.
@@ -41,13 +40,13 @@ import eu.cdevreeze.yaidom.queryapi.ClarkElemApi._
  *
  * @author Chris de Vreeze
  */
-abstract class AbstractLargeXmlTest extends FunSuite with BeforeAndAfterAll {
+abstract class AbstractLargeXmlTest extends AnyFunSuite with BeforeAndAfterAll {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.queryapitests")
 
   type E = BackingElemApi
 
-  type D <: DocumentApi { type DocElemType <: E }
+  type D <: DocumentApi {type DocElemType <: E}
 
   @volatile private var doc: D = _
 

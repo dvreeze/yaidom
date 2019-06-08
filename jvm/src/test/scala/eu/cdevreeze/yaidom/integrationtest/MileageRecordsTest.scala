@@ -26,27 +26,24 @@ import scala.math.BigDecimal.int2bigDecimal
 import scala.math.ceil
 import scala.math.floor
 
-import org.junit.runner.RunWith
-import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
-
 import eu.cdevreeze.yaidom.convert.ScalaXmlConversions.convertToElem
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
-import eu.cdevreeze.yaidom.scalaxml.ScalaXmlElem
-import eu.cdevreeze.yaidom.simple.Document
-import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
 import eu.cdevreeze.yaidom.resolved
+import eu.cdevreeze.yaidom.scalaxml.ScalaXmlElem
+import eu.cdevreeze.yaidom.simple.Document
+import eu.cdevreeze.yaidom.simple.Elem
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * Test case using yaidom for mileage records.
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
-class MileageRecordsTest extends FunSuite {
+class MileageRecordsTest extends AnyFunSuite {
+
   import MileageRecordsTest.MileageRecords
 
   test("testReferentialIntegrity") {
@@ -293,7 +290,9 @@ object MileageRecordsTest {
   final class TripCategory(val name: String, val isPrivate: Boolean) {
 
     def toElem: Elem = {
-      val xml = <tripCategory isPrivate={ isPrivate.toString }>{ name }</tripCategory>
+      val xml = <tripCategory isPrivate={isPrivate.toString}>
+        {name}
+      </tripCategory>
       convertToElem(xml).ensuring(e => resolved.Elem.from(e) == resolved.Elem.from(ScalaXmlElem(xml)))
     }
   }
@@ -310,21 +309,31 @@ object MileageRecordsTest {
   }
 
   final class Address(
-    val name:        String,
-    val street:      String,
+    val name: String,
+    val street: String,
     val houseNumber: String,
-    val city:        String,
-    val zipCode:     String,
-    val country:     String) {
+    val city: String,
+    val zipCode: String,
+    val country: String) {
 
     def toElem(qname: QName): Elem = {
       val xml =
-        <address name={ name }>
-          <street>{ street }</street>
-          <houseNumber>{ houseNumber }</houseNumber>
-          <city>{ city }</city>
-          <zipCode>{ zipCode }</zipCode>
-          <country>{ country }</country>
+        <address name={name}>
+          <street>
+            {street}
+          </street>
+          <houseNumber>
+            {houseNumber}
+          </houseNumber>
+          <city>
+            {city}
+          </city>
+          <zipCode>
+            {zipCode}
+          </zipCode>
+          <country>
+            {country}
+          </country>
         </address>
       convertToElem(xml).copy(qname = qname)
     }
@@ -345,21 +354,29 @@ object MileageRecordsTest {
   }
 
   final class KnownTrip(
-    val name:            String,
-    val categoryName:    String,
+    val name: String,
+    val categoryName: String,
     val fromAddressName: String,
-    val toAddressName:   String,
-    val km:              BigDecimal) {
+    val toAddressName: String,
+    val km: BigDecimal) {
 
     require(km >= 0, s"${km} must be >= 0")
 
     def toElem: Elem = {
       val xml =
-        <knownTrip name={ name }>
-          <category>{ categoryName }</category>
-          <fromAddress>{ fromAddressName }</fromAddress>
-          <toAddress>{ toAddressName }</toAddress>
-          <km>{ km.toString }</km>
+        <knownTrip name={name}>
+          <category>
+            {categoryName}
+          </category>
+          <fromAddress>
+            {fromAddressName}
+          </fromAddress>
+          <toAddress>
+            {toAddressName}
+          </toAddress>
+          <km>
+            {km.toString}
+          </km>
         </knownTrip>
 
       convertToElem(xml)
@@ -385,10 +402,10 @@ object MileageRecordsTest {
   }
 
   final class Trip(
-    val date:     LocalDate,
+    val date: LocalDate,
     val tripName: String,
-    val startKm:  Int,
-    val endKm:    Int) {
+    val startKm: Int,
+    val endKm: Int) {
 
     require(startKm <= endKm, s"${startKm} must be <= ${endKm} on date ${date}")
 
@@ -402,10 +419,16 @@ object MileageRecordsTest {
 
     def toElem: Elem = {
       val xml =
-        <trip date={ date.toString() }>
-          <tripName>{ tripName }</tripName>
-          <start>{ startKm.toString }</start>
-          <end>{ endKm.toString }</end>
+        <trip date={date.toString()}>
+          <tripName>
+            {tripName}
+          </tripName>
+          <start>
+            {startKm.toString}
+          </start>
+          <end>
+            {endKm.toString}
+          </end>
         </trip>
 
       convertToElem(xml)
@@ -434,8 +457,8 @@ object MileageRecordsTest {
   final class MileageRecords(
     val tripCategories: immutable.IndexedSeq[TripCategory],
     val knownAddresses: immutable.IndexedSeq[Address],
-    val knownTrips:     immutable.IndexedSeq[KnownTrip],
-    val trips:          immutable.IndexedSeq[Trip]) {
+    val knownTrips: immutable.IndexedSeq[KnownTrip],
+    val trips: immutable.IndexedSeq[Trip]) {
 
     val tripCategoriesByName: Map[String, TripCategory] =
       tripCategories.map(tripCat => (tripCat.name -> tripCat)).toMap
@@ -583,4 +606,5 @@ object MileageRecordsTest {
       new MileageRecords(tripCategories, knownAddresses, knownTrips, trips)
     }
   }
+
 }

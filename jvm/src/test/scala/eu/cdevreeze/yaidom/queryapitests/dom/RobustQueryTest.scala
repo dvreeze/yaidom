@@ -16,8 +16,8 @@
 
 package eu.cdevreeze.yaidom.queryapitests.dom
 
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
+
+
 
 import eu.cdevreeze.yaidom.dom.DomElem
 import eu.cdevreeze.yaidom.queryapitests.AbstractRobustQueryTest
@@ -29,7 +29,7 @@ import javax.xml.parsers.DocumentBuilderFactory
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
+
 class RobustQueryTest extends AbstractRobustQueryTest {
 
   final type E = DomElem

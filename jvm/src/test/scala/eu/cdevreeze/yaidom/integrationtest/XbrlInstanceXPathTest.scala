@@ -16,18 +16,12 @@
 
 package eu.cdevreeze.yaidom.integrationtest
 
-import org.junit.runner.RunWith
-import org.scalatest.BeforeAndAfterAll
-import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
-import org.w3c.dom.NodeList
-
 import eu.cdevreeze.yaidom.convert
 import eu.cdevreeze.yaidom.convert.DomConversions.nodeListToIndexedSeq
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.core.jvm.NamespaceContexts
 import eu.cdevreeze.yaidom.core.jvm.JavaQNames
+import eu.cdevreeze.yaidom.core.jvm.NamespaceContexts
 import eu.cdevreeze.yaidom.dom
 import eu.cdevreeze.yaidom.parse
 import javax.xml.xpath.XPathConstants
@@ -35,6 +29,9 @@ import javax.xml.xpath.XPathFactory
 import javax.xml.xpath.XPathFunction
 import javax.xml.xpath.XPathFunctionException
 import javax.xml.xpath.XPathFunctionResolver
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.funsuite.AnyFunSuite
+import org.w3c.dom.NodeList
 
 /**
  * XBRL instance querying test using XPath for querying and XPath functions for XBRL support, where the XPath functions
@@ -50,14 +47,12 @@ import javax.xml.xpath.XPathFunctionResolver
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
-class XbrlInstanceXPathTest extends FunSuite with BeforeAndAfterAll {
-
-  import XbrlInstanceXPathTest.XbrliNs
-  import XbrlInstanceXPathTest.LinkNs
-  import XbrlInstanceXPathTest.XLinkNs
+class XbrlInstanceXPathTest extends AnyFunSuite with BeforeAndAfterAll {
 
   import XbrlInstanceXPathTest.CustomFunctionNs
+  import XbrlInstanceXPathTest.LinkNs
+  import XbrlInstanceXPathTest.XLinkNs
+  import XbrlInstanceXPathTest.XbrliNs
 
   private val docParser = parse.DocumentParserUsingSax.newInstance
   private val doc =

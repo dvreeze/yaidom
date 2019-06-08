@@ -16,18 +16,16 @@
 
 package eu.cdevreeze.yaidom.queryapitests
 
-import scala.Vector
 import scala.collection.immutable
-
-import org.scalatest.FunSuite
 
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.simple.NodeBuilder
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
-import eu.cdevreeze.yaidom.queryapi.ClarkNodes
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi._
+import eu.cdevreeze.yaidom.queryapi.ClarkNodes
+import eu.cdevreeze.yaidom.simple.NodeBuilder
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * ElemLike-based query test case. This test case shows how XPath and XQuery queries can be written in this API, be it somewhat
@@ -39,7 +37,7 @@ import eu.cdevreeze.yaidom.queryapi.ClarkElemApi._
  *
  * @author Chris de Vreeze
  */
-abstract class AbstractElemLikeQueryTest extends FunSuite {
+abstract class AbstractElemLikeQueryTest extends AnyFunSuite {
 
   type E <: ClarkNodes.Elem with ClarkElemApi.Aux[E]
 
@@ -56,7 +54,9 @@ abstract class AbstractElemLikeQueryTest extends FunSuite {
       "Database Systems: The Complete Book",
       "Hector and Jeff's Database Hints",
       "Jennifer's Economical Database Hints")) {
-      val result = bookTitles map { _.trimmedText }
+      val result = bookTitles map {
+        _.trimmedText
+      }
       result.toSet
     }
   }
@@ -79,7 +79,9 @@ abstract class AbstractElemLikeQueryTest extends FunSuite {
       "Database Systems: The Complete Book",
       "Hector and Jeff's Database Hints",
       "Jennifer's Economical Database Hints")) {
-      val result = bookTitles map { _.trimmedText }
+      val result = bookTitles map {
+        _.trimmedText
+      }
       result.toSet
     }
   }
@@ -98,7 +100,9 @@ abstract class AbstractElemLikeQueryTest extends FunSuite {
       "Database Systems: The Complete Book",
       "Hector and Jeff's Database Hints",
       "Jennifer's Economical Database Hints")) {
-      val result = bookTitles map { _.trimmedText }
+      val result = bookTitles map {
+        _.trimmedText
+      }
       result.toSet
     }
   }
@@ -113,7 +117,9 @@ abstract class AbstractElemLikeQueryTest extends FunSuite {
     val bookOrMagazineTitles =
       for {
         bookOrMagazine <- bookstore filterChildElems { e => Set("Book", "Magazine").contains(e.localName) }
-        title <- bookOrMagazine findChildElem { _.localName == "Title" }
+        title <- bookOrMagazine findChildElem {
+          _.localName == "Title"
+        }
       } yield title
 
     assertResult(Set(
@@ -123,7 +129,9 @@ abstract class AbstractElemLikeQueryTest extends FunSuite {
       "Jennifer's Economical Database Hints",
       "National Geographic",
       "Newsweek")) {
-      val result = bookOrMagazineTitles map { _.trimmedText }
+      val result = bookOrMagazineTitles map {
+        _.trimmedText
+      }
       result.toSet
     }
   }
@@ -143,7 +151,9 @@ abstract class AbstractElemLikeQueryTest extends FunSuite {
       "Jennifer's Economical Database Hints",
       "National Geographic",
       "Newsweek")) {
-      val result = titles map { _.trimmedText }
+      val result = titles map {
+        _.trimmedText
+      }
       result.toSet
     }
   }
@@ -163,7 +173,9 @@ abstract class AbstractElemLikeQueryTest extends FunSuite {
       "Jennifer's Economical Database Hints",
       "National Geographic",
       "Newsweek")) {
-      val result = titles map { _.trimmedText }
+      val result = titles map {
+        _.trimmedText
+      }
       result.toSet
     }
   }
@@ -220,7 +232,10 @@ abstract class AbstractElemLikeQueryTest extends FunSuite {
       "A First Course in Database Systems",
       "Hector and Jeff's Database Hints",
       "Jennifer's Economical Database Hints")) {
-      val result = books flatMap { book => book.findElem(EName("Title")) map { _.trimmedText } }
+      val result = books flatMap { book => book.findElem(EName("Title")) map {
+        _.trimmedText
+      }
+      }
       result.toSet
     }
   }
@@ -246,7 +261,10 @@ abstract class AbstractElemLikeQueryTest extends FunSuite {
       "A First Course in Database Systems",
       "Hector and Jeff's Database Hints",
       "Jennifer's Economical Database Hints")) {
-      val result = books flatMap { book => book.findElem(EName("Title")) map { _.trimmedText } }
+      val result = books flatMap { book => book.findElem(EName("Title")) map {
+        _.trimmedText
+      }
+      }
       result.toSet
     }
   }
@@ -267,7 +285,9 @@ abstract class AbstractElemLikeQueryTest extends FunSuite {
       "A First Course in Database Systems",
       "Hector and Jeff's Database Hints",
       "Jennifer's Economical Database Hints")) {
-      val result = titles map { _.trimmedText }
+      val result = titles map {
+        _.trimmedText
+      }
       result.toSet
     }
 
@@ -275,7 +295,9 @@ abstract class AbstractElemLikeQueryTest extends FunSuite {
 
     val titles2 =
       for {
-        book <- bookstore filterChildElems { _.localName == "Book" }
+        book <- bookstore filterChildElems {
+          _.localName == "Book"
+        }
         price <- book.attributeOption(EName("Price"))
         if price.toInt < 90
       } yield book.getChildElem(EName("Title"))
@@ -284,7 +306,9 @@ abstract class AbstractElemLikeQueryTest extends FunSuite {
       "A First Course in Database Systems",
       "Hector and Jeff's Database Hints",
       "Jennifer's Economical Database Hints")) {
-      val result = titles2 map { _.trimmedText }
+      val result = titles2 map {
+        _.trimmedText
+      }
       result.toSet
     }
   }
@@ -307,8 +331,12 @@ abstract class AbstractElemLikeQueryTest extends FunSuite {
           cheapBookElm <- cheapBookElms
           authorElm <- cheapBookElm \\ (_.localName == "Author")
         } yield {
-          val firstNameElmOption = authorElm findChildElem { _.localName == "First_Name" }
-          val lastNameElmOption = authorElm findChildElem { _.localName == "Last_Name" }
+          val firstNameElmOption = authorElm findChildElem {
+            _.localName == "First_Name"
+          }
+          val lastNameElmOption = authorElm findChildElem {
+            _.localName == "Last_Name"
+          }
 
           val firstName = firstNameElmOption.map(_.text).getOrElse("")
           val lastName = lastNameElmOption.map(_.text).getOrElse("")
@@ -378,7 +406,9 @@ abstract class AbstractElemLikeQueryTest extends FunSuite {
     assertResult(Set(
       "Database Systems: The Complete Book",
       "Hector and Jeff's Database Hints")) {
-      val result = bookTitles map { _.trimmedText }
+      val result = bookTitles map {
+        _.trimmedText
+      }
       result.toSet
     }
   }
@@ -392,15 +422,23 @@ abstract class AbstractElemLikeQueryTest extends FunSuite {
       for {
         book <- bookstore \ (_.localName == "Book")
         if book.attribute(EName("Price")).toInt < 90
-        authors = book getChildElem { _.localName == "Authors" }
-        authorLastName <- authors \ { _.localName == "Author" } flatMap { e => e \ (_.localName == "Last_Name") } map { _.trimmedText }
+        authors = book getChildElem {
+          _.localName == "Authors"
+        }
+        authorLastName <- authors \ {
+          _.localName == "Author"
+        } flatMap { e => e \ (_.localName == "Last_Name") } map {
+          _.trimmedText
+        }
         if authorLastName == "Ullman"
       } yield book.getChildElem(EName("Title"))
 
     assertResult(Set(
       "A First Course in Database Systems",
       "Hector and Jeff's Database Hints")) {
-      val result = bookTitles map { _.trimmedText }
+      val result = bookTitles map {
+        _.trimmedText
+      }
       result.toSet
     }
   }
@@ -414,17 +452,29 @@ abstract class AbstractElemLikeQueryTest extends FunSuite {
       for {
         book <- bookstore \ (_.localName == "Book")
         if book.attribute(EName("Price")).toInt < 90
-        authors = book getChildElem { _.localName == "Authors" }
-        authorLastName <- authors \ { _.localName == "Author" } flatMap { e => e \ (_.localName == "Last_Name") } map { _.trimmedText }
+        authors = book getChildElem {
+          _.localName == "Authors"
+        }
+        authorLastName <- authors \ {
+          _.localName == "Author"
+        } flatMap { e => e \ (_.localName == "Last_Name") } map {
+          _.trimmedText
+        }
         if authorLastName == "Ullman"
-        authorFirstName <- authors \ { _.localName == "Author" } flatMap { e => e \ (_.localName == "First_Name") } map { _.trimmedText }
+        authorFirstName <- authors \ {
+          _.localName == "Author"
+        } flatMap { e => e \ (_.localName == "First_Name") } map {
+          _.trimmedText
+        }
         if authorFirstName == "Jeffrey"
       } yield book.getChildElem(EName("Title"))
 
     assertResult(Set(
       "A First Course in Database Systems",
       "Hector and Jeff's Database Hints")) {
-      val result = bookTitles map { _.trimmedText }
+      val result = bookTitles map {
+        _.trimmedText
+      }
       result.toSet
     }
   }
@@ -447,7 +497,9 @@ abstract class AbstractElemLikeQueryTest extends FunSuite {
 
     assertResult(Set(
       "Hector and Jeff's Database Hints")) {
-      val result = bookTitles map { _.trimmedText }
+      val result = bookTitles map {
+        _.trimmedText
+      }
       result.toSet
     }
   }
@@ -459,7 +511,9 @@ abstract class AbstractElemLikeQueryTest extends FunSuite {
 
     val bookElms =
       for {
-        bookElm <- bookstore filterChildElems { _.localName == "Book" }
+        bookElm <- bookstore filterChildElems {
+          _.localName == "Book"
+        }
         if (bookElm \\ (_.localName == "Author")) exists { e =>
           ((e.getChildElem(_.localName == "First_Name")).text == "Jeffrey") &&
             ((e.getChildElem(_.localName == "Last_Name")).text == "Ullman")
@@ -489,12 +543,17 @@ abstract class AbstractElemLikeQueryTest extends FunSuite {
         secondAuthor <- authorColl.drop(1).headOption
       } yield secondAuthor
 
-    val secondAuthorLastNames = secondAuthors map { e => e getChildElem { _.localName == "Last_Name" } }
+    val secondAuthorLastNames = secondAuthors map { e => e getChildElem {
+      _.localName == "Last_Name"
+    }
+    }
     assertResult(Set(
       "Widom",
       "Ullman",
       "Garcia-Molina")) {
-      val result = secondAuthorLastNames map { _.trimmedText }
+      val result = secondAuthorLastNames map {
+        _.trimmedText
+      }
       result.toSet
     }
   }
@@ -512,7 +571,9 @@ abstract class AbstractElemLikeQueryTest extends FunSuite {
       } yield book.getChildElem(EName("Title"))
 
     assertResult(Set("Database Systems: The Complete Book")) {
-      val result = titles map { _.trimmedText }
+      val result = titles map {
+        _.trimmedText
+      }
       result.toSet
     }
   }
@@ -535,7 +596,10 @@ abstract class AbstractElemLikeQueryTest extends FunSuite {
       } yield magazine
 
     assertResult(Set("Hector and Jeff's Database Hints")) {
-      val result = magazines flatMap { mag => mag.findElem(EName("Title")) map { _.trimmedText } }
+      val result = magazines flatMap { mag => mag.findElem(EName("Title")) map {
+        _.trimmedText
+      }
+      }
       result.toSet
     }
   }
@@ -561,7 +625,10 @@ abstract class AbstractElemLikeQueryTest extends FunSuite {
       } yield magazine
 
     assertResult(Set("Hector and Jeff's Database Hints")) {
-      val result = magazines flatMap { mag => mag.findElem(EName("Title")) map { _.trimmedText } }
+      val result = magazines flatMap { mag => mag.findElem(EName("Title")) map {
+        _.trimmedText
+      }
+      }
       result.toSet
     }
   }
@@ -579,16 +646,24 @@ abstract class AbstractElemLikeQueryTest extends FunSuite {
           val result = bookstore \ { e => Set("Book", "Magazine").contains(e.localName) }
           result filter (e => toResolvedElem(e) != toResolvedElem(bookOrMagazine))
         }
-        titles = otherBooksAndMagazines map { e => e getChildElem { _.localName == "Title" } }
+        titles = otherBooksAndMagazines map { e => e getChildElem {
+          _.localName == "Title"
+        }
+        }
         titleStrings = {
-          val result = titles map { _.trimmedText }
+          val result = titles map {
+            _.trimmedText
+          }
           result.toSet
         }
         if titleStrings.contains(titleString)
       } yield bookOrMagazine
 
     assertResult(Set("Hector and Jeff's Database Hints", "National Geographic")) {
-      val result = booksAndMagazines flatMap { mag => mag.findElem(EName("Title")) map { _.trimmedText } }
+      val result = booksAndMagazines flatMap { mag => mag.findElem(EName("Title")) map {
+        _.trimmedText
+      }
+      }
       result.toSet
     }
   }
@@ -603,12 +678,18 @@ abstract class AbstractElemLikeQueryTest extends FunSuite {
         bookOrMagazine <- bookstore \ { e => Set("Book", "Magazine").contains(e.localName) }
         titleString: String = bookOrMagazine.getChildElem(EName("Title")).trimmedText
         otherBooks = bookstore.filterChildElems(EName("Book")) filter (e => toResolvedElem(e) != toResolvedElem(bookOrMagazine))
-        titles = otherBooks map { e => e getChildElem { _.localName == "Title" } }
+        titles = otherBooks map { e => e getChildElem {
+          _.localName == "Title"
+        }
+        }
         if titles.map(_.trimmedText).contains(titleString)
       } yield bookOrMagazine
 
     assertResult(Set("Hector and Jeff's Database Hints")) {
-      val result = booksAndMagazines flatMap { mag => mag.findElem(EName("Title")) map { _.trimmedText } }
+      val result = booksAndMagazines flatMap { mag => mag.findElem(EName("Title")) map {
+        _.trimmedText
+      }
+      }
       result.toSet
     }
   }
@@ -642,7 +723,10 @@ abstract class AbstractElemLikeQueryTest extends FunSuite {
       } yield book
 
     assertResult(Set("A First Course in Database Systems", "Jennifer's Economical Database Hints")) {
-      val result = books flatMap { book => book.findElem(EName("Title")) map { _.trimmedText } }
+      val result = books flatMap { book => book.findElem(EName("Title")) map {
+        _.trimmedText
+      }
+      }
       result.toSet
     }
   }
@@ -656,7 +740,9 @@ abstract class AbstractElemLikeQueryTest extends FunSuite {
       for {
         book <- bookstore \ (_.localName == "Book")
         authorNames = {
-          val result = book.filterElems(EName("Author")) map { _.getChildElem(EName("Last_Name")).trimmedText }
+          val result = book.filterElems(EName("Author")) map {
+            _.getChildElem(EName("Last_Name")).trimmedText
+          }
           result.toSet
         }
         if authorNames.contains("Ullman") && !authorNames.contains("Widom")
@@ -664,7 +750,9 @@ abstract class AbstractElemLikeQueryTest extends FunSuite {
 
     assertResult(Set(
       "Hector and Jeff's Database Hints")) {
-      val result = titles map { _.trimmedText }
+      val result = titles map {
+        _.trimmedText
+      }
       result.toSet
     }
   }
@@ -743,7 +831,9 @@ abstract class AbstractElemLikeQueryTest extends FunSuite {
       val authors = book.getChildElem(EName("Authors"))
       val result = for {
         author <- authors \ (_.localName == "Author")
-        lastName = author getChildElem { _.localName == "Last_Name" }
+        lastName = author getChildElem {
+          _.localName == "Last_Name"
+        }
         lastNameValue: String = lastName.trimmedText
       } yield lastNameValue
       result.toSet
@@ -870,7 +960,9 @@ abstract class AbstractElemLikeQueryTest extends FunSuite {
       EName("Title"))
 
     assertResult(depthFirstElmNames) {
-      elms map { _.resolvedName }
+      elms map {
+        _.resolvedName
+      }
     }
   }
 

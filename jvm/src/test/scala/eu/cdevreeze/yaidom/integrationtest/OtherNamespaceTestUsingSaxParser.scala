@@ -16,8 +16,8 @@
 
 package eu.cdevreeze.yaidom.integrationtest
 
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
+
+
 
 import eu.cdevreeze.yaidom.parse
 
@@ -29,7 +29,7 @@ import eu.cdevreeze.yaidom.parse
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
+
 class OtherNamespaceTestUsingSaxParser extends AbstractOtherNamespaceTest {
 
   val documentParser: parse.DocumentParser = parse.DocumentParserUsingSax.newInstance

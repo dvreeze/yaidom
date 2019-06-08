@@ -16,19 +16,10 @@
 
 package eu.cdevreeze.yaidom.integrationtest
 
-import java.{ io => jio }
-import java.{ util => jutil }
+import java.{io => jio}
+import java.{util => jutil}
 
 import scala.collection.immutable
-
-import org.ccil.cowan.tagsoup.jaxp.{ SAXFactoryImpl => TagSoupSAXFactoryImpl }
-import org.junit.runner.RunWith
-import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
-import org.xml.sax.EntityResolver
-import org.xml.sax.ErrorHandler
-import org.xml.sax.InputSource
-import org.xml.sax.SAXParseException
 
 import eu.cdevreeze.yaidom.convert.YaidomToSaxEventsConversions
 import eu.cdevreeze.yaidom.core.EName
@@ -47,8 +38,13 @@ import eu.cdevreeze.yaidom.simple.DocBuilder
 import eu.cdevreeze.yaidom.simple.Document
 import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.simple.NodeBuilder
-import eu.cdevreeze.yaidom.simple.NodeBuilder.textElem
 import javax.xml.parsers.SAXParserFactory
+import org.ccil.cowan.tagsoup.jaxp.{SAXFactoryImpl => TagSoupSAXFactoryImpl}
+import org.scalatest.funsuite.AnyFunSuite
+import org.xml.sax.EntityResolver
+import org.xml.sax.ErrorHandler
+import org.xml.sax.InputSource
+import org.xml.sax.SAXParseException
 
 /**
  * SAX interoperability test case.
@@ -61,8 +57,7 @@ import javax.xml.parsers.SAXParserFactory
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
-class SaxInteropTest extends FunSuite {
+class SaxInteropTest extends AnyFunSuite {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
@@ -939,7 +934,8 @@ class SaxInteropTest extends FunSuite {
     var lineNumber = 0
     var columnNumber = 0
 
-    trait MyErrorHandler extends ErrorHandler { self: SaxHandlerWithLocator =>
+    trait MyErrorHandler extends ErrorHandler {
+      self: SaxHandlerWithLocator =>
 
       override def error(exc: SAXParseException): Unit = {
         errorCount += 1
@@ -1013,7 +1009,7 @@ class SaxInteropTest extends FunSuite {
       recordsElm.findAllElemsOrSelf.size
     }
 
-    val firstRecordElm = (recordsElm \ (_.localName == "car"))(0)
+    val firstRecordElm = (recordsElm \ (_.localName == "car")) (0)
 
     assertResult("car") {
       firstRecordElm.localName
@@ -1086,7 +1082,9 @@ class SaxInteropTest extends FunSuite {
     val liElms = ulElm.findAllChildElems
 
     assertResult(List("li")) {
-      val result = liElms map { _.localName }
+      val result = liElms map {
+        _.localName
+      }
       result.distinct
     }
 
@@ -1115,7 +1113,9 @@ class SaxInteropTest extends FunSuite {
     val liElms2 = ulElm2.findAllChildElems
 
     assertResult(List("li")) {
-      val result = liElms2 map { _.localName }
+      val result = liElms2 map {
+        _.localName
+      }
       result.distinct
     }
 
@@ -1134,7 +1134,9 @@ class SaxInteropTest extends FunSuite {
     val liElms3 = ulElm3.findAllChildElems
 
     assertResult(List("li")) {
-      val result = liElms3 map { _.localName }
+      val result = liElms3 map {
+        _.localName
+      }
       result.distinct
     }
   }
@@ -1169,4 +1171,5 @@ class SaxInteropTest extends FunSuite {
       null
     }
   }
+
 }

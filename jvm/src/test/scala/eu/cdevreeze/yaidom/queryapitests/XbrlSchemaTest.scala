@@ -19,24 +19,20 @@ package eu.cdevreeze.yaidom.queryapitests
 import scala.collection.immutable
 import scala.reflect.classTag
 
-import org.junit.runner.RunWith
-import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
-
 import eu.cdevreeze.yaidom.core.EName
-import eu.cdevreeze.yaidom.simple.Document
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
-import eu.cdevreeze.yaidom.queryapi.ElemApi.anyElem
 import eu.cdevreeze.yaidom.queryapi.ClarkElemLike
+import eu.cdevreeze.yaidom.queryapi.ElemApi.anyElem
 import eu.cdevreeze.yaidom.queryapi.SubtypeAwareElemLike
+import eu.cdevreeze.yaidom.simple.Document
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * Test case using yaidom sub-type-aware elements for XBRL schema processing.
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
-class XbrlSchemaTest extends FunSuite {
+class XbrlSchemaTest extends AnyFunSuite {
 
   import XbrlSchemaTest._
 
@@ -97,7 +93,9 @@ class XbrlSchemaTest extends FunSuite {
     val paths = xbrlSchema.wrappedElem.findAllElemsOrSelf.map(_.path)
 
     assertResult(paths) {
-      xbrlSchema.findAllElemsOrSelfOfType(classTag[XsdElem]) map { _.wrappedElem.path }
+      xbrlSchema.findAllElemsOrSelfOfType(classTag[XsdElem]) map {
+        _.wrappedElem.path
+      }
     }
 
     val elemsContainingPlus =
@@ -236,4 +234,5 @@ object XbrlSchemaTest {
       case _ => new XsdElem(elem)
     }
   }
+
 }

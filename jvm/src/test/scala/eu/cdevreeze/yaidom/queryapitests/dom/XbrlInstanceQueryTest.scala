@@ -16,8 +16,8 @@
 
 package eu.cdevreeze.yaidom.queryapitests.dom
 
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
+
+
 
 import eu.cdevreeze.yaidom.dom.DomElem
 import eu.cdevreeze.yaidom.queryapitests.AbstractXbrlInstanceQueryTest
@@ -28,7 +28,7 @@ import javax.xml.parsers.DocumentBuilderFactory
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
+
 class XbrlInstanceQueryTest extends AbstractXbrlInstanceQueryTest {
 
   final type E = DomElem

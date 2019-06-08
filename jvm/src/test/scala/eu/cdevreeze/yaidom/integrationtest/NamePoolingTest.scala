@@ -16,28 +16,24 @@
 
 package eu.cdevreeze.yaidom.integrationtest
 
-import org.junit.runner.RunWith
-import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
-
 import eu.cdevreeze.yaidom.core.ENameProvider
 import eu.cdevreeze.yaidom.core.QNameProvider
 import eu.cdevreeze.yaidom.core.jvm.CaffeineENameProvider
 import eu.cdevreeze.yaidom.core.jvm.CaffeineQNameProvider
-import eu.cdevreeze.yaidom.simple.Document
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
+import eu.cdevreeze.yaidom.simple.Document
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * Name pooling test, using Google Guava cache based EName and QName providers.
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
-class NamePoolingTest extends FunSuite {
+class NamePoolingTest extends AnyFunSuite {
 
-  import NamePoolingTest._
   import ClarkElemApi._
+  import NamePoolingTest._
 
   test("testNamePooling") {
     ENameProvider.globalENameProvider.become(enameProvider)

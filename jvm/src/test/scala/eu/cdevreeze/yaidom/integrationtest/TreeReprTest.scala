@@ -16,11 +16,6 @@
 
 package eu.cdevreeze.yaidom.integrationtest
 
-import org.junit.runner.RunWith
-import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
-import org.xml.sax.InputSource
-
 import eu.cdevreeze.yaidom.convert.DomConversions
 import eu.cdevreeze.yaidom.core.Declarations
 import eu.cdevreeze.yaidom.core.QName
@@ -29,6 +24,8 @@ import eu.cdevreeze.yaidom.simple.DocBuilder
 import eu.cdevreeze.yaidom.simple.Document
 import eu.cdevreeze.yaidom.simple.EntityRef
 import javax.xml.parsers.DocumentBuilderFactory
+import org.scalatest.funsuite.AnyFunSuite
+import org.xml.sax.InputSource
 
 /**
  * Tree representation test case. The code to create DocBuilder objects had come verbatim from the toString results
@@ -43,8 +40,7 @@ import javax.xml.parsers.DocumentBuilderFactory
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
-class TreeReprTest extends FunSuite {
+class TreeReprTest extends AnyFunSuite {
 
   import eu.cdevreeze.yaidom.simple.DocBuilder._
   import eu.cdevreeze.yaidom.simple.NodeBuilder._
@@ -143,8 +139,9 @@ class TreeReprTest extends FunSuite {
                   elem(
                     qname = QName("Remark"),
                     children = Vector(
-                      text("""Buy this book bundled with "A First Course" - a great deal!
-    """))))),
+                      text(
+                        """Buy this book bundled with "A First Course" - a great deal!
+                        """))))),
               elem(
                 qname = QName("Book"),
                 attributes = Vector(QName("ISBN") -> "ISBN-0-11-222222-3", QName("Price") -> "50"),
@@ -302,7 +299,8 @@ class TreeReprTest extends FunSuite {
               elem(
                 qname = QName("child"),
                 children = Vector(
-                  text("""This text contains an entity reference, viz. hi.
+                  text(
+                    """This text contains an entity reference, viz. hi.
   The entity is defined in the included DTD.
   """)))))))
 
@@ -330,7 +328,8 @@ class TreeReprTest extends FunSuite {
                 children = Vector(
                   text("""This text contains an entity reference, viz. """),
                   entityRef("hello"),
-                  text("""hi.
+                  text(
+                    """hi.
   The entity is defined in the included DTD.
   """)))))))
 
@@ -405,14 +404,16 @@ class TreeReprTest extends FunSuite {
                 qname = QName("child"),
                 attributes = Vector(QName("about") -> """Jansen & co"""),
                 children = Vector(
-                  text("""
+                  text(
+                    """
     Jansen & co
   """))),
               elem(
                 qname = QName("child"),
                 attributes = Vector(QName("about") -> """Jansen & co"""),
                 children = Vector(
-                  text("""
+                  text(
+                    """
   Jansen & co
   """)))))))
 
@@ -475,8 +476,9 @@ class TreeReprTest extends FunSuite {
                     qname = QName("record"),
                     attributes = Vector(QName("type") -> "speed"),
                     children = Vector(
-                      text("""Production Pickup Truck with speed of 271kph
-    """))))),
+                      text(
+                        """Production Pickup Truck with speed of 271kph
+                        """))))),
               elem(
                 qname = QName("car"),
                 attributes = Vector(QName("make") -> "Peel", QName("name") -> "P50", QName("year") -> "1962"),
@@ -489,7 +491,8 @@ class TreeReprTest extends FunSuite {
                     qname = QName("record"),
                     attributes = Vector(QName("type") -> "size"),
                     children = Vector(
-                      text("""Smallest Street-Legal Car at 99cm wide and 59 kg
+                      text(
+                        """Smallest Street-Legal Car at 99cm wide and 59 kg
       in weight"""))))),
               elem(
                 qname = QName("car"),
@@ -607,8 +610,9 @@ class TreeReprTest extends FunSuite {
                   elem(
                     qname = QName("Remark"),
                     children = Vector(
-                      text("""Buy this book bundled with "A First Course" - a great deal!
-    """))))),
+                      text(
+                        """Buy this book bundled with "A First Course" - a great deal!
+                        """))))),
               elem(
                 qname = QName("Book"),
                 attributes = Vector(QName("ISBN") -> "ISBN-0-11-222222-3", QName("Price") -> "50"),
@@ -710,7 +714,8 @@ class TreeReprTest extends FunSuite {
   test("testCreateTreeForXmlFromBugReport") {
     val parser = DocumentParserUsingDom.newInstance
 
-    val xmlString = """<?xml version="1.0" encoding="UTF-8"?>
+    val xmlString =
+      """<?xml version="1.0" encoding="UTF-8"?>
 <rootElem>
   <listing>
     <item />

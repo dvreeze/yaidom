@@ -18,8 +18,8 @@ package eu.cdevreeze.yaidom.queryapitests.nodeinfo
 
 import java.io.StringReader
 
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
+
+
 import org.xml.sax.InputSource
 
 import eu.cdevreeze.yaidom.convert.ScalaXmlConversions.convertToElem
@@ -38,7 +38,7 @@ import net.sf.saxon.s9api.Processor
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
+
 class XQuery3UseCasesTest extends AbstractXQuery3UseCasesTest {
 
   final type E = SaxonElem

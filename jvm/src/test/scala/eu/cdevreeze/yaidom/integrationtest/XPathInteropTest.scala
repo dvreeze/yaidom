@@ -18,13 +18,6 @@ package eu.cdevreeze.yaidom.integrationtest
 
 import scala.collection.immutable
 
-import org.junit.runner.RunWith
-import org.scalatest.BeforeAndAfterAll
-import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
-import org.w3c.dom.Node
-import org.w3c.dom.NodeList
-
 import eu.cdevreeze.yaidom.convert
 import eu.cdevreeze.yaidom.convert.DomConversions.convertToElem
 import eu.cdevreeze.yaidom.convert.DomConversions.nodeListToIndexedSeq
@@ -36,6 +29,10 @@ import eu.cdevreeze.yaidom.parse
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
 import javax.xml.xpath.XPathConstants
 import javax.xml.xpath.XPathFactory
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.funsuite.AnyFunSuite
+import org.w3c.dom.Node
+import org.w3c.dom.NodeList
 
 /**
  * XPath interoperability test. This test shows that DOM Node lists obtained with XPath queries can be processed further using
@@ -43,8 +40,7 @@ import javax.xml.xpath.XPathFactory
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
-class XPathInteropTest extends FunSuite with BeforeAndAfterAll {
+class XPathInteropTest extends AnyFunSuite with BeforeAndAfterAll {
 
   test("testProcessXPathResults") {
     val ns = "http://bookstore"

@@ -16,29 +16,26 @@
 
 package eu.cdevreeze.yaidom.integrationtest
 
-import org.junit.runner.RunWith
-import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
-import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
-import eu.cdevreeze.yaidom.simple.NodeBuilder._
-import eu.cdevreeze.yaidom.simple.ElemBuilder
-import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.simple.NodeBuilder
-import eu.cdevreeze.yaidom.simple.Node
 import eu.cdevreeze.yaidom.core.Declarations
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
+import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.indexed
+import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.simple
+import eu.cdevreeze.yaidom.simple.ElemBuilder
+import eu.cdevreeze.yaidom.simple.Node
+import eu.cdevreeze.yaidom.simple.NodeBuilder
+import eu.cdevreeze.yaidom.simple.NodeBuilder._
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * XML creation test case.
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
-class CreationTest extends FunSuite {
+class CreationTest extends AnyFunSuite {
 
   test("testCreation") {
     // 1. Parse XML file into Elem

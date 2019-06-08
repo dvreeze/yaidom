@@ -18,8 +18,8 @@ package eu.cdevreeze.yaidom.queryapitests.indexed
 
 import java.io.InputStream
 
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
+
+
 
 import eu.cdevreeze.yaidom.indexed.Document
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingStax
@@ -30,7 +30,7 @@ import eu.cdevreeze.yaidom.queryapitests.AbstractLargeXmlTest
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
+
 class LargeXmlTest extends AbstractLargeXmlTest {
 
   type D = Document

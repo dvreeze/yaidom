@@ -16,23 +16,18 @@
 
 package eu.cdevreeze.yaidom.integrationtest
 
-import scala.Vector
-
-import org.junit.runner.RunWith
-import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
-
 import eu.cdevreeze.yaidom.convert.ScalaXmlConversions.convertElem
 import eu.cdevreeze.yaidom.convert.ScalaXmlConversions.convertToElem
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.simple.Document
-import eu.cdevreeze.yaidom.simple.Elem
-import eu.cdevreeze.yaidom.simple.Node
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi._
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.scalaxml
+import eu.cdevreeze.yaidom.simple.Document
+import eu.cdevreeze.yaidom.simple.Elem
+import eu.cdevreeze.yaidom.simple.Node
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * Query test case, testing several example queries.
@@ -45,8 +40,7 @@ import eu.cdevreeze.yaidom.scalaxml
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
-class SimpleQueryTest extends FunSuite {
+class SimpleQueryTest extends AnyFunSuite {
 
   test("testVerySimpleProductQuery") {
     val productElems =
@@ -238,7 +232,7 @@ class SimpleQueryTest extends FunSuite {
         nameElem <- productElem \ EName("name")
       } yield {
         val xml =
-          <item num={ itemElem.attribute(EName("num")) } name={ nameElem.text } quan={ itemElem.attribute(EName("quantity")) }/>
+            <item num={itemElem.attribute(EName("num"))} name={nameElem.text} quan={itemElem.attribute(EName("quantity"))}/>
         convertToElem(xml)
       }
 

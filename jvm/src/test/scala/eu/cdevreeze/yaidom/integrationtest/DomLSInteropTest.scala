@@ -16,20 +16,8 @@
 
 package eu.cdevreeze.yaidom.integrationtest
 
-import java.{ io => jio }
-import java.{ util => jutil }
-
-import org.junit.runner.RunWith
-import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
-import org.w3c.dom.DOMError
-import org.w3c.dom.DOMErrorHandler
-import org.w3c.dom.ls.DOMImplementationLS
-import org.w3c.dom.ls.LSException
-import org.w3c.dom.ls.LSInput
-import org.w3c.dom.ls.LSParser
-import org.w3c.dom.ls.LSResourceResolver
-import org.xml.sax.InputSource
+import java.{io => jio}
+import java.{util => jutil}
 
 import eu.cdevreeze.yaidom.convert.DomConversions
 import eu.cdevreeze.yaidom.convert.DomConversions.convertDocument
@@ -49,8 +37,16 @@ import eu.cdevreeze.yaidom.simple.Document
 import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.simple.EntityRef
 import eu.cdevreeze.yaidom.simple.NodeBuilder
-import eu.cdevreeze.yaidom.simple.NodeBuilder.textElem
 import javax.xml.parsers.DocumentBuilderFactory
+import org.scalatest.funsuite.AnyFunSuite
+import org.w3c.dom.DOMError
+import org.w3c.dom.DOMErrorHandler
+import org.w3c.dom.ls.DOMImplementationLS
+import org.w3c.dom.ls.LSException
+import org.w3c.dom.ls.LSInput
+import org.w3c.dom.ls.LSParser
+import org.w3c.dom.ls.LSResourceResolver
+import org.xml.sax.InputSource
 
 /**
  * DOM LS interoperability test case.
@@ -63,8 +59,7 @@ import javax.xml.parsers.DocumentBuilderFactory
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
-class DomLSInteropTest extends FunSuite {
+class DomLSInteropTest extends AnyFunSuite {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
@@ -1044,7 +1039,7 @@ class DomLSInteropTest extends FunSuite {
       recordsElm.findAllElemsOrSelf.size
     }
 
-    val firstRecordElm = (recordsElm \ (_.localName == "car"))(0)
+    val firstRecordElm = (recordsElm \ (_.localName == "car")) (0)
 
     assertResult("car") {
       firstRecordElm.localName

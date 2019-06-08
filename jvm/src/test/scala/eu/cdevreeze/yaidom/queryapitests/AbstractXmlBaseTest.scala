@@ -20,12 +20,11 @@ import java.net.URI
 
 import scala.collection.immutable
 
-import org.scalatest.FunSuite
-
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi._
 import eu.cdevreeze.yaidom.queryapi.DocumentApi
 import eu.cdevreeze.yaidom.queryapi.ScopedElemApi
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * XML Base test case. It tests some expectations about XML Base support for different element implementations.
@@ -33,7 +32,7 @@ import eu.cdevreeze.yaidom.queryapi.ScopedElemApi
  *
  * @author Chris de Vreeze
  */
-abstract class AbstractXmlBaseTest extends FunSuite {
+abstract class AbstractXmlBaseTest extends AnyFunSuite {
 
   private val XmlBaseEName = EName("http://www.w3.org/XML/1998/namespace", "base")
   private val XLinkNs = "http://www.w3.org/1999/xlink"

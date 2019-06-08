@@ -16,10 +16,6 @@
 
 package eu.cdevreeze.yaidom.integrationtest
 
-import org.junit.runner.RunWith
-import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
-
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.core.QName
@@ -28,6 +24,7 @@ import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
 import eu.cdevreeze.yaidom.queryapi.ClarkNodes
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.simple
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * XML diff test case. Yaidom resolved elements are a good basis for a namespace-aware XML difference tool, provided
@@ -35,8 +32,7 @@ import eu.cdevreeze.yaidom.simple
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
-class XmlDiffTest extends FunSuite {
+class XmlDiffTest extends AnyFunSuite {
 
   test("testNamespaceAwareness") {
     val docParser = DocumentParserUsingDom.newInstance()
@@ -83,7 +79,7 @@ class XmlDiffTest extends FunSuite {
 
     val editedDoc2 = doc2 transformElemsOrSelf {
       case e if e.localName == "title" => e.copy(children = Vector(simple.Text("Sample Feed", false)))
-      case e                           => e
+      case e => e
     }
 
     val diffs = XmlDiffTest.findDiffs(doc1.documentElement, editedDoc2.documentElement)
@@ -108,7 +104,7 @@ class XmlDiffTest extends FunSuite {
 
     val editedDoc2 = doc2 transformElemsOrSelf {
       case e if e.localName == "title" => e.copy(qname = QName(e.qname.prefixOption, "Title"))
-      case e                           => e
+      case e => e
     }
 
     val diffs = XmlDiffTest.findDiffs(doc1.documentElement, editedDoc2.documentElement)
@@ -174,10 +170,11 @@ object XmlDiffTest {
   }
 
   final case class Diffs(
-    val onlyInFirstElem:         Set[Path],
-    val onlyInSecondElem:        Set[Path],
+    val onlyInFirstElem: Set[Path],
+    val onlyInSecondElem: Set[Path],
     val inBothElemsButDiffering: Set[Path]) {
 
     def allDiffs = onlyInFirstElem.union(onlyInSecondElem).union(inBothElemsButDiffering)
   }
+
 }

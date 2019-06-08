@@ -16,15 +16,10 @@
 
 package eu.cdevreeze.yaidom.integrationtest
 
-import java.{ io => jio }
-import java.{ util => jutil }
+import java.{io => jio}
+import java.{util => jutil}
 
 import scala.collection.immutable
-
-import org.junit.runner.RunWith
-import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
-import org.xml.sax.InputSource
 
 import eu.cdevreeze.yaidom.convert.StaxConversions
 import eu.cdevreeze.yaidom.core.EName
@@ -41,9 +36,10 @@ import eu.cdevreeze.yaidom.simple.Document
 import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.simple.EntityRef
 import eu.cdevreeze.yaidom.simple.NodeBuilder
-import eu.cdevreeze.yaidom.simple.NodeBuilder.textElem
 import javax.xml.stream.XMLInputFactory
 import javax.xml.stream.XMLResolver
+import org.scalatest.funsuite.AnyFunSuite
+import org.xml.sax.InputSource
 
 /**
  * StAX interoperability test case.
@@ -56,8 +52,7 @@ import javax.xml.stream.XMLResolver
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
-class StaxInteropTest extends FunSuite {
+class StaxInteropTest extends AnyFunSuite {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
@@ -1026,7 +1021,7 @@ class StaxInteropTest extends FunSuite {
       recordsElm.findAllElemsOrSelf.size
     }
 
-    val firstRecordElm = (recordsElm \ (_.localName == "car"))(0)
+    val firstRecordElm = (recordsElm \ (_.localName == "car")) (0)
 
     assertResult("car") {
       firstRecordElm.localName
@@ -1133,4 +1128,5 @@ class StaxInteropTest extends FunSuite {
       }
     }
   }
+
 }

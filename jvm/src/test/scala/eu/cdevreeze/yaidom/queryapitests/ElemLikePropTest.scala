@@ -16,32 +16,26 @@
 
 package eu.cdevreeze.yaidom.queryapitests
 
-import scala.Vector
-
-import org.junit.runner.RunWith
+import eu.cdevreeze.yaidom.core.QName
+import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.parse
+import eu.cdevreeze.yaidom.simple.Document
+import eu.cdevreeze.yaidom.simple.Elem
+import eu.cdevreeze.yaidom.simple.Node
 import org.scalacheck.Arbitrary
 import org.scalacheck.Gen
 import org.scalacheck.Gen.oneOf
 import org.scalacheck.Gen.someOf
 import org.scalacheck.Prop.propBoolean
-import org.scalatest.FunSuite
-import org.scalatest.prop.Checkers
-import org.scalatest.junit.JUnitRunner
-
-import eu.cdevreeze.yaidom.core.QName
-import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.simple.Document
-import eu.cdevreeze.yaidom.simple.Elem
-import eu.cdevreeze.yaidom.simple.Node
-import eu.cdevreeze.yaidom.parse
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatestplus.scalacheck.Checkers
 
 /**
  * ElemLike properties test case.
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
-class ElemLikePropTest extends FunSuite with Checkers {
+class ElemLikePropTest extends AnyFunSuite with Checkers {
 
   // Simple "definitions"
 
@@ -126,7 +120,9 @@ class ElemLikePropTest extends FunSuite with Checkers {
     check({ (elem: Elem, p: Elem => Boolean) =>
       elem.findTopmostElemsOrSelf(p) == {
         elem.filterElemsOrSelf(p) filter { e =>
-          val hasNoMatchingAncestor = elem.filterElemsOrSelf(p) forall { _.findElem(_ == e).isEmpty }
+          val hasNoMatchingAncestor = elem.filterElemsOrSelf(p) forall {
+            _.findElem(_ == e).isEmpty
+          }
           hasNoMatchingAncestor
         }
       }
@@ -137,7 +133,9 @@ class ElemLikePropTest extends FunSuite with Checkers {
     check({ (elem: Elem, p: Elem => Boolean) =>
       elem.findTopmostElems(p) == {
         elem.filterElems(p) filter { e =>
-          val hasNoMatchingAncestor = elem.filterElems(p) forall { _.findElem(_ == e).isEmpty }
+          val hasNoMatchingAncestor = elem.filterElems(p) forall {
+            _.findElem(_ == e).isEmpty
+          }
           hasNoMatchingAncestor
         }
       }
@@ -156,8 +154,8 @@ class ElemLikePropTest extends FunSuite with Checkers {
       "trivialXmlWithEuro.xml",
       "airportsGermany.xml",
       "trivialXmlWithPI.xml") map { s =>
-        classOf[ElemLikePropTest].getResource("/eu/cdevreeze/yaidom/integrationtest/" + s).toURI
-      }
+      classOf[ElemLikePropTest].getResource("/eu/cdevreeze/yaidom/integrationtest/" + s).toURI
+    }
 
     val docs = uris.map(uri => docParser.parse(uri))
     val bigDoc = Document(Node.elem(qname = QName("all"), scope = Scope.Empty, children = docs.map(_.documentElement)))

@@ -16,10 +16,7 @@
 
 package eu.cdevreeze.yaidom.queryapitests
 
-import scala.Vector
 import scala.reflect.ClassTag
-
-import org.scalatest.FunSuite
 
 import eu.cdevreeze.yaidom
 import eu.cdevreeze.yaidom.core.EName
@@ -28,16 +25,17 @@ import eu.cdevreeze.yaidom.indexed.IndexedClarkElem
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingStax
 import eu.cdevreeze.yaidom.queryapi.ClarkNodes
 import eu.cdevreeze.yaidom.queryapi.ElemWithPath
-import eu.cdevreeze.yaidom.queryapi.UpdatableElemApi
 import eu.cdevreeze.yaidom.queryapi.TransformableElemApi
+import eu.cdevreeze.yaidom.queryapi.UpdatableElemApi
 import eu.cdevreeze.yaidom.simple.Elem
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * Update test, using different yaidom methods of updating.
  *
  * @author Chris de Vreeze
  */
-abstract class AbstractUpdateTest extends FunSuite {
+abstract class AbstractUpdateTest extends AnyFunSuite {
 
   type N <: ClarkNodes.Node
   type E <: N with ClarkNodes.Elem.Aux[N, E] with UpdatableElemApi.Aux[N, E] with TransformableElemApi.Aux[N, E]

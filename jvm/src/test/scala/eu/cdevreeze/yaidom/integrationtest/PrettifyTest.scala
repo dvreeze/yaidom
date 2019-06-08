@@ -16,13 +16,7 @@
 
 package eu.cdevreeze.yaidom.integrationtest
 
-import java.{ util => jutil }
-
-import org.junit.runner.RunWith
-import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
-import org.xml.sax.EntityResolver
-import org.xml.sax.InputSource
+import java.{util => jutil}
 
 import eu.cdevreeze.yaidom.convert.DomConversions
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
@@ -33,6 +27,9 @@ import eu.cdevreeze.yaidom.simple.Node
 import eu.cdevreeze.yaidom.simple.Text
 import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
+import org.scalatest.funsuite.AnyFunSuite
+import org.xml.sax.EntityResolver
+import org.xml.sax.InputSource
 
 /**
  * Prettify test case.
@@ -45,8 +42,7 @@ import javax.xml.parsers.DocumentBuilderFactory
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
-class PrettifyTest extends FunSuite {
+class PrettifyTest extends AnyFunSuite {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
@@ -192,7 +188,8 @@ class PrettifyTest extends FunSuite {
   test("testPrettifyXmlFromBugReport") {
     val parser = DocumentParserUsingDom.newInstance
 
-    val xmlString = """<?xml version="1.0" encoding="UTF-8"?>
+    val xmlString =
+      """<?xml version="1.0" encoding="UTF-8"?>
 <rootElem>
   <listing>
     <item />
@@ -215,7 +212,8 @@ class PrettifyTest extends FunSuite {
     dbf.setCoalescing(false)
     val parser = DocumentParserUsingDom.newInstance(dbf)
 
-    val xmlString = """<?xml version="1.0" encoding="UTF-8"?>
+    val xmlString =
+      """<?xml version="1.0" encoding="UTF-8"?>
 <tag1>
  <tag2>
     <![CDATA[  Some data ]]>

@@ -16,24 +16,20 @@
 
 package eu.cdevreeze.yaidom.integrationtest
 
-import org.junit.runner.RunWith
-import org.scalatest.BeforeAndAfterAll
-import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
-
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi._
 import eu.cdevreeze.yaidom.resolved
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * QName-based query test.
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
-class ScopedQueryTest extends FunSuite with BeforeAndAfterAll {
+class ScopedQueryTest extends AnyFunSuite with BeforeAndAfterAll {
 
   test("testQueryBooks") {
     val docParser = DocumentParserUsingSax.newInstance()

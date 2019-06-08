@@ -18,8 +18,6 @@ package eu.cdevreeze.yaidom.queryapitests
 
 import java.io.File
 
-import org.scalatest.FunSuite
-
 import eu.cdevreeze.yaidom.core.Declarations
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
@@ -27,13 +25,14 @@ import eu.cdevreeze.yaidom.core.PathBuilder
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.queryapi.BackingNodes
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * BackingElemNodeApi test case.
  *
  * @author Chris de Vreeze
  */
-abstract class AbstractBackingElemTest extends FunSuite {
+abstract class AbstractBackingElemTest extends AnyFunSuite {
 
   private val XsNamespace = "http://www.w3.org/2001/XMLSchema"
   private val XLinkNamespace = "http://www.w3.org/1999/xlink"
@@ -109,8 +108,8 @@ abstract class AbstractBackingElemTest extends FunSuite {
         AttributeFormDefaultEName -> "unqualified",
         ElementFormDefaultEName -> "qualified")) {
 
-        docElem.resolvedAttributes.toMap
-      }
+      docElem.resolvedAttributes.toMap
+    }
 
     val linkbaseRefElems = docElem.filterElems(_.resolvedName == LinkLinkbaseRefEName)
 
@@ -152,8 +151,8 @@ abstract class AbstractBackingElemTest extends FunSuite {
         QName("attributeFormDefault") -> "unqualified",
         QName("elementFormDefault") -> "qualified")) {
 
-        docElem.attributes.toMap
-      }
+      docElem.attributes.toMap
+    }
 
     val linkbaseRefElems = docElem.filterElems(_.resolvedName == LinkLinkbaseRefEName)
 
@@ -176,8 +175,8 @@ abstract class AbstractBackingElemTest extends FunSuite {
         "nl-codes" -> "http://www.sometaxonomy/0.1/basis/sbr/types/nl-codes",
         "some-i" -> "http://www.sometaxonomy/0.1/basis/some2/items/some-data")) {
 
-        docElem.scope
-      }
+      docElem.scope
+    }
 
     assertResult(Set(docElem.scope)) {
       docElem.findAllElemsOrSelf.map(_.scope).toSet

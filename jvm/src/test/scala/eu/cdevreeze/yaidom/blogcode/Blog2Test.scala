@@ -17,9 +17,7 @@
 package eu.cdevreeze.yaidom.blogcode
 
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
-import org.junit.runner.RunWith
-import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * Code of yaidom blog 2 ("namespaces in yaidom"). The blog uses the excellent article http://www.lenzconsulting.com/namespaces/.
@@ -35,8 +33,7 @@ import org.scalatest.junit.JUnitRunner
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
-class Blog2Test extends FunSuite {
+class Blog2Test extends AnyFunSuite {
 
   private val pathToParentDir: java.io.File =
     (new java.io.File(classOf[Blog2Test].getResource("feed1.txt").toURI)).getParentFile
@@ -45,12 +42,11 @@ class Blog2Test extends FunSuite {
    * The code of the entire article.
    */
   test("testFindNamesInFeed1") {
+    import ClarkElemApi._
     import eu.cdevreeze.yaidom.core._
-    import eu.cdevreeze.yaidom.simple._
     import eu.cdevreeze.yaidom.parse
     import eu.cdevreeze.yaidom.resolved
-
-    import ClarkElemApi._
+    import eu.cdevreeze.yaidom.simple._
 
     // Using a yaidom DocumentParser that used SAX internally
     val docParser = parse.DocumentParserUsingSax.newInstance

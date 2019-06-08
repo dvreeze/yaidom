@@ -16,12 +16,9 @@
 
 package eu.cdevreeze.yaidom.integrationtest
 
-import org.junit.runner.RunWith
-import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
-
 import eu.cdevreeze.yaidom.dom.DomDocument
 import javax.xml.parsers.DocumentBuilderFactory
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * Newline handling test case, checking that the XML parser normalizes line endings to Unix newlines.
@@ -32,8 +29,7 @@ import javax.xml.parsers.DocumentBuilderFactory
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
-class NewlineTest extends FunSuite {
+class NewlineTest extends AnyFunSuite {
 
   test("testNormalizeNewlineInPrettifiedXml") {
     val docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder()

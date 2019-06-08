@@ -16,13 +16,7 @@
 
 package eu.cdevreeze.yaidom.integrationtest
 
-import java.{ util => jutil }
-
-import org.junit.runner.RunWith
-import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
-import org.xml.sax.EntityResolver
-import org.xml.sax.InputSource
+import java.{util => jutil}
 
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
@@ -36,6 +30,9 @@ import javax.xml.transform.stream.StreamSource
 import net.sf.saxon.dom.NodeOverNodeInfo
 import net.sf.saxon.lib.ParseOptions
 import net.sf.saxon.s9api.Processor
+import org.scalatest.funsuite.AnyFunSuite
+import org.xml.sax.EntityResolver
+import org.xml.sax.InputSource
 
 /**
  * Saxon DOM wrapper test case. It shows that we can easily create `ElemLike` wrappers around Saxon DOMNodeWrapper Elements.
@@ -46,8 +43,7 @@ import net.sf.saxon.s9api.Processor
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
-class SaxonDomWrapperTest extends FunSuite {
+class SaxonDomWrapperTest extends AnyFunSuite {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
@@ -501,7 +497,7 @@ class SaxonDomWrapperTest extends FunSuite {
       recordsElm.findAllElemsOrSelf.size
     }
 
-    val firstRecordElm = (recordsElm \ (_.localName == "car"))(0)
+    val firstRecordElm = (recordsElm \ (_.localName == "car")) (0)
 
     assertResult("car") {
       firstRecordElm.localName
@@ -590,4 +586,5 @@ class SaxonDomWrapperTest extends FunSuite {
       null
     }
   }
+
 }

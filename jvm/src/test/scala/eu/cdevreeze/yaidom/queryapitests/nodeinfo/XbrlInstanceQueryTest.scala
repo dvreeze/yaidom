@@ -16,8 +16,8 @@
 
 package eu.cdevreeze.yaidom.queryapitests.nodeinfo
 
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
+
+
 
 import eu.cdevreeze.yaidom.queryapitests.AbstractXbrlInstanceQueryTest
 import eu.cdevreeze.yaidom.saxon.SaxonDocument
@@ -31,7 +31,7 @@ import net.sf.saxon.s9api.Processor
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
+
 class XbrlInstanceQueryTest extends AbstractXbrlInstanceQueryTest {
 
   final type E = SaxonElem

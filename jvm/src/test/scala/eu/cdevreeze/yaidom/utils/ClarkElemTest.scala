@@ -16,25 +16,21 @@
 
 package eu.cdevreeze.yaidom.utils
 
-import org.junit.runner.RunWith
-import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
-
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.queryapi.ClarkElemApi.withEName
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
+import eu.cdevreeze.yaidom.queryapi.ClarkElemApi.withEName
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.simple
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * ClarkElem test case.
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
-class ClarkElemTest extends FunSuite {
+class ClarkElemTest extends AnyFunSuite {
 
   private val docParser = DocumentParserUsingSax.newInstance
 
@@ -55,13 +51,13 @@ class ClarkElemTest extends FunSuite {
     val parsedInstance = ClarkNode.Elem.from(docParser.parse(uri).documentElement)
 
     val filteredInstance = parsedInstance.minusAttribute(QName("xsi:schemaLocation").res) transformChildElemsToNodeSeq {
-      case e @ ClarkNode.Elem(EName(_, "schemaRef"), _, _) =>
+      case e@ClarkNode.Elem(EName(_, "schemaRef"), _, _) =>
         Vector(e)
-      case e @ ClarkNode.Elem(EName(_, "context"), _, _) if e.attributeOption(EName("id")).contains("I-2007") =>
+      case e@ClarkNode.Elem(EName(_, "context"), _, _) if e.attributeOption(EName("id")).contains("I-2007") =>
         Vector(e)
-      case e @ ClarkNode.Elem(EName(_, "unit"), _, _) if e.attributeOption(EName("id")).contains("U-Monetary") =>
+      case e@ClarkNode.Elem(EName(_, "unit"), _, _) if e.attributeOption(EName("id")).contains("U-Monetary") =>
         Vector(e)
-      case e @ ClarkNode.Elem(EName(_, "CashAndCashEquivalents"), _, _) if e.attributeOption(EName("contextRef")).contains("I-2007") &&
+      case e@ClarkNode.Elem(EName(_, "CashAndCashEquivalents"), _, _) if e.attributeOption(EName("contextRef")).contains("I-2007") &&
         e.attributeOption(EName("unitRef")).contains("U-Monetary") =>
 
         Vector(e)
@@ -101,7 +97,6 @@ class ClarkElemTest extends FunSuite {
 
   private def createContext(): ClarkNode.Elem = {
     import ClarkNode.Node._
-
     import scope._
 
     val identifier =
@@ -130,7 +125,6 @@ class ClarkElemTest extends FunSuite {
 
   private def createUnit(): ClarkNode.Elem = {
     import ClarkNode.Node._
-
     import scope._
 
     // Mind the prefix 'iso427' below. If we convert this to a simple Elem,
@@ -144,7 +138,6 @@ class ClarkElemTest extends FunSuite {
 
   private def createFact(): ClarkNode.Elem = {
     import ClarkNode.Node._
-
     import scope._
 
     textElem(QName("gaap:CashAndCashEquivalents").res, "1000")
@@ -156,7 +149,6 @@ class ClarkElemTest extends FunSuite {
 
   private def createInstance(): ClarkNode.Elem = {
     import ClarkNode.Node._
-
     import scope._
 
     val schemaRef =

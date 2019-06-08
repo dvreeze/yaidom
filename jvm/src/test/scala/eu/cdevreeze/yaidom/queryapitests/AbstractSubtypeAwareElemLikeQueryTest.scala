@@ -19,15 +19,14 @@ package eu.cdevreeze.yaidom.queryapitests
 import scala.collection.immutable
 import scala.reflect.classTag
 
-import org.scalatest.FunSuite
-
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.queryapi.BackingNodes
 import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
 import eu.cdevreeze.yaidom.queryapi.SubtypeAwareElemLike
-import AbstractSubtypeAwareElemLikeQueryTest._
+import eu.cdevreeze.yaidom.queryapitests.AbstractSubtypeAwareElemLikeQueryTest._
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * AbstractSubtypeAwareElemLike-based query test case, showing how to support custom XML dialects offering the
@@ -40,7 +39,7 @@ import AbstractSubtypeAwareElemLikeQueryTest._
  *
  * @author Chris de Vreeze
  */
-abstract class AbstractSubtypeAwareElemLikeQueryTest extends FunSuite {
+abstract class AbstractSubtypeAwareElemLikeQueryTest extends AnyFunSuite {
 
   protected val wrappedDocumentContent: BackingNodes.Elem
 
@@ -132,7 +131,7 @@ object AbstractSubtypeAwareElemLikeQueryTest {
 
     override def equals(other: Any): Boolean = other match {
       case e: SpreadsheetElem => backingElem == e.backingElem
-      case _                  => false
+      case _ => false
     }
 
     override def hashCode: Int = backingElem.hashCode
@@ -208,4 +207,5 @@ object AbstractSubtypeAwareElemLikeQueryTest {
       }
     }
   }
+
 }

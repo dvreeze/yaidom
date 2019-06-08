@@ -16,8 +16,8 @@
 
 package eu.cdevreeze.yaidom.queryapitests.indexed
 
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
+
+
 
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
 import eu.cdevreeze.yaidom.queryapi.BackingNodes
@@ -28,7 +28,7 @@ import eu.cdevreeze.yaidom.queryapitests.AbstractSubtypeAwareElemLikeQueryTest
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
+
 class SubtypeAwareElemLikeQueryTest extends AbstractSubtypeAwareElemLikeQueryTest {
 
   protected val wrappedDocumentContent: BackingNodes.Elem = {

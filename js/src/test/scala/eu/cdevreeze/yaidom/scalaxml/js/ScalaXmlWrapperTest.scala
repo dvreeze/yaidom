@@ -16,9 +16,6 @@
 
 package eu.cdevreeze.yaidom.scalaxml.js
 
-import org.scalatest.BeforeAndAfterAll
-import org.scalatest.FunSuite
-
 import eu.cdevreeze.yaidom.convert.ScalaXmlConversions
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
@@ -30,6 +27,8 @@ import eu.cdevreeze.yaidom.scalaxml.ScalaXmlElem
 import eu.cdevreeze.yaidom.scalaxml.ScalaXmlProcessingInstruction
 import eu.cdevreeze.yaidom.scalaxml.ScalaXmlText
 import eu.cdevreeze.yaidom.simple
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * Scala XML wrapper test case.
@@ -40,7 +39,7 @@ import eu.cdevreeze.yaidom.simple
  *
  * @author Chris de Vreeze
  */
-class ScalaXmlWrapperTest extends FunSuite with BeforeAndAfterAll {
+class ScalaXmlWrapperTest extends AnyFunSuite with BeforeAndAfterAll {
 
   private val nsBookstore = "http://bookstore"
   private val nsGoogle = "http://www.google.com"
@@ -116,7 +115,7 @@ class ScalaXmlWrapperTest extends FunSuite with BeforeAndAfterAll {
       recordsElm.findAllElemsOrSelf.size
     }
 
-    val firstRecordElm = (recordsElm \ (_.localName == "car"))(0)
+    val firstRecordElm = (recordsElm \ (_.localName == "car")) (0)
 
     assertResult("car") {
       firstRecordElm.localName
@@ -284,7 +283,7 @@ class ScalaXmlWrapperTest extends FunSuite with BeforeAndAfterAll {
       iroot.findAllElemsOrSelf.size
     }
 
-    val firstRecordElm = (iroot \ (_.localName == "car"))(0)
+    val firstRecordElm = (iroot \ (_.localName == "car")) (0)
 
     assertResult("car") {
       firstRecordElm.localName
@@ -502,7 +501,7 @@ class ScalaXmlWrapperTest extends FunSuite with BeforeAndAfterAll {
         <country>Isle of Man</country>
         <record type='size'>
           Smallest Street-Legal Car at 99cm wide and 59 kg
-			in weight
+          in weight
         </record>
       </car>
       <car name='Royale' make='Bugatti' year='1931'>
@@ -519,15 +518,18 @@ class ScalaXmlWrapperTest extends FunSuite with BeforeAndAfterAll {
       </FirstElement>
       <?some_pi some_value?>
       <SecondElement param2="something">
-        Pre-Text<Inline>Inlined text</Inline>
+        Pre-Text
+        <Inline>Inlined text</Inline>
         Post-text.
       </SecondElement>
       <ThirdElement>
         <![CDATA[Piet & co]]>
       </ThirdElement>
       <FourthElement>
-        This text contains an entity reference, viz. &hello;.
-	The entity is defined in the included DTD.
+        This text contains an entity reference, viz.
+        &hello;
+        .
+        The entity is defined in the included DTD.
       </FourthElement>
     </RootElement>
 
@@ -537,14 +539,14 @@ class ScalaXmlWrapperTest extends FunSuite with BeforeAndAfterAll {
   //  Version: 20161214
   //  Release date: Wed Dec 14 09:00:00 2016
   private val linkbaseXml =
-    <link:linkbase xmlns:gen="http://xbrl.org/2008/generic" xmlns:label="http://xbrl.org/2008/label" xmlns:link="http://www.xbrl.org/2003/linkbase" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xbrl.org/2008/label http://www.xbrl.org/2008/generic-label.xsd http://xbrl.org/2008/generic http://www.xbrl.org/2008/generic-link.xsd">
-      <link:roleRef roleURI="http://www.xbrl.org/2008/role/label" xlink:href="http://www.xbrl.org/2008/generic-label.xsd#standard-label" xlink:type="simple"/>
-      <link:roleRef roleURI="http://www.xbrl.org/2008/role/link" xlink:href="http://www.xbrl.org/2008/generic-link.xsd#standard-link-role" xlink:type="simple"/>
-      <link:arcroleRef arcroleURI="http://xbrl.org/arcrole/2008/element-label" xlink:href="http://www.xbrl.org/2008/generic-label.xsd#element-label" xlink:type="simple"/>
-      <gen:link xlink:role="http://www.xbrl.org/2008/role/link" xlink:type="extended">
-        <gen:arc xlink:arcrole="http://xbrl.org/arcrole/2008/element-label" xlink:from="ez-ncgc-lr_DutchCorporateGovernanceCode_loc" xlink:to="ez-ncgc-lr_DutchCorporateGovernanceCode_label_en" xlink:type="arc"/>
-        <label:label id="ez-ncgc-lr_DutchCorporateGovernanceCode_label_en" xlink:label="ez-ncgc-lr_DutchCorporateGovernanceCode_label_en" xlink:role="http://www.xbrl.org/2008/role/label" xlink:type="resource" xml:lang="en">Dutch Corporate Governance Code</label:label>
-        <link:loc xlink:href="ez-ncgc-linkroles.xsd#ez-ncgc-lr_DutchCorporateGovernanceCode" xlink:label="ez-ncgc-lr_DutchCorporateGovernanceCode_loc" xlink:type="locator"/>
-      </gen:link>
-    </link:linkbase>
+  <link:linkbase xmlns:gen="http://xbrl.org/2008/generic" xmlns:label="http://xbrl.org/2008/label" xmlns:link="http://www.xbrl.org/2003/linkbase" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xbrl.org/2008/label http://www.xbrl.org/2008/generic-label.xsd http://xbrl.org/2008/generic http://www.xbrl.org/2008/generic-link.xsd">
+    <link:roleRef roleURI="http://www.xbrl.org/2008/role/label" xlink:href="http://www.xbrl.org/2008/generic-label.xsd#standard-label" xlink:type="simple"/>
+    <link:roleRef roleURI="http://www.xbrl.org/2008/role/link" xlink:href="http://www.xbrl.org/2008/generic-link.xsd#standard-link-role" xlink:type="simple"/>
+    <link:arcroleRef arcroleURI="http://xbrl.org/arcrole/2008/element-label" xlink:href="http://www.xbrl.org/2008/generic-label.xsd#element-label" xlink:type="simple"/>
+    <gen:link xlink:role="http://www.xbrl.org/2008/role/link" xlink:type="extended">
+      <gen:arc xlink:arcrole="http://xbrl.org/arcrole/2008/element-label" xlink:from="ez-ncgc-lr_DutchCorporateGovernanceCode_loc" xlink:to="ez-ncgc-lr_DutchCorporateGovernanceCode_label_en" xlink:type="arc"/>
+      <label:label id="ez-ncgc-lr_DutchCorporateGovernanceCode_label_en" xlink:label="ez-ncgc-lr_DutchCorporateGovernanceCode_label_en" xlink:role="http://www.xbrl.org/2008/role/label" xlink:type="resource" xml:lang="en">Dutch Corporate Governance Code</label:label>
+      <link:loc xlink:href="ez-ncgc-linkroles.xsd#ez-ncgc-lr_DutchCorporateGovernanceCode" xlink:label="ez-ncgc-lr_DutchCorporateGovernanceCode_loc" xlink:type="locator"/>
+    </gen:link>
+  </link:linkbase>
 }

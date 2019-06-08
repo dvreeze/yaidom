@@ -18,25 +18,21 @@ package eu.cdevreeze.yaidom.integrationtest
 
 import java.io.StringReader
 
-import org.junit.runner.RunWith
-import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
-import org.xml.sax.InputSource
-
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
 import eu.cdevreeze.yaidom.print.DocumentPrinterUsingDom
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.simple
+import org.scalatest.funsuite.AnyFunSuite
+import org.xml.sax.InputSource
 
 /**
  * Escaped XML within XML test case.
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
-class EscapedXmlTest extends FunSuite {
+class EscapedXmlTest extends AnyFunSuite {
 
   test("testRoundtripEscapedInnerXml") {
     val docPrinter = DocumentPrinterUsingDom.newInstance()

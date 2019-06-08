@@ -16,17 +16,14 @@
 
 package eu.cdevreeze.yaidom.core
 
-import org.junit.runner.RunWith
-import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * QName test case.
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
-class QNameTest extends FunSuite {
+class QNameTest extends AnyFunSuite {
 
   test("testUnprefixedName") {
     val qname = UnprefixedName("Bookstore")
@@ -121,8 +118,8 @@ class QNameTest extends FunSuite {
     }
 
     val qnOption = qname match {
-      case qn @ QName(None, localPart) => Some(qn)
-      case _                           => None
+      case qn@QName(None, localPart) => Some(qn)
+      case _ => None
     }
 
     assertResult(Some(qname)) {
@@ -256,8 +253,8 @@ class QNameTest extends FunSuite {
     }
 
     val qnOption = qname match {
-      case qn @ QName(Some(prefix), localPart) => Some(qn)
-      case _                                   => None
+      case qn@QName(Some(prefix), localPart) => Some(qn)
+      case _ => None
     }
 
     assertResult(Some(qname)) {

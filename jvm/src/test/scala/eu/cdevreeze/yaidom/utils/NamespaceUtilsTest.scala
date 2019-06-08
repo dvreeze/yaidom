@@ -16,16 +16,6 @@
 
 package eu.cdevreeze.yaidom.utils
 
-import org.junit.runner.RunWith
-import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
-
-import NamespaceUtils.pushUpPrefixedNamespaces
-import NamespaceUtils.stripUnusedNamespaces
-import NamespaceUtils.findAllENames
-import NamespaceUtils.findAllNamespaces
-import NamespaceUtils.findENamesInElementItself
-import NamespaceUtils.findNamespacesInElementItself
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
@@ -34,14 +24,20 @@ import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
 import eu.cdevreeze.yaidom.queryapi.BackingElemApi
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.simple.NodeBuilder
+import eu.cdevreeze.yaidom.utils.NamespaceUtils.findAllENames
+import eu.cdevreeze.yaidom.utils.NamespaceUtils.findAllNamespaces
+import eu.cdevreeze.yaidom.utils.NamespaceUtils.findENamesInElementItself
+import eu.cdevreeze.yaidom.utils.NamespaceUtils.findNamespacesInElementItself
+import eu.cdevreeze.yaidom.utils.NamespaceUtils.pushUpPrefixedNamespaces
+import eu.cdevreeze.yaidom.utils.NamespaceUtils.stripUnusedNamespaces
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * NamespaceUtilsTest test case. See http://www.lenzconsulting.com/namespaces/ for the test data.
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
-class NamespaceUtilsTest extends FunSuite {
+class NamespaceUtilsTest extends AnyFunSuite {
 
   private val docParser = DocumentParserUsingSax.newInstance
 
@@ -238,4 +234,5 @@ class NamespaceUtilsTest extends FunSuite {
 
     def findAttributeValueENameExtractor(elem: BackingElemApi, attributeEName: EName): Option[TextENameExtractor] = None
   }
+
 }

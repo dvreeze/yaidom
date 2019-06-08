@@ -21,11 +21,6 @@ import java.nio.charset.Charset
 
 import scala.io.Codec
 
-import org.junit.runner.RunWith
-import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
-import org.xml.sax.InputSource
-
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.dom.DomDocument
 import eu.cdevreeze.yaidom.parse.DocumentParser
@@ -36,14 +31,15 @@ import eu.cdevreeze.yaidom.parse.DocumentParserUsingStax
 import eu.cdevreeze.yaidom.scalaxml.ScalaXmlDocument
 import eu.cdevreeze.yaidom.simple.DocBuilder
 import javax.xml.parsers.DocumentBuilderFactory
+import org.scalatest.funsuite.AnyFunSuite
+import org.xml.sax.InputSource
 
 /**
  * DocumentParser test.
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
-class DocumentParserTest extends FunSuite {
+class DocumentParserTest extends AnyFunSuite {
 
   test("testParseWithEndingCommentsUsingSax") {
     val parser = DocumentParserUsingSax.newInstance

@@ -16,12 +16,7 @@
 
 package eu.cdevreeze.yaidom
 
-import org.junit.runner.RunWith
-import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
-
-import XmlStringUtils.isAllowedElementLocalName
-import XmlStringUtils.isProbablyValidXmlName
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * Test case for [[eu.cdevreeze.yaidom.XmlStringUtils]].
@@ -30,8 +25,8 @@ import XmlStringUtils.isProbablyValidXmlName
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
-class XmlStringUtilsTest extends FunSuite {
+
+class XmlStringUtilsTest extends AnyFunSuite {
 
   test("testNameValidity") {
     import XmlStringUtils._

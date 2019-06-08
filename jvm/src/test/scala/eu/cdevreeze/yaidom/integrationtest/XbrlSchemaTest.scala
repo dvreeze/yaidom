@@ -16,22 +16,18 @@
 
 package eu.cdevreeze.yaidom.integrationtest
 
-import org.junit.runner.RunWith
-import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
-
 import eu.cdevreeze.yaidom.core.EName
-import eu.cdevreeze.yaidom.simple.Document
 import eu.cdevreeze.yaidom.indexed
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
+import eu.cdevreeze.yaidom.simple.Document
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * Test case using yaidom indexed elements for XBRL schema processing.
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
-class XbrlSchemaTest extends FunSuite {
+class XbrlSchemaTest extends AnyFunSuite {
   import XbrlSchemaTest._
 
   def testQueryXbrlSchema(): Unit = {

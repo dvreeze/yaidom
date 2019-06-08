@@ -16,14 +16,9 @@
 
 package eu.cdevreeze.yaidom.integrationtest
 
-import java.{ io => jio }
+import java.{io => jio}
 
 import scala.collection.immutable
-
-import org.junit.runner.RunWith
-import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
-import org.xml.sax.InputSource
 
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
@@ -35,6 +30,8 @@ import eu.cdevreeze.yaidom.simple.NodeBuilder
 import eu.cdevreeze.yaidom.simple.NodeBuilder.elem
 import eu.cdevreeze.yaidom.simple.NodeBuilder.emptyElem
 import eu.cdevreeze.yaidom.simple.NodeBuilder.textElem
+import org.scalatest.funsuite.AnyFunSuite
+import org.xml.sax.InputSource
 
 /**
  * Example http://www.javacodegeeks.com/2012/05/scala-basic-xml-processing.html (for Scala's XML library) "ported" to
@@ -47,8 +44,7 @@ import eu.cdevreeze.yaidom.simple.NodeBuilder.textElem
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
-class BasicXmlProcessingTest extends FunSuite {
+class BasicXmlProcessingTest extends AnyFunSuite {
 
   import BasicXmlProcessingTest._
 
@@ -87,20 +83,28 @@ class BasicXmlProcessingTest extends FunSuite {
     val bars = foo \ (_.localName == "bar")
 
     assertResult(List("bar", "bar", "bar")) {
-      bars map { _.localName }
+      bars map {
+        _.localName
+      }
     }
 
     assertResult("hi 1 yellow") {
       val bars = foo \ (_.localName == "bar")
-      bars map { _.text } mkString " "
+      bars map {
+        _.text
+      } mkString " "
     }
 
     assertResult(List("greet", "count", "color")) {
-      (foo \ (_.localName == "bar")) map { _.attributeOption(EName("type")).getOrElse("") }
+      (foo \ (_.localName == "bar")) map {
+        _.attributeOption(EName("type")).getOrElse("")
+      }
     }
     assertResult(List("greet", "count", "color")) {
       // Knowing that the attribute "type" is always present
-      (foo \ (_.localName == "bar")) map { _.attribute(EName("type")) }
+      (foo \ (_.localName == "bar")) map {
+        _.attribute(EName("type"))
+      }
     }
 
     assertResult(List("greet" -> "hi", "count" -> "1", "color" -> "yellow")) {
@@ -134,11 +138,15 @@ class BasicXmlProcessingTest extends FunSuite {
     val zs = baz \\ (_.localName == "z")
 
     assertResult(List("z", "z", "z", "z")) {
-      zs map { _.localName }
+      zs map {
+        _.localName
+      }
     }
 
     assertResult(List("1", "2", "3", "4")) {
-      (baz \\ (_.localName == "z")) map { _.attribute(EName("x")) }
+      (baz \\ (_.localName == "z")) map {
+        _.attribute(EName("x"))
+      }
     }
 
     val fooString = """<foo><bar type="greet">hi</bar><bar type="count">1</bar><bar type="color">yellow</bar></foo>"""
@@ -280,4 +288,5 @@ object BasicXmlProcessingTest {
   }
 
   final case class Artist(val name: String, val albums: immutable.IndexedSeq[Album])
+
 }

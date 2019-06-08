@@ -16,10 +16,7 @@
 
 package eu.cdevreeze.yaidom.queryapitests
 
-import scala.Vector
 import scala.collection.immutable
-
-import org.scalatest.FunSuite
 
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
@@ -28,6 +25,7 @@ import eu.cdevreeze.yaidom.queryapi.ScopedElemApi
 import eu.cdevreeze.yaidom.queryapi.ScopedNodes
 import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.simple.Node
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * Query test, using examples from http://www.w3.org/TR/xquery-30-use-cases that show uses cases for XQuery 3.0.
@@ -40,7 +38,7 @@ import eu.cdevreeze.yaidom.simple.Node
  *
  * @author Chris de Vreeze
  */
-abstract class AbstractXQuery3UseCasesTest extends FunSuite {
+abstract class AbstractXQuery3UseCasesTest extends AnyFunSuite {
 
   type E <: ScopedNodes.Elem with ScopedElemApi.Aux[E]
 

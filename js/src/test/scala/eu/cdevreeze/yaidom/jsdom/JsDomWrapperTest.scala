@@ -16,11 +16,6 @@
 
 package eu.cdevreeze.yaidom.jsdom
 
-import org.scalajs.dom.experimental.domparser.DOMParser
-import org.scalajs.dom.experimental.domparser.SupportedType
-import org.scalatest.BeforeAndAfterAll
-import org.scalatest.FunSuite
-
 import eu.cdevreeze.yaidom.convert.JsDomConversions
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
@@ -29,6 +24,10 @@ import eu.cdevreeze.yaidom.indexed
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi._
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.simple
+import org.scalajs.dom.experimental.domparser.DOMParser
+import org.scalajs.dom.experimental.domparser.SupportedType
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * DOM wrapper test case.
@@ -39,7 +38,7 @@ import eu.cdevreeze.yaidom.simple
  *
  * @author Chris de Vreeze
  */
-class JsDomWrapperTest extends FunSuite with BeforeAndAfterAll {
+class JsDomWrapperTest extends AnyFunSuite with BeforeAndAfterAll {
 
   private val nsBookstore = "http://bookstore"
   private val nsGoogle = "http://www.google.com"
@@ -127,7 +126,7 @@ class JsDomWrapperTest extends FunSuite with BeforeAndAfterAll {
       recordsElm.findAllElemsOrSelf.size
     }
 
-    val firstRecordElm = (recordsElm \ (_.localName == "car"))(0)
+    val firstRecordElm = (recordsElm \ (_.localName == "car")) (0)
 
     assertResult("car") {
       firstRecordElm.localName
@@ -323,7 +322,7 @@ class JsDomWrapperTest extends FunSuite with BeforeAndAfterAll {
       iroot.findAllElemsOrSelf.size
     }
 
-    val firstRecordElm = (iroot \ (_.localName == "car"))(0)
+    val firstRecordElm = (iroot \ (_.localName == "car")) (0)
 
     assertResult("car") {
       firstRecordElm.localName

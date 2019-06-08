@@ -16,12 +16,9 @@
 
 package eu.cdevreeze.yaidom.queryapitests
 
-import scala.Vector
-
-import org.scalatest.FunSuite
-
-import eu.cdevreeze.yaidom.queryapi.ClarkNodes
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi.withLocalName
+import eu.cdevreeze.yaidom.queryapi.ClarkNodes
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * ClarkElemLike-based query test case showing robust querying.
@@ -36,7 +33,7 @@ import eu.cdevreeze.yaidom.queryapi.ClarkElemApi.withLocalName
  *
  * @author Chris de Vreeze
  */
-abstract class AbstractRobustQueryTest extends FunSuite {
+abstract class AbstractRobustQueryTest extends AnyFunSuite {
 
   type E <: ClarkNodes.Elem
 

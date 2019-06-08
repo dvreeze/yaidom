@@ -16,8 +16,8 @@
 
 package eu.cdevreeze.yaidom.queryapitests.scalaxml
 
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
+
+
 
 import eu.cdevreeze.yaidom.indexed.IndexedClarkElem
 import eu.cdevreeze.yaidom.queryapitests.AbstractIndexedElemLikeQueryTest
@@ -28,7 +28,7 @@ import eu.cdevreeze.yaidom.scalaxml.ScalaXmlElem
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
+
 class IndexedElemQueryTest extends AbstractIndexedElemLikeQueryTest {
 
   final type U = ScalaXmlElem

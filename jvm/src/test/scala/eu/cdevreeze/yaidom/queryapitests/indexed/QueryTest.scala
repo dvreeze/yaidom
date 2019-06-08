@@ -21,8 +21,8 @@ import java.net.URI
 import scala.Vector
 import scala.collection.immutable
 
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
+
+
 
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
@@ -38,7 +38,7 @@ import eu.cdevreeze.yaidom.queryapitests.AbstractElemLikeQueryTest
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
+
 class QueryTest extends AbstractElemLikeQueryTest {
 
   final type E = Elem

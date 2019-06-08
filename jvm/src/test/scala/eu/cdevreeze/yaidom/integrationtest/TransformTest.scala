@@ -16,12 +16,6 @@
 
 package eu.cdevreeze.yaidom.integrationtest
 
-import scala.Vector
-
-import org.junit.runner.RunWith
-import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
-
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
@@ -29,14 +23,14 @@ import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.simple.ElemBuilder
 import eu.cdevreeze.yaidom.simple.Node
 import eu.cdevreeze.yaidom.simple.NodeBuilder
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * XML transformation test case.
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
-class TransformTest extends FunSuite {
+class TransformTest extends AnyFunSuite {
 
   test("testNestedTransformation") {
     // See http://stackoverflow.com/questions/4313032/scala-xml-transform-throws-away-transformed-elements-with-multiple-attributes.

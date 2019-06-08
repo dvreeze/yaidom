@@ -16,19 +16,15 @@
 
 package eu.cdevreeze.yaidom.integrationtest
 
-import scala.Vector
 import scala.collection.immutable
-
-import org.junit.runner.RunWith
-import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
+import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
 import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.simple.NodeBuilder.elem
 import eu.cdevreeze.yaidom.simple.NodeBuilder.textElem
-import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * Test case using yaidom for validation of XML documents, playing with an "alternative schema language" (inspired by Relax NG and
@@ -38,8 +34,7 @@ import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
-class ValidationTest extends FunSuite {
+class ValidationTest extends AnyFunSuite {
 
   import ValidationTest._
 
@@ -157,7 +152,7 @@ class ValidationTest extends FunSuite {
 
 object ValidationTest {
 
-  final class ValidationResult private (val success: Boolean, val messages: immutable.Seq[String])
+  final class ValidationResult private(val success: Boolean, val messages: immutable.Seq[String])
 
   object ValidationResult {
 

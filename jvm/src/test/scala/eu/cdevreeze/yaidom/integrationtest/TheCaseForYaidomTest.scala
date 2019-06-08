@@ -16,17 +16,9 @@
 
 package eu.cdevreeze.yaidom.integrationtest
 
-import java.{ io => jio }
+import java.{io => jio}
 
-import scala.Vector
 import scala.xml.NodeSeq.seqToNodeSeq
-
-import org.junit.runner.RunWith
-import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
-import org.w3c.dom.DOMException
-import org.xml.sax.InputSource
-import org.xml.sax.SAXParseException
 
 import eu.cdevreeze.yaidom.convert.ScalaXmlConversions
 import eu.cdevreeze.yaidom.core.EName
@@ -43,6 +35,10 @@ import eu.cdevreeze.yaidom.simple.Node
 import eu.cdevreeze.yaidom.simple.NodeBuilder
 import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.parsers.SAXParserFactory
+import org.scalatest.funsuite.AnyFunSuite
+import org.w3c.dom.DOMException
+import org.xml.sax.InputSource
+import org.xml.sax.SAXParseException
 
 /**
  * Test case showing why preferring yaidom over the standard Scala XML library makes sense.
@@ -65,8 +61,7 @@ import javax.xml.parsers.SAXParserFactory
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
-class TheCaseForYaidomTest extends FunSuite {
+class TheCaseForYaidomTest extends AnyFunSuite {
 
   /**
    * Our XML, which is not namespace-well-formed.

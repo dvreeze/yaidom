@@ -19,35 +19,31 @@ package eu.cdevreeze.yaidom.xpath.saxon
 import java.io.File
 import java.net.URI
 
-import org.junit.runner.RunWith
-import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
-
-import eu.cdevreeze.yaidom.saxon.SaxonDocument
-import eu.cdevreeze.yaidom.saxon.SaxonElem
-import eu.cdevreeze.yaidom.saxon.SaxonNode
-import eu.cdevreeze.yaidom.utils.saxon.SaxonElemToSimpleElemConverter
-import eu.cdevreeze.yaidom.utils.saxon.SimpleElemToSaxonElemConverter
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.core.jvm.JavaQNames
 import eu.cdevreeze.yaidom.resolved
+import eu.cdevreeze.yaidom.saxon.SaxonDocument
+import eu.cdevreeze.yaidom.saxon.SaxonElem
+import eu.cdevreeze.yaidom.saxon.SaxonNode
 import eu.cdevreeze.yaidom.simple
+import eu.cdevreeze.yaidom.utils.saxon.SaxonElemToSimpleElemConverter
+import eu.cdevreeze.yaidom.utils.saxon.SimpleElemToSaxonElemConverter
 import javax.xml.xpath.XPathFunction
 import javax.xml.xpath.XPathFunctionResolver
 import javax.xml.xpath.XPathVariableResolver
 import net.sf.saxon.om.NodeInfo
 import net.sf.saxon.s9api.DocumentBuilder
 import net.sf.saxon.s9api.Processor
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * XPath test case using JAXP backed by Saxon.
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
-class XPathTest extends FunSuite {
+class XPathTest extends AnyFunSuite {
 
   private val processor = new Processor(false)
 

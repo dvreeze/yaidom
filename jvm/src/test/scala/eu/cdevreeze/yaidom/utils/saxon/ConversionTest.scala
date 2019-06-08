@@ -18,10 +18,6 @@ package eu.cdevreeze.yaidom.utils.saxon
 
 import java.io.File
 
-import org.junit.runner.RunWith
-import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
-
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
@@ -30,14 +26,14 @@ import eu.cdevreeze.yaidom.saxon.SaxonDocument
 import eu.cdevreeze.yaidom.simple
 import javax.xml.transform.stream.StreamSource
 import net.sf.saxon.s9api.Processor
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * Conversion test for Saxon elements to native simple elements and vice versa.
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
-class ConversionTest extends FunSuite {
+class ConversionTest extends AnyFunSuite {
 
   private val processor = new Processor(false)
 

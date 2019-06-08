@@ -22,8 +22,8 @@ import java.net.URI
 
 import scala.collection.immutable
 
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
+
+
 
 import eu.cdevreeze.yaidom.queryapitests.AbstractXmlBaseTest
 import eu.cdevreeze.yaidom.saxon.SaxonDocument
@@ -37,7 +37,7 @@ import net.sf.saxon.s9api.Processor
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
+
 class XmlBaseTest extends AbstractXmlBaseTest {
 
   type D = SaxonDocument

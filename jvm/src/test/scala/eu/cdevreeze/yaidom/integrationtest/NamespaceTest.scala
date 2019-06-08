@@ -16,12 +16,7 @@
 
 package eu.cdevreeze.yaidom.integrationtest
 
-import java.{ io => jio }
-
-import org.junit.runner.RunWith
-import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
-import org.xml.sax.InputSource
+import java.{io => jio}
 
 import eu.cdevreeze.yaidom.core.Declarations
 import eu.cdevreeze.yaidom.core.EName
@@ -32,6 +27,8 @@ import eu.cdevreeze.yaidom.print.DocumentPrinterUsingSax
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.simple.Node
 import eu.cdevreeze.yaidom.simple.NodeBuilder
+import org.scalatest.funsuite.AnyFunSuite
+import org.xml.sax.InputSource
 
 /**
  * Test case testing the use of namespaces in immutable Documents.
@@ -40,8 +37,7 @@ import eu.cdevreeze.yaidom.simple.NodeBuilder
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
-class NamespaceTest extends FunSuite {
+class NamespaceTest extends AnyFunSuite {
 
   val nsAtom = "http://www.w3.org/2005/Atom"
   val nsXhtml = "http://www.w3.org/1999/xhtml"
@@ -55,7 +51,9 @@ class NamespaceTest extends FunSuite {
     val rootElm = doc.documentElement
 
     assertResult(List(QName("feed"), QName("title"), QName("rights"), QName("xhtml:div"), QName("xhtml:strong"), QName("xhtml:em"))) {
-      rootElm.findAllElemsOrSelf map { _.qname }
+      rootElm.findAllElemsOrSelf map {
+        _.qname
+      }
     }
 
     val rootElmBuilder = NodeBuilder.fromElem(doc.documentElement)(Scope.Empty)
@@ -74,7 +72,9 @@ class NamespaceTest extends FunSuite {
     val rootElm = doc.documentElement
 
     assertResult(List(QName("feed"), QName("title"), QName("rights"), QName("div"), QName("strong"), QName("em"))) {
-      rootElm.findAllElemsOrSelf map { _.qname }
+      rootElm.findAllElemsOrSelf map {
+        _.qname
+      }
     }
 
     val rootElmBuilder = NodeBuilder.fromElem(doc.documentElement)(Scope.Empty)
@@ -83,10 +83,14 @@ class NamespaceTest extends FunSuite {
       rootElmBuilder.namespaces
     }
     assertResult(Declarations.from("example" -> nsExamples)) {
-      rootElmBuilder findElem { eb => eb.qname == QName("rights") } map { _.namespaces } getOrElse (Declarations.Empty)
+      rootElmBuilder findElem { eb => eb.qname == QName("rights") } map {
+        _.namespaces
+      } getOrElse (Declarations.Empty)
     }
     assertResult(Declarations.from("" -> nsXhtml)) {
-      rootElmBuilder findElem { eb => eb.qname == QName("div") } map { _.namespaces } getOrElse (Declarations.Empty)
+      rootElmBuilder findElem { eb => eb.qname == QName("div") } map {
+        _.namespaces
+      } getOrElse (Declarations.Empty)
     }
   }
 
@@ -98,7 +102,9 @@ class NamespaceTest extends FunSuite {
     val rootElm = doc.documentElement
 
     assertResult(List(QName("feed"), QName("title"), QName("rights"), QName("xhtml:div"), QName("xhtml:strong"), QName("xhtml:em"))) {
-      rootElm.findAllElemsOrSelf map { _.qname }
+      rootElm.findAllElemsOrSelf map {
+        _.qname
+      }
     }
 
     val rootElmBuilder = NodeBuilder.fromElem(doc.documentElement)(Scope.Empty)
@@ -108,11 +114,15 @@ class NamespaceTest extends FunSuite {
     }
     // Superfluous namespace declarations not restored
     assertResult(Declarations.Empty) {
-      rootElmBuilder findElem { eb => eb.qname == QName("rights") } map { _.namespaces } getOrElse (Declarations.Empty)
+      rootElmBuilder findElem { eb => eb.qname == QName("rights") } map {
+        _.namespaces
+      } getOrElse (Declarations.Empty)
     }
     // Superfluous namespace declarations not restored
     assertResult(Declarations.Empty) {
-      rootElmBuilder findElem { eb => eb.qname == QName("div") } map { _.namespaces } getOrElse (Declarations.Empty)
+      rootElmBuilder findElem { eb => eb.qname == QName("div") } map {
+        _.namespaces
+      } getOrElse (Declarations.Empty)
     }
   }
 
@@ -171,9 +181,10 @@ class NamespaceTest extends FunSuite {
   test("testOverrideNamespace") {
     val docParser = DocumentParserUsingSax.newInstance
 
-    val s = """|<my:foo xmlns:my="http://example.com/uri1">
-               |  <my:bar xmlns:my="http://example.com/uri2"/>
-               |</my:foo>""".stripMargin
+    val s =
+      """|<my:foo xmlns:my="http://example.com/uri1">
+         |  <my:bar xmlns:my="http://example.com/uri2"/>
+         |</my:foo>""".stripMargin
 
     val doc = docParser.parse(new InputSource(new jio.StringReader(s)))
     val rootElm = doc.documentElement
@@ -187,9 +198,10 @@ class NamespaceTest extends FunSuite {
     val docParser = DocumentParserUsingSax.newInstance
 
     // Relative URIs should not be used! In any case, namespace URI comparison is string comparison.
-    val s = """|<my1:foo xmlns:my1="http://example.com/uri1">
-               |  <my2:bar xmlns:my2="http://EXAMPLE.COM/uri2/"><my3:baz xmlns:my3="../uri3"/></my2:bar>
-               |</my1:foo>""".stripMargin
+    val s =
+      """|<my1:foo xmlns:my1="http://example.com/uri1">
+         |  <my2:bar xmlns:my2="http://EXAMPLE.COM/uri2/"><my3:baz xmlns:my3="../uri3"/></my2:bar>
+         |</my1:foo>""".stripMargin
 
     val doc = docParser.parse(new InputSource(new jio.StringReader(s)))
     val rootElm = doc.documentElement
@@ -214,10 +226,11 @@ class NamespaceTest extends FunSuite {
 
     // Only XML version 1.1 allows the use of prefixed namespace undeclarations
 
-    val s = """|<?xml version="1.1"?>
-               |<my:foo xmlns:my="http://example.com/uri1">
-               |  <my2:bar xmlns:my="" xmlns:my2="http://example.com/uri2"/>
-               |</my:foo>""".stripMargin
+    val s =
+      """|<?xml version="1.1"?>
+         |<my:foo xmlns:my="http://example.com/uri1">
+         |  <my2:bar xmlns:my="" xmlns:my2="http://example.com/uri2"/>
+         |</my:foo>""".stripMargin
 
     val doc = docParser.parse(new InputSource(new jio.StringReader(s)))
     val rootElm = doc.documentElement
@@ -230,9 +243,10 @@ class NamespaceTest extends FunSuite {
   test("testXmlNamespace") {
     val docParser = DocumentParserUsingSax.newInstance
 
-    val s = """|<my:foo xmlns:my="http://example.com/uri">
-               |  <my:bar xml:lang="en"/>
-               |</my:foo>""".stripMargin
+    val s =
+      """|<my:foo xmlns:my="http://example.com/uri">
+         |  <my:bar xml:lang="en"/>
+         |</my:foo>""".stripMargin
 
     val doc = docParser.parse(new InputSource(new jio.StringReader(s)))
     val rootElm = doc.documentElement
@@ -242,8 +256,7 @@ class NamespaceTest extends FunSuite {
     }
 
     assertResult(Some("en")) {
-      rootElm findElem { e => e.localName == "bar" } flatMap
-        { e => e.attributeOption(EName("{http://www.w3.org/XML/1998/namespace}lang")) }
+      rootElm findElem { e => e.localName == "bar" } flatMap { e => e.attributeOption(EName("{http://www.w3.org/XML/1998/namespace}lang")) }
     }
   }
 
@@ -252,12 +265,13 @@ class NamespaceTest extends FunSuite {
 
     // Only XML version 1.1 allows the use of prefixed namespace undeclarations
 
-    val s = """|<?xml version="1.1"?>
-               |<my:doc xmlns:my="http://xmlportfolio.com/xmlguild-examples">
-               |  <simple xmlns:my="">
-               |    <remark>We don't use namespaces.</remark>
-               |  </simple>
-               |</my:doc>""".stripMargin
+    val s =
+      """|<?xml version="1.1"?>
+         |<my:doc xmlns:my="http://xmlportfolio.com/xmlguild-examples">
+         |  <simple xmlns:my="">
+         |    <remark>We don't use namespaces.</remark>
+         |  </simple>
+         |</my:doc>""".stripMargin
 
     val doc = docParser.parse(new InputSource(new jio.StringReader(s)))
     val rootElm = doc.documentElement
@@ -266,7 +280,9 @@ class NamespaceTest extends FunSuite {
       rootElm.scope
     }
 
-    val simpleElmOption = rootElm findElem { _.qname == QName("simple") }
+    val simpleElmOption = rootElm findElem {
+      _.qname == QName("simple")
+    }
     val simpleElm = simpleElmOption.getOrElse(sys.error("Expected element 'simple'"))
 
     assertResult(EName("simple")) {
@@ -276,7 +292,9 @@ class NamespaceTest extends FunSuite {
       simpleElm.scope
     }
     assertResult(List(EName("simple"), EName("remark"))) {
-      simpleElm.findAllElemsOrSelf map { _.resolvedName }
+      simpleElm.findAllElemsOrSelf map {
+        _.resolvedName
+      }
     }
   }
 

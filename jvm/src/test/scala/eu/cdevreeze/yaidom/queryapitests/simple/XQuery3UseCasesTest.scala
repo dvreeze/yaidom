@@ -16,8 +16,8 @@
 
 package eu.cdevreeze.yaidom.queryapitests.simple
 
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
+
+
 
 import eu.cdevreeze.yaidom.convert.ScalaXmlConversions.convertToElem
 import eu.cdevreeze.yaidom.queryapitests.AbstractXQuery3UseCasesTest
@@ -28,7 +28,7 @@ import eu.cdevreeze.yaidom.simple.Elem
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
+
 class XQuery3UseCasesTest extends AbstractXQuery3UseCasesTest {
 
   final type E = Elem

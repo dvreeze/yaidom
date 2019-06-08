@@ -16,32 +16,29 @@
 
 package eu.cdevreeze.yaidom.integrationtest
 
-import java.{ io => jio }
 import java.io.File
 import java.io.FileInputStream
 import java.net.URI
-import java.{ util => jutil }
+import java.{io => jio}
+import java.{util => jutil}
 
 import scala.collection.immutable
 import scala.collection.mutable
 
-import org.junit.runner.RunWith
-import org.scalatest.BeforeAndAfterAll
-import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
-
-import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.convert.EventWithAncestry
 import eu.cdevreeze.yaidom.convert.StaxConversions.asIterator
 import eu.cdevreeze.yaidom.convert.StaxConversions.convertToEventWithAncestryIterator
 import eu.cdevreeze.yaidom.convert.StaxConversions.takeElem
 import eu.cdevreeze.yaidom.convert.StaxConversions.takeElemsUntil
+import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 import eu.cdevreeze.yaidom.simple.Elem
 import javax.xml.stream.XMLInputFactory
-import javax.xml.stream.events.{ ProcessingInstruction => StaxProcessingInstruction }
 import javax.xml.stream.events.XMLEvent
+import javax.xml.stream.events.{ProcessingInstruction => StaxProcessingInstruction}
 import javax.xml.transform.stream.StreamSource
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * Large XML test case, using streaming, thus keeping the memory footprint low. This test case shows how to code StAX-based streaming for yaidom, keeping the
@@ -51,8 +48,7 @@ import javax.xml.transform.stream.StreamSource
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
-class StreamingLargeXmlTest extends FunSuite with BeforeAndAfterAll {
+class StreamingLargeXmlTest extends AnyFunSuite with BeforeAndAfterAll {
 
   import EventWithAncestry.dropWhileNot
 
@@ -71,7 +67,9 @@ class StreamingLargeXmlTest extends FunSuite with BeforeAndAfterAll {
 
     val bos = new jio.ByteArrayOutputStream
     var b: Int = -1
-    while ({ b = is.read(); b >= 0 }) {
+    while ( {
+      b = is.read(); b >= 0
+    }) {
       bos.write(b)
     }
     is.close()

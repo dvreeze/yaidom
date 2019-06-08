@@ -16,17 +16,14 @@
 
 package eu.cdevreeze.yaidom.core
 
-import org.junit.runner.RunWith
-import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * EName test case.
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
-class ENameTest extends FunSuite {
+class ENameTest extends AnyFunSuite {
 
   private val bookstoreNs = "http://bookstore"
 
@@ -120,7 +117,7 @@ class ENameTest extends FunSuite {
     }
 
     val enOption = ename match {
-      case en @ EName(None, localPart) => Some(en)
+      case en@EName(None, localPart) => Some(en)
       case _ => None
     }
 
@@ -246,7 +243,7 @@ class ENameTest extends FunSuite {
     }
 
     val enOption = ename match {
-      case en @ EName(Some(ns), localPart) => Some(en)
+      case en@EName(Some(ns), localPart) => Some(en)
       case _ => None
     }
 

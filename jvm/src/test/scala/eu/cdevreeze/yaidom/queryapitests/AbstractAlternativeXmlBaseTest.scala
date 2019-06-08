@@ -18,18 +18,15 @@ package eu.cdevreeze.yaidom.queryapitests
 
 import java.net.URI
 
-import scala.Vector
 import scala.collection.immutable
 
-import org.scalatest.FunSuite
-
+import eu.cdevreeze.yaidom
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.queryapi.DocumentApi
 import eu.cdevreeze.yaidom.queryapi.ScopedElemApi
-import eu.cdevreeze.yaidom.queryapi.DocumentApi
-import eu.cdevreeze.yaidom
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * Alternative XML Base test case. It tests some expectations about XML Base support for different element implementations.
@@ -41,7 +38,7 @@ import eu.cdevreeze.yaidom
  *
  * @author Chris de Vreeze
  */
-abstract class AbstractAlternativeXmlBaseTest extends FunSuite {
+abstract class AbstractAlternativeXmlBaseTest extends AnyFunSuite {
 
   import yaidom.simple.Node._
 

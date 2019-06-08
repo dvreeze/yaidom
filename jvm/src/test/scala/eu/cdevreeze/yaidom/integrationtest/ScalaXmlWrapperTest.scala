@@ -16,20 +16,17 @@
 
 package eu.cdevreeze.yaidom.integrationtest
 
-import java.{ util => jutil }
+import java.{util => jutil}
 
 import scala.xml.parsing.ConstructingParser
-
-import org.junit.runner.RunWith
-import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
-import org.xml.sax.InputSource
 
 import eu.cdevreeze.yaidom.convert.ScalaXmlConversions._
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.scalaxml._
+import org.scalatest.funsuite.AnyFunSuite
+import org.xml.sax.InputSource
 
 /**
  * Scala XML wrapper test case. It shows that we can easily create `ElemLike` wrappers around Scala XML Elems.
@@ -40,8 +37,7 @@ import eu.cdevreeze.yaidom.scalaxml._
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
-class ScalaXmlWrapperTest extends FunSuite {
+class ScalaXmlWrapperTest extends AnyFunSuite {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
@@ -521,7 +517,7 @@ class ScalaXmlWrapperTest extends FunSuite {
       recordsElm.findAllElemsOrSelf.size
     }
 
-    val firstRecordElm = (recordsElm \ (_.localName == "car"))(0)
+    val firstRecordElm = (recordsElm \ (_.localName == "car")) (0)
 
     assertResult("car") {
       firstRecordElm.localName
@@ -642,14 +638,14 @@ class ScalaXmlWrapperTest extends FunSuite {
     assertResult(true) {
       domDoc.documentElement.findAllElemsOrSelf.flatMap(_.children).exists({
         case t: ScalaXmlCData if t.text == "Piet & co" => true
-        case _                                         => false
+        case _ => false
       })
     }
 
     assertResult(true) {
       !domDoc.documentElement.findAllElemsOrSelf.flatMap(_.children).exists({
         case t: ScalaXmlAtom => true
-        case _               => false
+        case _ => false
       })
     }
 

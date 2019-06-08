@@ -16,11 +16,10 @@
 
 package eu.cdevreeze.yaidom.xpath.saxon
 
-import scala.collection.JavaConverters.asScalaBufferConverter
-import scala.collection.JavaConverters.seqAsJavaListConverter
+import scala.jdk.CollectionConverters._
 
-import eu.cdevreeze.yaidom.saxon.SaxonNode
 import eu.cdevreeze.yaidom.core.EName
+import eu.cdevreeze.yaidom.saxon.SaxonNode
 import javax.xml.xpath.XPathFunction
 import net.sf.saxon.om.NodeInfo
 

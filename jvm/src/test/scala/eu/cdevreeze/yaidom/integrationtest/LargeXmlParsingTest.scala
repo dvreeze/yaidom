@@ -16,13 +16,8 @@
 
 package eu.cdevreeze.yaidom.integrationtest
 
-import java.{ io => jio }
-import java.{ util => jutil }
-
-import org.junit.runner.RunWith
-import org.scalatest.BeforeAndAfterAll
-import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
+import java.{io => jio}
+import java.{util => jutil}
 
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.ENameProvider
@@ -35,6 +30,8 @@ import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingStax
 import eu.cdevreeze.yaidom.queryapi.ClarkElemLike
 import eu.cdevreeze.yaidom.resolved
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * Large XML parsing test case.
@@ -43,8 +40,7 @@ import eu.cdevreeze.yaidom.resolved
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
-class LargeXmlParsingTest extends FunSuite with BeforeAndAfterAll {
+class LargeXmlParsingTest extends AnyFunSuite with BeforeAndAfterAll {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
@@ -66,7 +62,9 @@ class LargeXmlParsingTest extends FunSuite with BeforeAndAfterAll {
 
     val bos = new jio.ByteArrayOutputStream
     var b: Int = -1
-    while ({ b = is.read(); b >= 0 }) {
+    while ( {
+      b = is.read(); b >= 0
+    }) {
       bos.write(b)
     }
     is.close()

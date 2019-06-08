@@ -16,7 +16,6 @@
 
 package eu.cdevreeze.yaidom.core
 
-import org.junit.runner.RunWith
 import org.scalacheck.Arbitrary
 import org.scalacheck.Gen
 import org.scalacheck.Gen.const
@@ -24,17 +23,15 @@ import org.scalacheck.Gen.listOfN
 import org.scalacheck.Gen.oneOf
 import org.scalacheck.Gen.someOf
 import org.scalacheck.Prop.propBoolean
-import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
-import org.scalatest.prop.Checkers
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatestplus.scalacheck.Checkers
 
 /**
  * Scope properties test case.
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
-class ScopePropTest extends FunSuite with Checkers {
+class ScopePropTest extends AnyFunSuite with Checkers {
 
   test("testResolveProperty") {
     check({ (scope1: Scope, scope2: Scope) =>

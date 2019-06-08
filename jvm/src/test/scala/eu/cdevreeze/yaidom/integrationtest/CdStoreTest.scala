@@ -16,13 +16,10 @@
 
 package eu.cdevreeze.yaidom.integrationtest
 
-import org.junit.runner.RunWith
-import org.scalatest.BeforeAndAfterAll
-import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
-
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * CD store test case, using yaidom instead of XPath.
@@ -37,8 +34,7 @@ import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
-class CdStoreTest extends FunSuite with BeforeAndAfterAll {
+class CdStoreTest extends AnyFunSuite with BeforeAndAfterAll {
 
   test("testQueryArtistElems") {
     val parser = DocumentParserUsingSax.newInstance
@@ -53,7 +49,9 @@ class CdStoreTest extends FunSuite with BeforeAndAfterAll {
         artistElm <- cdElm \ (_.localName == "artist")
       } yield artistElm
 
-    val artists = artistElms map { _.text }
+    val artists = artistElms map {
+      _.text
+    }
 
     assertResult(List("An other artist")) {
       artists
@@ -63,11 +61,15 @@ class CdStoreTest extends FunSuite with BeforeAndAfterAll {
 
     val artistElms2 =
       for {
-        cdElm <- (doc.documentElement \\ (_.localName == "cd")) filter { _.attributeOption(EName("genre")).contains("metal") }
+        cdElm <- (doc.documentElement \\ (_.localName == "cd")) filter {
+          _.attributeOption(EName("genre")).contains("metal")
+        }
         artistElm <- cdElm \ (_.localName == "artist")
       } yield artistElm
 
-    val artists2 = artistElms2 map { _.text }
+    val artists2 = artistElms2 map {
+      _.text
+    }
 
     assertResult(List("An other artist")) {
       artists2
@@ -97,7 +99,9 @@ class CdStoreTest extends FunSuite with BeforeAndAfterAll {
 
     val artists2 =
       for {
-        cdElm <- (doc.documentElement \\ (_.localName == "cd")) filter { _.attributeOption(EName("genre")).contains("metal") }
+        cdElm <- (doc.documentElement \\ (_.localName == "cd")) filter {
+          _.attributeOption(EName("genre")).contains("metal")
+        }
         artistElm <- cdElm \ (_.localName == "artist")
       } yield artistElm.text
 
@@ -111,7 +115,9 @@ class CdStoreTest extends FunSuite with BeforeAndAfterAll {
 
     val artists3 =
       for {
-        cdElm <- (doc.documentElement \\ (_.localName == "cd")) filter { _.attributeOption(EName("genre")).contains("metal") }
+        cdElm <- (doc.documentElement \\ (_.localName == "cd")) filter {
+          _.attributeOption(EName("genre")).contains("metal")
+        }
         artistElm <- cdElm \ (_.localName == "artist")
       } yield artistElm.text
 

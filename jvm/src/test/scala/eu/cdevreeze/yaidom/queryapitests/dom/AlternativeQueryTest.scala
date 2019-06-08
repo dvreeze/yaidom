@@ -16,8 +16,8 @@
 
 package eu.cdevreeze.yaidom.queryapitests.dom
 
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
+
+
 
 import eu.cdevreeze.yaidom.convert.DomConversions
 import eu.cdevreeze.yaidom.convert.ScalaXmlConversions.convertToElem
@@ -31,7 +31,7 @@ import javax.xml.parsers.DocumentBuilderFactory
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
+
 class AlternativeQueryTest extends AbstractAlternativeQueryTest {
 
   final type E = DomElem

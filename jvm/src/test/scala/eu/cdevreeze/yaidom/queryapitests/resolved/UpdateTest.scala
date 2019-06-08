@@ -19,8 +19,8 @@ package eu.cdevreeze.yaidom.queryapitests.resolved
 import scala.reflect.classTag
 import scala.reflect.ClassTag
 
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
+
+
 
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
@@ -34,7 +34,7 @@ import eu.cdevreeze.yaidom.resolved.Text
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
+
 class UpdateTest extends AbstractUpdateTest {
 
   final type N = Node

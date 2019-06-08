@@ -18,10 +18,6 @@ package eu.cdevreeze.yaidom.queryapitests
 
 import java.net.URI
 
-import scala.Vector
-
-import org.scalatest.FunSuite
-
 import eu.cdevreeze.yaidom
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
@@ -29,7 +25,7 @@ import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
 import eu.cdevreeze.yaidom.queryapi.IndexedClarkElemApi
 import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
-import eu.cdevreeze.yaidom.simple.Node.emptyElem
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * Alternative XML Base test case.
@@ -40,7 +36,7 @@ import eu.cdevreeze.yaidom.simple.Node.emptyElem
  *
  * @author Chris de Vreeze
  */
-abstract class AbstractAlternativeXmlBaseOnIndexedClarkElemApiTest extends FunSuite {
+abstract class AbstractAlternativeXmlBaseOnIndexedClarkElemApiTest extends AnyFunSuite {
 
   import yaidom.simple.Node._
 

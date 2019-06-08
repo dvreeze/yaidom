@@ -16,17 +16,11 @@
 
 package eu.cdevreeze.yaidom.integrationtest
 
-import java.{ io => jio }
 import java.net.URI
-import java.{ util => jutil }
+import java.{io => jio}
+import java.{util => jutil}
 
 import scala.collection.immutable
-
-import org.junit.runner.RunWith
-import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
-import org.xml.sax.EntityResolver
-import org.xml.sax.InputSource
 
 import eu.cdevreeze.yaidom.XmlStringUtils
 import eu.cdevreeze.yaidom.core.Declarations
@@ -34,14 +28,17 @@ import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.dom.DomDocument
-import eu.cdevreeze.yaidom.queryapi.DocumentApi
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi._
+import eu.cdevreeze.yaidom.queryapi.DocumentApi
 import eu.cdevreeze.yaidom.queryapi.HasParent
 import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
 import eu.cdevreeze.yaidom.queryapi.ScopedNodes
 import eu.cdevreeze.yaidom.resolved
 import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
+import org.scalatest.funsuite.AnyFunSuite
+import org.xml.sax.EntityResolver
+import org.xml.sax.InputSource
 
 /**
  * XOM wrapper test case. It shows that we can easily create `ElemLike` wrappers around XOM Elements.
@@ -52,8 +49,7 @@ import javax.xml.parsers.DocumentBuilderFactory
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
-class XomWrapperTest extends FunSuite {
+class XomWrapperTest extends AnyFunSuite {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
@@ -613,7 +609,7 @@ class XomWrapperTest extends FunSuite {
       recordsElm.findAllElemsOrSelf.size
     }
 
-    val firstRecordElm = (recordsElm \ (_.localName == "car"))(0)
+    val firstRecordElm = (recordsElm \ (_.localName == "car")) (0)
 
     assertResult("car") {
       firstRecordElm.localName
@@ -703,6 +699,7 @@ class XomWrapperTest extends FunSuite {
       null
     }
   }
+
 }
 
 object XomWrapperTest {
@@ -852,11 +849,11 @@ object XomWrapperTest {
 
     def wrapNodeOption(node: nu.xom.Node): Option[XomNode] = {
       node match {
-        case e: nu.xom.Element                => Some(new XomElem(e))
-        case t: nu.xom.Text                   => Some(new XomText(t))
+        case e: nu.xom.Element => Some(new XomElem(e))
+        case t: nu.xom.Text => Some(new XomText(t))
         case pi: nu.xom.ProcessingInstruction => Some(new XomProcessingInstruction(pi))
-        case c: nu.xom.Comment                => Some(new XomComment(c))
-        case _                                => None
+        case c: nu.xom.Comment => Some(new XomComment(c))
+        case _ => None
       }
     }
 
@@ -867,7 +864,7 @@ object XomWrapperTest {
     def getAncestorsOrSelf(elem: nu.xom.Element): List[nu.xom.Element] = {
       val parentElement: nu.xom.Element = elem.getParent match {
         case e: nu.xom.Element => e
-        case _                 => null
+        case _ => null
       }
 
       if (parentElement eq null) List(elem)
@@ -877,4 +874,5 @@ object XomWrapperTest {
       }
     }
   }
+
 }

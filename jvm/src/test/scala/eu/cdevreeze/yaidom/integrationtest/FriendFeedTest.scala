@@ -16,31 +16,27 @@
 
 package eu.cdevreeze.yaidom.integrationtest
 
-import java.{ util => jutil }
+import java.{util => jutil}
 
-import scala.Vector
 import scala.collection.immutable
-
-import org.junit.runner.RunWith
-import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
 
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
+import eu.cdevreeze.yaidom.print
+import eu.cdevreeze.yaidom.print.DocumentPrinterUsingDom
+import eu.cdevreeze.yaidom.queryapi.ClarkElemApi._
+import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.simple.Document
 import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.simple.ElemBuilder
 import eu.cdevreeze.yaidom.simple.NodeBuilder.elem
 import eu.cdevreeze.yaidom.simple.NodeBuilder.emptyElem
 import eu.cdevreeze.yaidom.simple.NodeBuilder.textElem
-import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
-import eu.cdevreeze.yaidom.print
-import eu.cdevreeze.yaidom.print.DocumentPrinterUsingDom
-import eu.cdevreeze.yaidom.queryapi.ClarkElemApi._
-import eu.cdevreeze.yaidom.resolved
 import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.transform.TransformerFactory
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * Test case using yaidom on the FriendFeed example, used in https://www.ibm.com/developerworks/library/x-scalaxml/.
@@ -49,8 +45,7 @@ import javax.xml.transform.TransformerFactory
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
-class FriendFeedTest extends FunSuite {
+class FriendFeedTest extends AnyFunSuite {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
@@ -97,7 +92,9 @@ class FriendFeedTest extends FunSuite {
       feedElm.localName
     }
     assertResult(Set("entry")) {
-      val childNames = feedElm.findAllChildElems map { _.localName }
+      val childNames = feedElm.findAllChildElems map {
+        _.localName
+      }
       childNames.toSet
     }
 
@@ -264,7 +261,11 @@ class FriendFeedTest extends FunSuite {
     entryElms filter { entryElm =>
       // Assuming precisely 1 "service" child elem with precisely 1 "id" child elem
       // Using method getChildElem (taking a predicate on elements) repeatedly
-      val serviceIdElm = entryElm getChildElem { _.localName == "service" } getChildElem { _.localName == "id" }
+      val serviceIdElm = entryElm getChildElem {
+        _.localName == "service"
+      } getChildElem {
+        _.localName == "id"
+      }
       serviceIdElm.text.trim == serviceName
     }
   }

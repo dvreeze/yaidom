@@ -16,14 +16,8 @@
 
 package eu.cdevreeze.yaidom.blogcode
 
-import scala.Vector
-
-import org.junit.runner.RunWith
-import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
-
-import AbstractBlogXbrlTestSupport.XbrliNs
-import AbstractBlogXbrlTestSupport.XmlNs
+import eu.cdevreeze.yaidom.blogcode.AbstractBlogXbrlTestSupport.XbrliNs
+import eu.cdevreeze.yaidom.blogcode.AbstractBlogXbrlTestSupport.XmlNs
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.indexed
@@ -40,6 +34,7 @@ import eu.cdevreeze.yaidom.utils.DocumentENameExtractor
 import eu.cdevreeze.yaidom.utils.NamespaceUtils
 import eu.cdevreeze.yaidom.utils.SimpleTextENameExtractor
 import eu.cdevreeze.yaidom.utils.TextENameExtractor
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * Code of yaidom XBRL blog ("introducing yaidom, using XBRL examples"). The blog introduces yaidom in the context
@@ -50,8 +45,7 @@ import eu.cdevreeze.yaidom.utils.TextENameExtractor
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
-class BlogXbrlTest extends FunSuite with AbstractBlogXbrlTestSupport {
+class BlogXbrlTest extends AnyFunSuite with AbstractBlogXbrlTestSupport {
 
   private val sampleXbrlInstanceFile: java.io.File =
     (new java.io.File(classOf[BlogXbrlTest].getResource("sample-Instance-Proof.xml").toURI))

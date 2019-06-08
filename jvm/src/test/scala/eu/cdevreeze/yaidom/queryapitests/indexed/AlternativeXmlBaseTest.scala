@@ -20,8 +20,8 @@ import java.net.URI
 
 import scala.collection.immutable
 
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
+
+
 
 import eu.cdevreeze.yaidom.queryapi.DocumentApi
 import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
@@ -35,7 +35,7 @@ import eu.cdevreeze.yaidom
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
+
 class AlternativeXmlBaseTest extends AbstractAlternativeXmlBaseTest {
 
   type D = yaidom.indexed.Document

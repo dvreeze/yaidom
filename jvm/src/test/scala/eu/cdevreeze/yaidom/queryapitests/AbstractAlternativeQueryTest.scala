@@ -16,19 +16,17 @@
 
 package eu.cdevreeze.yaidom.queryapitests
 
-import scala.Vector
 import scala.collection.immutable
-
-import org.scalatest.FunSuite
 
 import eu.cdevreeze.yaidom.convert.ScalaXmlConversions.convertToElem
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.simple.NodeBuilder
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
-import eu.cdevreeze.yaidom.queryapi.ClarkNodes
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi.withLocalName
+import eu.cdevreeze.yaidom.queryapi.ClarkNodes
+import eu.cdevreeze.yaidom.simple.NodeBuilder
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * Alternative query test, with yaidom queries ported from XQuery examples.
@@ -38,7 +36,7 @@ import eu.cdevreeze.yaidom.queryapi.ClarkElemApi.withLocalName
  *
  * @author Chris de Vreeze
  */
-abstract class AbstractAlternativeQueryTest extends FunSuite {
+abstract class AbstractAlternativeQueryTest extends AnyFunSuite {
 
   type E <: ClarkNodes.Elem with ClarkElemApi.Aux[E]
 
@@ -236,12 +234,12 @@ abstract class AbstractAlternativeQueryTest extends FunSuite {
 
     val expectedResults =
       Vector(
-        <item num="557" name="Fleece Pullover" quan="1"/>,
-        <item num="563" name="Floppy Sun Hat" quan="1"/>,
-        <item num="443" name="Deluxe Travel Bag" quan="2"/>,
-        <item num="784" name="Cotton Dress Shirt" quan="1"/>,
-        <item num="784" name="Cotton Dress Shirt" quan="1"/>,
-        <item num="557" name="Fleece Pullover" quan="1"/>)
+          <item num="557" name="Fleece Pullover" quan="1"/>,
+          <item num="563" name="Floppy Sun Hat" quan="1"/>,
+          <item num="443" name="Deluxe Travel Bag" quan="2"/>,
+          <item num="784" name="Cotton Dress Shirt" quan="1"/>,
+          <item num="784" name="Cotton Dress Shirt" quan="1"/>,
+          <item num="557" name="Fleece Pullover" quan="1"/>)
 
     assertResult(expectedResults.map(e => eu.cdevreeze.yaidom.resolved.Elem.from(convertToElem(e)).removeAllInterElementWhitespace)) {
       itemElems.map(e => eu.cdevreeze.yaidom.resolved.Elem.from(e).removeAllInterElementWhitespace)

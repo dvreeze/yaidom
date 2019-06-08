@@ -18,8 +18,8 @@ package eu.cdevreeze.yaidom.queryapitests.simple
 
 import scala.Vector
 
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
+
+
 
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
@@ -34,7 +34,7 @@ import eu.cdevreeze.yaidom.simple.NodeBuilder
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
+
 class IndexedElemQueryTest extends AbstractIndexedElemLikeQueryTest {
 
   final type U = Elem

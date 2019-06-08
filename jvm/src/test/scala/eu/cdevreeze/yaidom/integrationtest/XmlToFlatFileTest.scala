@@ -16,18 +16,13 @@
 
 package eu.cdevreeze.yaidom.integrationtest
 
-import java.{ io => jio }
-
-import scala.Vector
-
-import org.junit.runner.RunWith
-import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
-import org.xml.sax.InputSource
+import java.{io => jio}
 
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingStax
 import eu.cdevreeze.yaidom.simple.Elem
+import org.scalatest.funsuite.AnyFunSuite
+import org.xml.sax.InputSource
 
 /**
  * Test case that "ports" http://www.jroller.com/jurberg/entry/converting_xml_to_flat_files to Scala.
@@ -35,13 +30,13 @@ import eu.cdevreeze.yaidom.simple.Elem
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
-class XmlToFlatFileTest extends FunSuite {
+class XmlToFlatFileTest extends AnyFunSuite {
 
   test("testConvertXmlToFlatFile") {
     val docParser = DocumentParserUsingStax.newInstance
 
-    val xmlData = """<?xml version="1.0"?>
+    val xmlData =
+      """<?xml version="1.0"?>
 <catalog>
    <book id="bk101">
       <author>Gambardella, Matthew</author>

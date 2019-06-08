@@ -18,8 +18,8 @@ package eu.cdevreeze.yaidom.queryapitests.nodeinfo
 
 import java.io.File
 
-import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitRunner
+
+
 
 import eu.cdevreeze.yaidom.queryapi.BackingNodes
 import eu.cdevreeze.yaidom.saxon.SaxonDocument
@@ -31,7 +31,7 @@ import net.sf.saxon.s9api.Processor
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
+
 class SubtypeAwareElemLikeQueryTest extends AbstractSubtypeAwareElemLikeQueryTest {
 
   private val processor = new Processor(false)

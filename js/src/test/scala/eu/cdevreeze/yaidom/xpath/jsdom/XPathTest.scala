@@ -16,22 +16,21 @@
 
 package eu.cdevreeze.yaidom.xpath.jsdom
 
-import org.scalajs.dom.experimental.domparser.DOMParser
-import org.scalajs.dom.experimental.domparser.SupportedType
-import org.scalatest.FunSuite
-
+import eu.cdevreeze.yaidom
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom
-import org.scalajs.dom.{ raw => sjsdom }
+import org.scalajs.dom.experimental.domparser.DOMParser
+import org.scalajs.dom.experimental.domparser.SupportedType
+import org.scalajs.dom.{raw => sjsdom}
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * XPath test case for JS-DOM.
  *
  * @author Chris de Vreeze
  */
-class XPathTest extends FunSuite {
+class XPathTest extends AnyFunSuite {
 
   private val XbrliNs = "http://www.xbrl.org/2003/instance"
 
@@ -184,7 +183,8 @@ class XPathTest extends FunSuite {
   // namespace prefix as in the XPath expressions. Otherwise the namespace-aware XPath queries do not work!
   // Is this a bug in js-dom? Or do we have to set namespace-awareness somewhere for XPath evaluation?
 
-  private def xmlString = """<?xml version="1.0" encoding="utf-8"?>
+  private def xmlString =
+    """<?xml version="1.0" encoding="utf-8"?>
 <!-- Created by Charles Hoffman, CPA, 2008-03-27 -->
 <!-- See http://www.xbrlsite.com/examples/comprehensiveexample/2008-04-18/sample-Instance-Proof.xml. -->
 <xbrli:xbrl xmlns='http://www.xbrl.org/2003/instance' xmlns:xbrli='http://www.xbrl.org/2003/instance'

@@ -19,17 +19,14 @@ package eu.cdevreeze.yaidom.core
 import scala.collection.JavaConverters.asScalaIteratorConverter
 
 import eu.cdevreeze.yaidom.core.jvm.NamespaceContexts
-import org.junit.runner.RunWith
-import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * Scope test case.
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
-class ScopeTest extends FunSuite {
+class ScopeTest extends AnyFunSuite {
 
   test("testCreateScope") {
     intercept[Exception] {
@@ -488,7 +485,7 @@ class ScopeTest extends FunSuite {
     def getPrefix(ns: String): String = ns match {
       case "http://e" => "e"
       case "http://f" => ""
-      case _          => sys.error(s"Unknown namespace: $ns")
+      case _ => sys.error(s"Unknown namespace: $ns")
     }
 
     assertResult("a") {

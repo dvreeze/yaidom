@@ -16,20 +16,13 @@
 
 package eu.cdevreeze.yaidom.integrationtest
 
-import java.{ io => jio }
 import java.net.URI
-import java.{ util => jutil }
+import java.{io => jio}
+import java.{util => jutil}
 
 import scala.collection.JavaConverters._
 import scala.collection.immutable
 
-import org.junit.runner.RunWith
-import org.scalatest.FunSuite
-import org.scalatest.junit.JUnitRunner
-import org.xml.sax.EntityResolver
-import org.xml.sax.InputSource
-
-import JDomWrapperTest._
 import eu.cdevreeze.yaidom.core.AbsolutePath
 import eu.cdevreeze.yaidom.core.Declarations
 import eu.cdevreeze.yaidom.core.EName
@@ -38,6 +31,7 @@ import eu.cdevreeze.yaidom.core.PathConversions
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.dom.DomDocument
+import eu.cdevreeze.yaidom.integrationtest.JDomWrapperTest._
 import eu.cdevreeze.yaidom.queryapi.BackingNodes
 import eu.cdevreeze.yaidom.queryapi.DocumentApi
 import eu.cdevreeze.yaidom.queryapi.ElemWithPath
@@ -46,6 +40,9 @@ import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
 import eu.cdevreeze.yaidom.resolved
 import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
+import org.scalatest.funsuite.AnyFunSuite
+import org.xml.sax.EntityResolver
+import org.xml.sax.InputSource
 
 /**
  * JDOM wrapper test case. It shows that we can easily create `ElemLike` wrappers around JDOM Elements.
@@ -56,8 +53,7 @@ import javax.xml.parsers.DocumentBuilderFactory
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
-class JDomWrapperTest extends FunSuite {
+class JDomWrapperTest extends AnyFunSuite {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
@@ -675,7 +671,7 @@ class JDomWrapperTest extends FunSuite {
       recordsElm.findAllElemsOrSelf.size
     }
 
-    val firstRecordElm = (recordsElm \ (_.localName == "car"))(0)
+    val firstRecordElm = (recordsElm \ (_.localName == "car")) (0)
 
     assertResult("car") {
       firstRecordElm.localName
@@ -792,6 +788,7 @@ class JDomWrapperTest extends FunSuite {
       null
     }
   }
+
 }
 
 object JDomWrapperTest {
@@ -1060,4 +1057,5 @@ object JDomWrapperTest {
 
     def wrapElement(elm: org.jdom2.Element): JDomElem = new JDomElem(elm)
   }
+
 }

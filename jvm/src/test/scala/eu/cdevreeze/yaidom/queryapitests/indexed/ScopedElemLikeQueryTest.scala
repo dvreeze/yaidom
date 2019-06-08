@@ -18,10 +18,10 @@ package eu.cdevreeze.yaidom.queryapitests.indexed
 
 import java.{ util => jutil }
 
-import org.junit.runner.RunWith
+
 import org.xml.sax.EntityResolver
 import org.xml.sax.InputSource
-import org.scalatest.junit.JUnitRunner
+
 
 import eu.cdevreeze.yaidom.convert
 import eu.cdevreeze.yaidom.core.Scope
@@ -35,7 +35,7 @@ import javax.xml.parsers.DocumentBuilderFactory
  *
  * @author Chris de Vreeze
  */
-@RunWith(classOf[JUnitRunner])
+
 class ScopedElemLikeQueryTest extends AbstractScopedElemLikeQueryTest {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.queryapitests.indexed")

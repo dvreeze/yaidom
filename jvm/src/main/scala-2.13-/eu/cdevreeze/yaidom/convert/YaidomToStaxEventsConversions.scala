@@ -16,11 +16,12 @@
 
 package eu.cdevreeze.yaidom.convert
 
-import java.{ util => jutil }
+import java.{util => jutil}
 
 import scala.collection.JavaConverters.seqAsJavaListConverter
 import scala.collection.immutable
 
+import eu.cdevreeze.yaidom.convert.YaidomToStaxEventsConversions.XmlEventsProducer
 import eu.cdevreeze.yaidom.core.Declarations
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.core.jvm.JavaQNames
@@ -39,7 +40,6 @@ import javax.xml.stream.events.EndElement
 import javax.xml.stream.events.Namespace
 import javax.xml.stream.events.StartElement
 import javax.xml.stream.events.XMLEvent
-import YaidomToStaxEventsConversions.XmlEventsProducer
 
 /**
  * Converter from yaidom nodes to StAX events, in particular from [[eu.cdevreeze.yaidom.simple.Elem]] to `immutable.IndexedSeq[XMLEvent]`,
