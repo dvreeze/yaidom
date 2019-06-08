@@ -16,9 +16,6 @@
 
 package eu.cdevreeze.yaidom.queryapitests.dom
 
-
-
-
 import eu.cdevreeze.yaidom.convert.DomConversions
 import eu.cdevreeze.yaidom.convert.ScalaXmlConversions.convertToElem
 import eu.cdevreeze.yaidom.core.Scope
@@ -31,7 +28,6 @@ import javax.xml.parsers.DocumentBuilderFactory
  *
  * @author Chris de Vreeze
  */
-
 class AlternativeQueryTest extends AbstractAlternativeQueryTest {
 
   final type E = DomElem

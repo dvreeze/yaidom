@@ -16,9 +16,6 @@
 
 package eu.cdevreeze.yaidom.queryapitests.indexed
 
-
-
-
 import eu.cdevreeze.yaidom.indexed.Elem
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
 import eu.cdevreeze.yaidom.queryapitests.AbstractRobustQueryTest
@@ -28,7 +25,6 @@ import eu.cdevreeze.yaidom.queryapitests.AbstractRobustQueryTest
  *
  * @author Chris de Vreeze
  */
-
 class RobustQueryTest extends AbstractRobustQueryTest {
 
   final type E = Elem

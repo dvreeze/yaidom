@@ -18,9 +18,6 @@ package eu.cdevreeze.yaidom.queryapitests.indexed
 
 import java.net.URI
 
-
-
-
 import eu.cdevreeze.yaidom.convert.ScalaXmlConversions.convertToElem
 import eu.cdevreeze.yaidom.indexed.Document
 import eu.cdevreeze.yaidom.indexed.Elem
@@ -31,7 +28,6 @@ import eu.cdevreeze.yaidom.queryapitests.AbstractAlternativeQueryTest
  *
  * @author Chris de Vreeze
  */
-
 class AlternativeQueryTest extends AbstractAlternativeQueryTest {
 
   final type E = Elem

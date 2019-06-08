@@ -16,19 +16,15 @@
 
 package eu.cdevreeze.yaidom.queryapitests.simple
 
-
-
-
 import eu.cdevreeze.yaidom.convert.ScalaXmlConversions.convertToElem
-import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.queryapitests.AbstractAlternativeQueryTest
+import eu.cdevreeze.yaidom.simple.Elem
 
 /**
  * Alternative query test case for standard Elems.
  *
  * @author Chris de Vreeze
  */
-
 class AlternativeQueryTest extends AbstractAlternativeQueryTest {
 
   final type E = Elem

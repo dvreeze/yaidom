@@ -16,21 +16,16 @@
 
 package eu.cdevreeze.yaidom.queryapitests.dom
 
-import scala.Vector
-
-
-
-
 import eu.cdevreeze.yaidom.convert
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.dom.DomElem
 import eu.cdevreeze.yaidom.indexed.IndexedClarkElem
+import eu.cdevreeze.yaidom.queryapitests.AbstractIndexedElemLikeQueryTest
 import eu.cdevreeze.yaidom.simple.Document
 import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.simple.ElemBuilder
 import eu.cdevreeze.yaidom.simple.NodeBuilder
-import eu.cdevreeze.yaidom.dom.DomElem
-import eu.cdevreeze.yaidom.queryapitests.AbstractIndexedElemLikeQueryTest
 import javax.xml.parsers.DocumentBuilderFactory
 
 /**
@@ -38,7 +33,6 @@ import javax.xml.parsers.DocumentBuilderFactory
  *
  * @author Chris de Vreeze
  */
-
 class IndexedElemQueryTest extends AbstractIndexedElemLikeQueryTest {
 
   final type U = DomElem

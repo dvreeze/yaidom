@@ -16,23 +16,19 @@
 
 package eu.cdevreeze.yaidom.queryapitests.dom
 
-import scala.Vector
 import scala.collection.immutable
-
-
-
 
 import eu.cdevreeze.yaidom.convert
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
+import eu.cdevreeze.yaidom.dom.DomElem
+import eu.cdevreeze.yaidom.queryapi.ClarkElemApi._
+import eu.cdevreeze.yaidom.queryapitests.AbstractElemLikeQueryTest
 import eu.cdevreeze.yaidom.simple.Document
 import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.simple.ElemBuilder
 import eu.cdevreeze.yaidom.simple.NodeBuilder
-import eu.cdevreeze.yaidom.dom.DomElem
-import eu.cdevreeze.yaidom.queryapi.ClarkElemApi._
-import eu.cdevreeze.yaidom.queryapitests.AbstractElemLikeQueryTest
 import javax.xml.parsers.DocumentBuilderFactory
 
 /**
@@ -40,7 +36,6 @@ import javax.xml.parsers.DocumentBuilderFactory
  *
  * @author Chris de Vreeze
  */
-
 class QueryTest extends AbstractElemLikeQueryTest {
 
   final type E = DomElem

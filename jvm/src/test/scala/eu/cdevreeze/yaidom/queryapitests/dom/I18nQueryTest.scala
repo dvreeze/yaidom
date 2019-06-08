@@ -16,9 +16,6 @@
 
 package eu.cdevreeze.yaidom.queryapitests.dom
 
-
-
-
 import eu.cdevreeze.yaidom.dom.DomElem
 import eu.cdevreeze.yaidom.queryapitests.AbstractI18nQueryTest
 import javax.xml.parsers.DocumentBuilder
@@ -29,7 +26,6 @@ import javax.xml.parsers.DocumentBuilderFactory
  *
  * @author Chris de Vreeze
  */
-
 class I18nQueryTest extends AbstractI18nQueryTest {
 
   final type E = DomElem

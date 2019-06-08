@@ -18,10 +18,6 @@ package eu.cdevreeze.yaidom.queryapitests.nodeinfo
 
 import java.io.StringReader
 
-
-
-import org.xml.sax.InputSource
-
 import eu.cdevreeze.yaidom.convert.ScalaXmlConversions.convertToElem
 import eu.cdevreeze.yaidom.print.DocumentPrinterUsingDom
 import eu.cdevreeze.yaidom.queryapitests.AbstractXQuery3UseCasesTest
@@ -32,13 +28,13 @@ import eu.cdevreeze.yaidom.simple.Elem
 import javax.xml.transform.sax.SAXSource
 import net.sf.saxon.lib.ParseOptions
 import net.sf.saxon.s9api.Processor
+import org.xml.sax.InputSource
 
 /**
  * AbstractXQuery3UseCasesTest for Saxon wrapper Elems.
  *
  * @author Chris de Vreeze
  */
-
 class XQuery3UseCasesTest extends AbstractXQuery3UseCasesTest {
 
   final type E = SaxonElem

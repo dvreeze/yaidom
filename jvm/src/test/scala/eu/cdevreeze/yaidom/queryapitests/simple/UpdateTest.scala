@@ -16,11 +16,8 @@
 
 package eu.cdevreeze.yaidom.queryapitests.simple
 
-import scala.reflect.classTag
 import scala.reflect.ClassTag
-
-
-
+import scala.reflect.classTag
 
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
@@ -34,7 +31,6 @@ import eu.cdevreeze.yaidom.simple.Text
  *
  * @author Chris de Vreeze
  */
-
 class UpdateTest extends AbstractUpdateTest {
 
   final type N = Node

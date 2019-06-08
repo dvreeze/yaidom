@@ -130,9 +130,6 @@ lazy val yaidom = crossProject(JSPlatform, JVMPlatform)
       }
     },
 
-    // Excluding UpdateTest in Scala 2.13.0-M5 build due to regression:
-    // "inferred type ... contains type selection from volatile type ..."
-
     Test / unmanagedSources / excludeFilter := {
       if (scalaBinaryVersion.value == "2.13.0-RC3") {
         new SimpleFileFilter(f =>
@@ -140,7 +137,6 @@ lazy val yaidom = crossProject(JSPlatform, JVMPlatform)
           f.toString.contains("ScalaMetaExperimentTest") ||
           f.toString.contains("JvmIndependencyTest") ||
           f.toString.contains("PackageDependencyTest") ||
-          f.toString.contains("UpdateTest") ||
           f.toString.contains("DomInteropTest") || // Serialization issue in Scala 2.13.0-M5?
           f.toString.contains("DomLSInteropTest") || // Serialization issue in Scala 2.13.0-M5?
           f.toString.contains("JaxbTest"))

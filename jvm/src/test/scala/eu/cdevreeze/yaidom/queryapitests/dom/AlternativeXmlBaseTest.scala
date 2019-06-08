@@ -20,9 +20,6 @@ import java.net.URI
 
 import scala.collection.immutable
 
-
-
-
 import eu.cdevreeze.yaidom
 import eu.cdevreeze.yaidom.convert.DomConversions
 import eu.cdevreeze.yaidom.dom.DomDocument
@@ -39,7 +36,6 @@ import javax.xml.parsers.DocumentBuilderFactory
  *
  * @author Chris de Vreeze
  */
-
 class AlternativeXmlBaseTest extends AbstractAlternativeXmlBaseTest {
 
   type D = DomDocument

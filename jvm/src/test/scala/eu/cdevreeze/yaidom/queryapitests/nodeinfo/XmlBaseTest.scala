@@ -22,9 +22,6 @@ import java.net.URI
 
 import scala.collection.immutable
 
-
-
-
 import eu.cdevreeze.yaidom.queryapitests.AbstractXmlBaseTest
 import eu.cdevreeze.yaidom.saxon.SaxonDocument
 import eu.cdevreeze.yaidom.saxon.SaxonElem
@@ -37,7 +34,6 @@ import net.sf.saxon.s9api.Processor
  *
  * @author Chris de Vreeze
  */
-
 class XmlBaseTest extends AbstractXmlBaseTest {
 
   type D = SaxonDocument

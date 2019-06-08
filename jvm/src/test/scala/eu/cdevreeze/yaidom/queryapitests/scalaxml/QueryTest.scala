@@ -16,27 +16,22 @@
 
 package eu.cdevreeze.yaidom.queryapitests.scalaxml
 
-import scala.Vector
 import scala.collection.immutable
-
-
-
 
 import eu.cdevreeze.yaidom.convert
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.simple.NodeBuilder
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi._
 import eu.cdevreeze.yaidom.queryapitests.AbstractElemLikeQueryTest
 import eu.cdevreeze.yaidom.scalaxml.ScalaXmlElem
+import eu.cdevreeze.yaidom.simple.NodeBuilder
 
 /**
  * Query test case for Scala XML wrapper elements.
  *
  * @author Chris de Vreeze
  */
-
 class QueryTest extends AbstractElemLikeQueryTest {
 
   final type E = ScalaXmlElem

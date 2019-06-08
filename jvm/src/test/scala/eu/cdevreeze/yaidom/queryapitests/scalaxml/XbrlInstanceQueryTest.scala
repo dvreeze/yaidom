@@ -16,9 +16,6 @@
 
 package eu.cdevreeze.yaidom.queryapitests.scalaxml
 
-
-
-
 import eu.cdevreeze.yaidom.queryapitests.AbstractXbrlInstanceQueryTest
 import eu.cdevreeze.yaidom.scalaxml.ScalaXmlElem
 import eu.cdevreeze.yaidom.scalaxml.ScalaXmlNode
@@ -28,7 +25,6 @@ import eu.cdevreeze.yaidom.scalaxml.ScalaXmlNode
  *
  * @author Chris de Vreeze
  */
-
 class XbrlInstanceQueryTest extends AbstractXbrlInstanceQueryTest {
 
   final type E = ScalaXmlElem

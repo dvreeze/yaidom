@@ -16,9 +16,6 @@
 
 package eu.cdevreeze.yaidom.queryapitests.scalaxml
 
-
-
-
 import eu.cdevreeze.yaidom.indexed.IndexedClarkElem
 import eu.cdevreeze.yaidom.queryapitests.AbstractIndexedElemLikeQueryTest
 import eu.cdevreeze.yaidom.scalaxml.ScalaXmlElem
@@ -28,7 +25,6 @@ import eu.cdevreeze.yaidom.scalaxml.ScalaXmlElem
  *
  * @author Chris de Vreeze
  */
-
 class IndexedElemQueryTest extends AbstractIndexedElemLikeQueryTest {
 
   final type U = ScalaXmlElem

@@ -16,9 +16,6 @@
 
 package eu.cdevreeze.yaidom.queryapitests.scalaxml
 
-
-
-
 import eu.cdevreeze.yaidom.queryapitests.AbstractAlternativeQueryTest
 import eu.cdevreeze.yaidom.scalaxml.ScalaXmlElem
 
@@ -27,7 +24,6 @@ import eu.cdevreeze.yaidom.scalaxml.ScalaXmlElem
  *
  * @author Chris de Vreeze
  */
-
 class AlternativeQueryTest extends AbstractAlternativeQueryTest {
 
   final type E = ScalaXmlElem

@@ -37,8 +37,11 @@ import org.scalatest.funsuite.AnyFunSuite
  */
 abstract class AbstractUpdateTest extends AnyFunSuite {
 
-  type N <: ClarkNodes.Node
-  type E <: N with ClarkNodes.Elem.Aux[N, E] with UpdatableElemApi.Aux[N, E] with TransformableElemApi.Aux[N, E]
+  // Note below how we prevent the following error: "inferred type ... contains type selection from volatile type ..."
+  // We do this by type E no longer extending type N.
+
+  type E <: ClarkNodes.Elem.Aux[N, E] with UpdatableElemApi.Aux[N, E] with TransformableElemApi.Aux[N, E]
+  type N >: E <: ClarkNodes.Node
 
   implicit val clsTag: ClassTag[E]
 

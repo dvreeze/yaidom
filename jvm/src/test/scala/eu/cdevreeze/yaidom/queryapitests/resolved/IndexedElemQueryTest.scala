@@ -16,11 +16,6 @@
 
 package eu.cdevreeze.yaidom.queryapitests.resolved
 
-import scala.Vector
-
-
-
-
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.indexed.IndexedClarkElem
@@ -34,7 +29,6 @@ import eu.cdevreeze.yaidom.simple.NodeBuilder
  *
  * @author Chris de Vreeze
  */
-
 class IndexedElemQueryTest extends AbstractIndexedElemLikeQueryTest {
 
   final type U = Elem

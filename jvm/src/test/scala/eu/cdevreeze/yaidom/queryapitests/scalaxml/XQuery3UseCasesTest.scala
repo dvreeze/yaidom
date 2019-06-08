@@ -16,9 +16,6 @@
 
 package eu.cdevreeze.yaidom.queryapitests.scalaxml
 
-
-
-
 import eu.cdevreeze.yaidom.convert.ScalaXmlConversions
 import eu.cdevreeze.yaidom.queryapitests.AbstractXQuery3UseCasesTest
 import eu.cdevreeze.yaidom.scalaxml.ScalaXmlElem
@@ -29,7 +26,6 @@ import eu.cdevreeze.yaidom.simple.Elem
  *
  * @author Chris de Vreeze
  */
-
 class XQuery3UseCasesTest extends AbstractXQuery3UseCasesTest {
 
   final type E = ScalaXmlElem

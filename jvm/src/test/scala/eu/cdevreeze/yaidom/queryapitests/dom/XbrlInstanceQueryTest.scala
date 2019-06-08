@@ -16,9 +16,6 @@
 
 package eu.cdevreeze.yaidom.queryapitests.dom
 
-
-
-
 import eu.cdevreeze.yaidom.dom.DomElem
 import eu.cdevreeze.yaidom.queryapitests.AbstractXbrlInstanceQueryTest
 import javax.xml.parsers.DocumentBuilderFactory
@@ -28,7 +25,6 @@ import javax.xml.parsers.DocumentBuilderFactory
  *
  * @author Chris de Vreeze
  */
-
 class XbrlInstanceQueryTest extends AbstractXbrlInstanceQueryTest {
 
   final type E = DomElem

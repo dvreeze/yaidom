@@ -16,22 +16,18 @@
 
 package eu.cdevreeze.yaidom.queryapitests.scalaxml
 
-import java.{ util => jutil }
-
-
-import org.xml.sax.InputSource
-
+import java.{util => jutil}
 
 import eu.cdevreeze.yaidom.queryapitests.AbstractScopedElemLikeQueryTest
 import eu.cdevreeze.yaidom.scalaxml.ScalaXmlElem
 import eu.cdevreeze.yaidom.scalaxml.ScalaXmlNode
+import org.xml.sax.InputSource
 
 /**
  * Query test case for Scala XML wrapper elements.
  *
  * @author Chris de Vreeze
  */
-
 class ScopedElemLikeQueryTest extends AbstractScopedElemLikeQueryTest {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.queryapitests.scalaxml")

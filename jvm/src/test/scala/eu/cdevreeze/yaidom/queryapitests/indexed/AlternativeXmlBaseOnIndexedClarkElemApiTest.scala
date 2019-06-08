@@ -18,9 +18,6 @@ package eu.cdevreeze.yaidom.queryapitests.indexed
 
 import java.net.URI
 
-
-
-
 import eu.cdevreeze.yaidom.indexed.Elem
 import eu.cdevreeze.yaidom.queryapitests.AbstractAlternativeXmlBaseOnIndexedClarkElemApiTest
 import eu.cdevreeze.yaidom.simple
@@ -30,7 +27,6 @@ import eu.cdevreeze.yaidom.simple
  *
  * @author Chris de Vreeze
  */
-
 class AlternativeXmlBaseOnIndexedClarkElemApiTest extends AbstractAlternativeXmlBaseOnIndexedClarkElemApiTest {
 
   type U = simple.Elem

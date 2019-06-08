@@ -16,9 +16,6 @@
 
 package eu.cdevreeze.yaidom.queryapitests.indexed
 
-
-
-
 import eu.cdevreeze.yaidom.indexed.Document
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingStax
 import eu.cdevreeze.yaidom.queryapitests.AbstractBackingElemTest
@@ -28,7 +25,6 @@ import eu.cdevreeze.yaidom.queryapitests.AbstractBackingElemTest
  *
  * @author Chris de Vreeze
  */
-
 class BackingElemTest extends AbstractBackingElemTest {
 
   private val docParser = DocumentParserUsingStax.newInstance()

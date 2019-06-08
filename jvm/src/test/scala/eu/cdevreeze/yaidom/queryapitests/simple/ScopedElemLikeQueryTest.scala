@@ -16,12 +16,7 @@
 
 package eu.cdevreeze.yaidom.queryapitests.simple
 
-import java.{ util => jutil }
-
-
-import org.xml.sax.EntityResolver
-import org.xml.sax.InputSource
-
+import java.{util => jutil}
 
 import eu.cdevreeze.yaidom.convert
 import eu.cdevreeze.yaidom.core.Scope
@@ -29,13 +24,14 @@ import eu.cdevreeze.yaidom.queryapitests.AbstractScopedElemLikeQueryTest
 import eu.cdevreeze.yaidom.simple.Elem
 import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
+import org.xml.sax.EntityResolver
+import org.xml.sax.InputSource
 
 /**
  * Query test case for simple elements.
  *
  * @author Chris de Vreeze
  */
-
 class ScopedElemLikeQueryTest extends AbstractScopedElemLikeQueryTest {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.queryapitests.simple")

@@ -16,9 +16,6 @@
 
 package eu.cdevreeze.yaidom.queryapitests.indexed
 
-
-
-
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
 import eu.cdevreeze.yaidom.queryapi.BackingNodes
 import eu.cdevreeze.yaidom.queryapitests.AbstractSubtypeAwareElemLikeQueryTest
@@ -28,7 +25,6 @@ import eu.cdevreeze.yaidom.queryapitests.AbstractSubtypeAwareElemLikeQueryTest
  *
  * @author Chris de Vreeze
  */
-
 class SubtypeAwareElemLikeQueryTest extends AbstractSubtypeAwareElemLikeQueryTest {
 
   protected val wrappedDocumentContent: BackingNodes.Elem = {

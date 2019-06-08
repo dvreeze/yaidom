@@ -18,9 +18,6 @@ package eu.cdevreeze.yaidom.queryapitests.nodeinfo
 
 import java.io.File
 
-
-
-
 import eu.cdevreeze.yaidom.queryapitests.AbstractBackingElemTest
 import eu.cdevreeze.yaidom.saxon.SaxonDocument
 import javax.xml.transform.stream.StreamSource
@@ -31,7 +28,6 @@ import net.sf.saxon.s9api.Processor
  *
  * @author Chris de Vreeze
  */
-
 class BackingElemTest extends AbstractBackingElemTest {
 
   private val processor = new Processor(false)

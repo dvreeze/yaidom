@@ -16,9 +16,6 @@
 
 package eu.cdevreeze.yaidom.queryapitests.scalaxml
 
-
-
-
 import eu.cdevreeze.yaidom.convert.ScalaXmlConversions
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
 import eu.cdevreeze.yaidom.queryapi.BackingNodes
@@ -30,7 +27,6 @@ import eu.cdevreeze.yaidom.scalaxml.ScalaXmlElem
  *
  * @author Chris de Vreeze
  */
-
 class SubtypeAwareElemLikeQueryTest extends AbstractSubtypeAwareElemLikeQueryTest {
 
   protected val wrappedDocumentContent: BackingNodes.Elem = {

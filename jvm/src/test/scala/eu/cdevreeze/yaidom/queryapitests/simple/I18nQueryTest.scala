@@ -16,9 +16,6 @@
 
 package eu.cdevreeze.yaidom.queryapitests.simple
 
-
-
-
 import eu.cdevreeze.yaidom.convert
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.queryapitests.AbstractI18nQueryTest
@@ -31,7 +28,6 @@ import javax.xml.parsers.DocumentBuilderFactory
  *
  * @author Chris de Vreeze
  */
-
 class I18nQueryTest extends AbstractI18nQueryTest {
 
   final type E = Elem

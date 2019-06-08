@@ -16,9 +16,6 @@
 
 package eu.cdevreeze.yaidom.queryapitests.nodeinfo
 
-
-
-
 import eu.cdevreeze.yaidom.queryapitests.AbstractXbrlInstanceQueryTest
 import eu.cdevreeze.yaidom.saxon.SaxonDocument
 import eu.cdevreeze.yaidom.saxon.SaxonElem
@@ -31,7 +28,6 @@ import net.sf.saxon.s9api.Processor
  *
  * @author Chris de Vreeze
  */
-
 class XbrlInstanceQueryTest extends AbstractXbrlInstanceQueryTest {
 
   final type E = SaxonElem

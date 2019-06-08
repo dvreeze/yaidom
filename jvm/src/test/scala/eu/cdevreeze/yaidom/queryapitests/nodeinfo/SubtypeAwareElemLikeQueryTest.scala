@@ -18,12 +18,9 @@ package eu.cdevreeze.yaidom.queryapitests.nodeinfo
 
 import java.io.File
 
-
-
-
 import eu.cdevreeze.yaidom.queryapi.BackingNodes
-import eu.cdevreeze.yaidom.saxon.SaxonDocument
 import eu.cdevreeze.yaidom.queryapitests.AbstractSubtypeAwareElemLikeQueryTest
+import eu.cdevreeze.yaidom.saxon.SaxonDocument
 import net.sf.saxon.s9api.Processor
 
 /**
@@ -31,7 +28,6 @@ import net.sf.saxon.s9api.Processor
  *
  * @author Chris de Vreeze
  */
-
 class SubtypeAwareElemLikeQueryTest extends AbstractSubtypeAwareElemLikeQueryTest {
 
   private val processor = new Processor(false)

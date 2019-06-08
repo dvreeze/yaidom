@@ -16,9 +16,6 @@
 
 package eu.cdevreeze.yaidom.integrationtest
 
-
-
-
 import eu.cdevreeze.yaidom.parse
 
 /**

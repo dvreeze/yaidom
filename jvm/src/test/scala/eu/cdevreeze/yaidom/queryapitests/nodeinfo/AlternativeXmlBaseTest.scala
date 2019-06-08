@@ -21,10 +21,6 @@ import java.net.URI
 
 import scala.collection.immutable
 
-
-
-import org.xml.sax.InputSource
-
 import eu.cdevreeze.yaidom
 import eu.cdevreeze.yaidom.print.DocumentPrinterUsingDom
 import eu.cdevreeze.yaidom.queryapi.DocumentApi
@@ -34,6 +30,7 @@ import eu.cdevreeze.yaidom.saxon.SaxonElem
 import javax.xml.transform.sax.SAXSource
 import net.sf.saxon.lib.ParseOptions
 import net.sf.saxon.s9api.Processor
+import org.xml.sax.InputSource
 
 /**
  * Alternative XML Base test case for Saxon wrapper Elems. This test uses the XML Base tutorial at: http://zvon.org/comp/r/tut-XML_Base.html.
@@ -42,7 +39,6 @@ import net.sf.saxon.s9api.Processor
  *
  * @author Chris de Vreeze
  */
-
 class AlternativeXmlBaseTest extends AbstractAlternativeXmlBaseTest {
 
   type D = SaxonDocument

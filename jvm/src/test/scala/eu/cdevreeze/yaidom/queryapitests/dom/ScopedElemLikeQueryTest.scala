@@ -16,24 +16,20 @@
 
 package eu.cdevreeze.yaidom.queryapitests.dom
 
-import java.{ util => jutil }
-
-
-import org.xml.sax.EntityResolver
-import org.xml.sax.InputSource
-
+import java.{util => jutil}
 
 import eu.cdevreeze.yaidom.dom.DomElem
 import eu.cdevreeze.yaidom.queryapitests.AbstractScopedElemLikeQueryTest
 import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
+import org.xml.sax.EntityResolver
+import org.xml.sax.InputSource
 
 /**
  * Query test case for DOM wrapper elements.
  *
  * @author Chris de Vreeze
  */
-
 class ScopedElemLikeQueryTest extends AbstractScopedElemLikeQueryTest {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.queryapitests.dom")

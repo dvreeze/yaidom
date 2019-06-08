@@ -16,9 +16,6 @@
 
 package eu.cdevreeze.yaidom.queryapitests.resolved
 
-
-
-
 import eu.cdevreeze.yaidom.convert.ScalaXmlConversions.convertToElem
 import eu.cdevreeze.yaidom.queryapitests.AbstractAlternativeQueryTest
 import eu.cdevreeze.yaidom.resolved.Elem
@@ -28,7 +25,6 @@ import eu.cdevreeze.yaidom.resolved.Elem
  *
  * @author Chris de Vreeze
  */
-
 class AlternativeQueryTest extends AbstractAlternativeQueryTest {
 
   final type E = Elem

@@ -16,9 +16,6 @@
 
 package eu.cdevreeze.yaidom.queryapitests.dom
 
-
-
-
 import eu.cdevreeze.yaidom.dom.DomElem
 import eu.cdevreeze.yaidom.queryapitests.AbstractRobustQueryTest
 import javax.xml.parsers.DocumentBuilder
@@ -29,7 +26,6 @@ import javax.xml.parsers.DocumentBuilderFactory
  *
  * @author Chris de Vreeze
  */
-
 class RobustQueryTest extends AbstractRobustQueryTest {
 
   final type E = DomElem

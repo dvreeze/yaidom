@@ -18,9 +18,6 @@ package eu.cdevreeze.yaidom.queryapitests.indexed
 
 import java.io.InputStream
 
-
-
-
 import eu.cdevreeze.yaidom.indexed.Document
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingStax
 import eu.cdevreeze.yaidom.queryapitests.AbstractLargeXmlTest
@@ -30,7 +27,6 @@ import eu.cdevreeze.yaidom.queryapitests.AbstractLargeXmlTest
  *
  * @author Chris de Vreeze
  */
-
 class LargeXmlTest extends AbstractLargeXmlTest {
 
   type D = Document

@@ -20,13 +20,10 @@ import java.net.URI
 
 import scala.collection.immutable
 
-
-
-
+import eu.cdevreeze.yaidom
 import eu.cdevreeze.yaidom.queryapi.DocumentApi
 import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
 import eu.cdevreeze.yaidom.queryapitests.AbstractAlternativeXmlBaseTest
-import eu.cdevreeze.yaidom
 
 /**
  * Alternative XML Base test case for indexed Elems. This test uses the XML Base tutorial at: http://zvon.org/comp/r/tut-XML_Base.html.
@@ -35,7 +32,6 @@ import eu.cdevreeze.yaidom
  *
  * @author Chris de Vreeze
  */
-
 class AlternativeXmlBaseTest extends AbstractAlternativeXmlBaseTest {
 
   type D = yaidom.indexed.Document

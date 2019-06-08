@@ -16,9 +16,6 @@
 
 package eu.cdevreeze.yaidom.integrationtest
 
-
-
-
 import org.xml.sax.InputSource
 
 import eu.cdevreeze.yaidom.convert.ScalaXmlConversions.convertElem

@@ -20,9 +20,6 @@ import java.net.URI
 
 import scala.collection.immutable
 
-
-
-
 import eu.cdevreeze.yaidom.indexed
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
 import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
@@ -33,7 +30,6 @@ import eu.cdevreeze.yaidom.queryapitests.AbstractXmlBaseTest
  *
  * @author Chris de Vreeze
  */
-
 class XmlBaseTest extends AbstractXmlBaseTest {
 
   type D = indexed.Document
