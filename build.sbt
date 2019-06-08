@@ -10,7 +10,7 @@
 import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 
 val scalaVer = "2.12.8"
-val crossScalaVer = Seq(scalaVer, "2.11.12", "2.13.0-RC3")
+val crossScalaVer = Seq(scalaVer, "2.13.0-RC3")
 
 lazy val commonSettings = Seq(
   name         := "yaidom",
@@ -136,8 +136,6 @@ lazy val yaidom = crossProject(JSPlatform, JVMPlatform)
           f.toString.contains("java8") ||
           f.toString.contains("DomInteropTest") || // Serialization issue since Scala 2.13.0-M5?
           f.toString.contains("DomLSInteropTest")) // Serialization issue since Scala 2.13.0-M5?
-      } else if (scalaBinaryVersion.value == "2.11") {
-        new SimpleFileFilter(f => f.toString.contains("SaxonInspiredQueryTest"))
       } else {
         NothingFilter
       }
