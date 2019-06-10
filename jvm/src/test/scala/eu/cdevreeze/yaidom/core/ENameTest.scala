@@ -16,14 +16,14 @@
 
 package eu.cdevreeze.yaidom.core
 
-import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.FunSuite
 
 /**
  * EName test case.
  *
  * @author Chris de Vreeze
  */
-class ENameTest extends AnyFunSuite {
+class ENameTest extends FunSuite {
 
   private val bookstoreNs = "http://bookstore"
 

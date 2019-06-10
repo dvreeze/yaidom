@@ -28,7 +28,7 @@ import eu.cdevreeze.yaidom.scalaxml.ScalaXmlProcessingInstruction
 import eu.cdevreeze.yaidom.scalaxml.ScalaXmlText
 import eu.cdevreeze.yaidom.simple
 import org.scalatest.BeforeAndAfterAll
-import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.FunSuite
 
 /**
  * Scala XML wrapper test case.
@@ -39,7 +39,7 @@ import org.scalatest.funsuite.AnyFunSuite
  *
  * @author Chris de Vreeze
  */
-class ScalaXmlWrapperTest extends AnyFunSuite with BeforeAndAfterAll {
+class ScalaXmlWrapperTest extends FunSuite with BeforeAndAfterAll {
 
   private val nsBookstore = "http://bookstore"
   private val nsGoogle = "http://www.google.com"

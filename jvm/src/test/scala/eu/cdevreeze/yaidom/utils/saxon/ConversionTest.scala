@@ -26,14 +26,14 @@ import eu.cdevreeze.yaidom.saxon.SaxonDocument
 import eu.cdevreeze.yaidom.simple
 import javax.xml.transform.stream.StreamSource
 import net.sf.saxon.s9api.Processor
-import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.FunSuite
 
 /**
  * Conversion test for Saxon elements to native simple elements and vice versa.
  *
  * @author Chris de Vreeze
  */
-class ConversionTest extends AnyFunSuite {
+class ConversionTest extends FunSuite {
 
   private val processor = new Processor(false)
 

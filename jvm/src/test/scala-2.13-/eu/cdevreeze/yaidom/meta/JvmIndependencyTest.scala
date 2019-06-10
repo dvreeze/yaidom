@@ -21,7 +21,7 @@ import java.io.File
 import scala.collection.immutable
 import scala.meta._
 
-import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.FunSuite
 
 /**
  * Test case checking that the "shared" code base can be used targeting Scala.js, by inspecting import statements.
@@ -31,7 +31,7 @@ import org.scalatest.funsuite.AnyFunSuite
  *
  * @author Chris de Vreeze
  */
-class JvmIndependencyTest extends AnyFunSuite {
+class JvmIndependencyTest extends FunSuite {
 
   import JvmIndependencyTest.ImportedName
 

@@ -20,14 +20,14 @@ import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi.withEName
 import eu.cdevreeze.yaidom.queryapi.ScopedNodes
-import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.FunSuite
 
 /**
  * ScopedElemLike-based I18N query test case. Make sure the encoding of this source file is UTF-8!
  *
  * @author Chris de Vreeze
  */
-abstract class AbstractI18nQueryTest extends AnyFunSuite {
+abstract class AbstractI18nQueryTest extends FunSuite {
 
   type E <: ScopedNodes.Elem
 

@@ -27,7 +27,7 @@ import org.scalacheck.Gen
 import org.scalacheck.Gen.oneOf
 import org.scalacheck.Gen.someOf
 import org.scalacheck.Prop.propBoolean
-import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.FunSuite
 import org.scalatestplus.scalacheck.Checkers
 
 /**
@@ -35,7 +35,7 @@ import org.scalatestplus.scalacheck.Checkers
  *
  * @author Chris de Vreeze
  */
-class ElemLikePropTest extends AnyFunSuite with Checkers {
+class ElemLikePropTest extends FunSuite with Checkers {
 
   // Simple "definitions"
 

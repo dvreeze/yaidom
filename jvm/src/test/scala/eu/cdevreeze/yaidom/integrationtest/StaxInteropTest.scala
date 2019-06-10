@@ -38,7 +38,7 @@ import eu.cdevreeze.yaidom.simple.EntityRef
 import eu.cdevreeze.yaidom.simple.NodeBuilder
 import javax.xml.stream.XMLInputFactory
 import javax.xml.stream.XMLResolver
-import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.FunSuite
 import org.xml.sax.InputSource
 
 /**
@@ -52,7 +52,7 @@ import org.xml.sax.InputSource
  *
  * @author Chris de Vreeze
  */
-class StaxInteropTest extends AnyFunSuite {
+class StaxInteropTest extends FunSuite {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 

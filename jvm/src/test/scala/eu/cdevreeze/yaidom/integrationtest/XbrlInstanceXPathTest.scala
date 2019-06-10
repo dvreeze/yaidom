@@ -30,7 +30,7 @@ import javax.xml.xpath.XPathFunction
 import javax.xml.xpath.XPathFunctionException
 import javax.xml.xpath.XPathFunctionResolver
 import org.scalatest.BeforeAndAfterAll
-import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.FunSuite
 import org.w3c.dom.NodeList
 
 /**
@@ -47,7 +47,7 @@ import org.w3c.dom.NodeList
  *
  * @author Chris de Vreeze
  */
-class XbrlInstanceXPathTest extends AnyFunSuite with BeforeAndAfterAll {
+class XbrlInstanceXPathTest extends FunSuite with BeforeAndAfterAll {
 
   import XbrlInstanceXPathTest.CustomFunctionNs
   import XbrlInstanceXPathTest.LinkNs

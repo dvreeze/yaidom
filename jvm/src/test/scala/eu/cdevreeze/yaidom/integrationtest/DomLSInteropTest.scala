@@ -38,7 +38,7 @@ import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.simple.EntityRef
 import eu.cdevreeze.yaidom.simple.NodeBuilder
 import javax.xml.parsers.DocumentBuilderFactory
-import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.FunSuite
 import org.w3c.dom.DOMError
 import org.w3c.dom.DOMErrorHandler
 import org.w3c.dom.ls.DOMImplementationLS
@@ -59,7 +59,7 @@ import org.xml.sax.InputSource
  *
  * @author Chris de Vreeze
  */
-class DomLSInteropTest extends AnyFunSuite {
+class DomLSInteropTest extends FunSuite {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 

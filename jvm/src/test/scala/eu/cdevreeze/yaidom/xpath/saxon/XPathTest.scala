@@ -36,14 +36,14 @@ import javax.xml.xpath.XPathVariableResolver
 import net.sf.saxon.om.NodeInfo
 import net.sf.saxon.s9api.DocumentBuilder
 import net.sf.saxon.s9api.Processor
-import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.FunSuite
 
 /**
  * XPath test case using JAXP backed by Saxon.
  *
  * @author Chris de Vreeze
  */
-class XPathTest extends AnyFunSuite {
+class XPathTest extends FunSuite {
 
   private val processor = new Processor(false)
 

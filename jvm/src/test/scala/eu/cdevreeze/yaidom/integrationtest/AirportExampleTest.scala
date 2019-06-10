@@ -28,7 +28,7 @@ import eu.cdevreeze.yaidom.simple.Document
 import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.simple.ElemBuilder
 import eu.cdevreeze.yaidom.simple.NodeBuilder
-import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.FunSuite
 
 /**
  * Test case using yaidom on files of airports.
@@ -39,7 +39,7 @@ import org.scalatest.funsuite.AnyFunSuite
  *
  * @author Chris de Vreeze
  */
-class AirportExampleTest extends AnyFunSuite {
+class AirportExampleTest extends FunSuite {
 
   import AirportExampleTest._
 

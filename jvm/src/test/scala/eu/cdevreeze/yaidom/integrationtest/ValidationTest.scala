@@ -24,7 +24,7 @@ import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
 import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.simple.NodeBuilder.elem
 import eu.cdevreeze.yaidom.simple.NodeBuilder.textElem
-import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.FunSuite
 
 /**
  * Test case using yaidom for validation of XML documents, playing with an "alternative schema language" (inspired by Relax NG and
@@ -34,7 +34,7 @@ import org.scalatest.funsuite.AnyFunSuite
  *
  * @author Chris de Vreeze
  */
-class ValidationTest extends AnyFunSuite {
+class ValidationTest extends FunSuite {
 
   import ValidationTest._
 

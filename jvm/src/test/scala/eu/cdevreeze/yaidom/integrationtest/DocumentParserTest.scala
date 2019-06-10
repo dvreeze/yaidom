@@ -31,7 +31,7 @@ import eu.cdevreeze.yaidom.parse.DocumentParserUsingStax
 import eu.cdevreeze.yaidom.scalaxml.ScalaXmlDocument
 import eu.cdevreeze.yaidom.simple.DocBuilder
 import javax.xml.parsers.DocumentBuilderFactory
-import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.FunSuite
 import org.xml.sax.InputSource
 
 /**
@@ -39,7 +39,7 @@ import org.xml.sax.InputSource
  *
  * @author Chris de Vreeze
  */
-class DocumentParserTest extends AnyFunSuite {
+class DocumentParserTest extends FunSuite {
 
   test("testParseWithEndingCommentsUsingSax") {
     val parser = DocumentParserUsingSax.newInstance

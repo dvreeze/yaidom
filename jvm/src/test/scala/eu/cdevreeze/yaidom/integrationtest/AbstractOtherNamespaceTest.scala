@@ -27,7 +27,7 @@ import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.simple.Document
 import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.simple.NodeBuilder
-import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.FunSuite
 import org.xml.sax.InputSource
 
 /**
@@ -38,7 +38,7 @@ import org.xml.sax.InputSource
  *
  * @author Chris de Vreeze
  */
-abstract class AbstractOtherNamespaceTest extends AnyFunSuite {
+abstract class AbstractOtherNamespaceTest extends FunSuite {
 
   def documentParser: DocumentParser
 

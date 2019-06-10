@@ -24,7 +24,7 @@ import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
 import eu.cdevreeze.yaidom.print.DocumentPrinterUsingDom
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.simple
-import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.FunSuite
 import org.xml.sax.InputSource
 
 /**
@@ -32,7 +32,7 @@ import org.xml.sax.InputSource
  *
  * @author Chris de Vreeze
  */
-class EscapedXmlTest extends AnyFunSuite {
+class EscapedXmlTest extends FunSuite {
 
   test("testRoundtripEscapedInnerXml") {
     val docPrinter = DocumentPrinterUsingDom.newInstance()

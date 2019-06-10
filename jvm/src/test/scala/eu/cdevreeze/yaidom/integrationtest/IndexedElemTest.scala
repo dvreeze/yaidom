@@ -34,7 +34,7 @@ import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.scalaxml.ScalaXmlElem
 import eu.cdevreeze.yaidom.simple.Document
 import eu.cdevreeze.yaidom.simple.Elem
-import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.FunSuite
 import org.xml.sax.InputSource
 
 /**
@@ -42,7 +42,7 @@ import org.xml.sax.InputSource
  *
  * @author Chris de Vreeze
  */
-class IndexedElemTest extends AnyFunSuite {
+class IndexedElemTest extends FunSuite {
 
   test("testIndexingForSimpleElem") {
     doTestIndexing[Elem, indexed.Elem](IndexedScopedElem(docWithCommentAtEnd.documentElement))

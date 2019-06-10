@@ -40,7 +40,7 @@ import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
 import eu.cdevreeze.yaidom.resolved
 import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
-import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.FunSuite
 import org.xml.sax.EntityResolver
 import org.xml.sax.InputSource
 
@@ -53,7 +53,7 @@ import org.xml.sax.InputSource
  *
  * @author Chris de Vreeze
  */
-class JDomWrapperTest extends AnyFunSuite {
+class JDomWrapperTest extends FunSuite {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 

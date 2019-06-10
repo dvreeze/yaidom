@@ -19,7 +19,7 @@ package eu.cdevreeze.yaidom.integrationtest
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
 import org.scalatest.BeforeAndAfterAll
-import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.FunSuite
 
 /**
  * CD store test case, using yaidom instead of XPath.
@@ -34,7 +34,7 @@ import org.scalatest.funsuite.AnyFunSuite
  *
  * @author Chris de Vreeze
  */
-class CdStoreTest extends AnyFunSuite with BeforeAndAfterAll {
+class CdStoreTest extends FunSuite with BeforeAndAfterAll {
 
   test("testQueryArtistElems") {
     val parser = DocumentParserUsingSax.newInstance

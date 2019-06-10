@@ -21,14 +21,14 @@ import java.io.File
 import scala.collection.immutable
 import scala.meta._
 
-import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.FunSuite
 
 /**
  * Test case checking for unidirectional package dependencies in yaidom, by inspecting import statements.
  *
  * @author Chris de Vreeze
  */
-class PackageDependencyTest extends AnyFunSuite {
+class PackageDependencyTest extends FunSuite {
 
   /**
    * Sub-package of yaidom, for example List("core") or List("java8", "indexed").

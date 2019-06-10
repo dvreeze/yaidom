@@ -30,7 +30,7 @@ import eu.cdevreeze.yaidom.simple.Document
 import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.simple.EntityRef
 import eu.cdevreeze.yaidom.simple.NodeBuilder
-import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.FunSuite
 
 /**
  * Scala XML interoperability test case.
@@ -41,7 +41,7 @@ import org.scalatest.funsuite.AnyFunSuite
  *
  * @author Chris de Vreeze
  */
-class ScalaXmlInteropTest extends AnyFunSuite {
+class ScalaXmlInteropTest extends FunSuite {
 
   private val nsBookstore = "http://bookstore"
   private val nsGoogle = "http://www.google.com"

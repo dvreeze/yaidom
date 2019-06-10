@@ -25,7 +25,7 @@ import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi._
 import eu.cdevreeze.yaidom.queryapi.ClarkNodes
 import eu.cdevreeze.yaidom.simple.NodeBuilder
-import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.FunSuite
 
 /**
  * ElemLike-based query test case. This test case shows how XPath and XQuery queries can be written in this API, be it somewhat
@@ -37,7 +37,7 @@ import org.scalatest.funsuite.AnyFunSuite
  *
  * @author Chris de Vreeze
  */
-abstract class AbstractElemLikeQueryTest extends AnyFunSuite {
+abstract class AbstractElemLikeQueryTest extends FunSuite {
 
   type E <: ClarkNodes.Elem with ClarkElemApi.Aux[E]
 

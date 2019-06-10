@@ -38,7 +38,7 @@ import javax.xml.stream.events.XMLEvent
 import javax.xml.stream.events.{ProcessingInstruction => StaxProcessingInstruction}
 import javax.xml.transform.stream.StreamSource
 import org.scalatest.BeforeAndAfterAll
-import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.FunSuite
 
 /**
  * Large XML test case, using streaming, thus keeping the memory footprint low. This test case shows how to code StAX-based streaming for yaidom, keeping the
@@ -48,7 +48,7 @@ import org.scalatest.funsuite.AnyFunSuite
  *
  * @author Chris de Vreeze
  */
-class StreamingLargeXmlTest extends AnyFunSuite with BeforeAndAfterAll {
+class StreamingLargeXmlTest extends FunSuite with BeforeAndAfterAll {
 
   import EventWithAncestry.dropWhileNot
 

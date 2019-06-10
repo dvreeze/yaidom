@@ -26,7 +26,7 @@ import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi.withLocalName
 import eu.cdevreeze.yaidom.queryapi.ClarkNodes
 import eu.cdevreeze.yaidom.simple.NodeBuilder
-import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.FunSuite
 
 /**
  * Alternative query test, with yaidom queries ported from XQuery examples.
@@ -36,7 +36,7 @@ import org.scalatest.funsuite.AnyFunSuite
  *
  * @author Chris de Vreeze
  */
-abstract class AbstractAlternativeQueryTest extends AnyFunSuite {
+abstract class AbstractAlternativeQueryTest extends FunSuite {
 
   type E <: ClarkNodes.Elem with ClarkElemApi.Aux[E]
 

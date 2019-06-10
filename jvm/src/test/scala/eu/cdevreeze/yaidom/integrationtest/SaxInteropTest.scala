@@ -40,7 +40,7 @@ import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.simple.NodeBuilder
 import javax.xml.parsers.SAXParserFactory
 import org.ccil.cowan.tagsoup.jaxp.{SAXFactoryImpl => TagSoupSAXFactoryImpl}
-import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.FunSuite
 import org.xml.sax.EntityResolver
 import org.xml.sax.ErrorHandler
 import org.xml.sax.InputSource
@@ -57,7 +57,7 @@ import org.xml.sax.SAXParseException
  *
  * @author Chris de Vreeze
  */
-class SaxInteropTest extends AnyFunSuite {
+class SaxInteropTest extends FunSuite {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 

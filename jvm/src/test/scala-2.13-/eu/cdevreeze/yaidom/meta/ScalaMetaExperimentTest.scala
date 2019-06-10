@@ -18,7 +18,7 @@ package eu.cdevreeze.yaidom.meta
 
 import scala.meta._
 
-import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.FunSuite
 
 /**
  * Test case experimenting with Scala.meta. This experiment helps in writing a test case that checks for unidirectional
@@ -26,7 +26,7 @@ import org.scalatest.funsuite.AnyFunSuite
  *
  * @author Chris de Vreeze
  */
-class ScalaMetaExperimentTest extends AnyFunSuite {
+class ScalaMetaExperimentTest extends FunSuite {
 
   test("testSimplePackageImport") {
     // Building a Tree using quasi-quotes, and manually, and comparing the two

@@ -26,7 +26,7 @@ import eu.cdevreeze.yaidom.queryapi.BackingNodes
 import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
 import eu.cdevreeze.yaidom.queryapi.SubtypeAwareElemLike
 import eu.cdevreeze.yaidom.queryapitests.AbstractSubtypeAwareElemLikeQueryTest._
-import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.FunSuite
 
 /**
  * AbstractSubtypeAwareElemLike-based query test case, showing how to support custom XML dialects offering the
@@ -39,7 +39,7 @@ import org.scalatest.funsuite.AnyFunSuite
  *
  * @author Chris de Vreeze
  */
-abstract class AbstractSubtypeAwareElemLikeQueryTest extends AnyFunSuite {
+abstract class AbstractSubtypeAwareElemLikeQueryTest extends FunSuite {
 
   protected val wrappedDocumentContent: BackingNodes.Elem
 

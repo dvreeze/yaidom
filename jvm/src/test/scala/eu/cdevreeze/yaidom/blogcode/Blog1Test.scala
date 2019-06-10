@@ -17,7 +17,7 @@
 package eu.cdevreeze.yaidom.blogcode
 
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
-import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.FunSuite
 
 /**
  * Code of yaidom blog 1 ("yaidom querying"). The blog uses examples from the coursera course Introduction to Databases,
@@ -41,7 +41,7 @@ import org.scalatest.funsuite.AnyFunSuite
  *
  * @author Chris de Vreeze
  */
-class Blog1Test extends AnyFunSuite {
+class Blog1Test extends FunSuite {
 
   private val pathToParentDir: java.io.File =
     (new java.io.File(classOf[Blog1Test].getResource("books.xml").toURI)).getParentFile

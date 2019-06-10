@@ -45,7 +45,7 @@ import eu.cdevreeze.yaidom.utils.saxon.SimpleElemToSaxonElemConverter
 import javax.xml.parsers.DocumentBuilderFactory
 import net.sf.saxon.s9api.Processor
 import org.scalatest.BeforeAndAfterAll
-import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.FunSuite
 
 /**
  * Large XML test case.
@@ -54,7 +54,7 @@ import org.scalatest.funsuite.AnyFunSuite
  *
  * @author Chris de Vreeze
  */
-class LargeXmlTest extends AnyFunSuite with BeforeAndAfterAll {
+class LargeXmlTest extends FunSuite with BeforeAndAfterAll {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 

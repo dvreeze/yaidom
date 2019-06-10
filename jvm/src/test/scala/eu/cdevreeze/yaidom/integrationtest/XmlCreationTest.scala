@@ -36,14 +36,14 @@ import eu.cdevreeze.yaidom.queryapi.SubtypeAwareElemLike
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.simple
 import org.scalatest.BeforeAndAfterAll
-import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.FunSuite
 
 /**
  * XML creation test, using resolved elements to quickly and easily create some XML snippet.
  *
  * @author Chris de Vreeze
  */
-class XmlCreationTest extends AnyFunSuite with BeforeAndAfterAll {
+class XmlCreationTest extends FunSuite with BeforeAndAfterAll {
 
   import XmlCreationTest._
 

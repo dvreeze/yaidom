@@ -29,7 +29,7 @@ import eu.cdevreeze.yaidom.queryapi.ClarkElemApi.withEName
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.simple
 import eu.cdevreeze.yaidom.utils.NamespaceUtils
-import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.FunSuite
 
 /**
  * Code of yaidom XBRL blog ("XBRL, Scala and yaidom"). The blog introduces yaidom in the context
@@ -41,7 +41,7 @@ import org.scalatest.funsuite.AnyFunSuite
  *
  * @author Chris de Vreeze
  */
-class Blog2XbrlTest extends AnyFunSuite {
+class Blog2XbrlTest extends FunSuite {
 
   private val sampleXbrlInstanceFile: java.io.File =
     (new java.io.File(classOf[Blog2XbrlTest].getResource("company-instance.xml").toURI))

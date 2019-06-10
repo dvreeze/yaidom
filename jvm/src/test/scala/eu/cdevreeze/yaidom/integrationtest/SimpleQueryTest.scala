@@ -27,7 +27,7 @@ import eu.cdevreeze.yaidom.scalaxml
 import eu.cdevreeze.yaidom.simple.Document
 import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.simple.Node
-import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.FunSuite
 
 /**
  * Query test case, testing several example queries.
@@ -40,7 +40,7 @@ import org.scalatest.funsuite.AnyFunSuite
  *
  * @author Chris de Vreeze
  */
-class SimpleQueryTest extends AnyFunSuite {
+class SimpleQueryTest extends FunSuite {
 
   test("testVerySimpleProductQuery") {
     val productElems =

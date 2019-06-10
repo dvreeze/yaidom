@@ -28,14 +28,14 @@ import eu.cdevreeze.yaidom.simple.ElemBuilder
 import eu.cdevreeze.yaidom.simple.Node
 import eu.cdevreeze.yaidom.simple.NodeBuilder
 import eu.cdevreeze.yaidom.simple.NodeBuilder._
-import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.FunSuite
 
 /**
  * XML creation test case.
  *
  * @author Chris de Vreeze
  */
-class CreationTest extends AnyFunSuite {
+class CreationTest extends FunSuite {
 
   test("testCreation") {
     // 1. Parse XML file into Elem

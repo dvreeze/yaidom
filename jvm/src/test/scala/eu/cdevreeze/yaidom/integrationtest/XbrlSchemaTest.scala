@@ -20,14 +20,14 @@ import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.indexed
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
 import eu.cdevreeze.yaidom.simple.Document
-import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.FunSuite
 
 /**
  * Test case using yaidom indexed elements for XBRL schema processing.
  *
  * @author Chris de Vreeze
  */
-class XbrlSchemaTest extends AnyFunSuite {
+class XbrlSchemaTest extends FunSuite {
   import XbrlSchemaTest._
 
   def testQueryXbrlSchema(): Unit = {

@@ -25,14 +25,14 @@ import eu.cdevreeze.yaidom.queryapi.ClarkElemLike
 import eu.cdevreeze.yaidom.queryapi.ElemApi.anyElem
 import eu.cdevreeze.yaidom.queryapi.SubtypeAwareElemLike
 import eu.cdevreeze.yaidom.simple.Document
-import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.FunSuite
 
 /**
  * Test case using yaidom sub-type-aware elements for XBRL schema processing.
  *
  * @author Chris de Vreeze
  */
-class XbrlSchemaTest extends AnyFunSuite {
+class XbrlSchemaTest extends FunSuite {
 
   import XbrlSchemaTest._
 

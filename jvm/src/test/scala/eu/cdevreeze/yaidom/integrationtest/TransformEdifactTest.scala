@@ -31,7 +31,7 @@ import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.simple.Node.elem
 import eu.cdevreeze.yaidom.simple.Node.emptyElem
 import eu.cdevreeze.yaidom.simple.Node.textElem
-import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.FunSuite
 
 /**
  * Transformation test for EDIFACT messages.
@@ -49,7 +49,7 @@ import org.scalatest.funsuite.AnyFunSuite
  *
  * @author Chris de Vreeze
  */
-class TransformEdifactTest extends AnyFunSuite {
+class TransformEdifactTest extends FunSuite {
 
   private val docParser = DocumentParserUsingSax.newInstance
   private val docPrinter = DocumentPrinterUsingSax.newInstance

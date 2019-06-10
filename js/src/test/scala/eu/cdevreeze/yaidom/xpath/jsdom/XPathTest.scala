@@ -23,14 +23,14 @@ import eu.cdevreeze.yaidom.core.Scope
 import org.scalajs.dom.experimental.domparser.DOMParser
 import org.scalajs.dom.experimental.domparser.SupportedType
 import org.scalajs.dom.{raw => sjsdom}
-import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.FunSuite
 
 /**
  * XPath test case for JS-DOM.
  *
  * @author Chris de Vreeze
  */
-class XPathTest extends AnyFunSuite {
+class XPathTest extends FunSuite {
 
   private val XbrliNs = "http://www.xbrl.org/2003/instance"
 

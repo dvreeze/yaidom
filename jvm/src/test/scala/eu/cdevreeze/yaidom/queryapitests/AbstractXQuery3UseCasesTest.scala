@@ -25,7 +25,7 @@ import eu.cdevreeze.yaidom.queryapi.ScopedElemApi
 import eu.cdevreeze.yaidom.queryapi.ScopedNodes
 import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.simple.Node
-import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.FunSuite
 
 /**
  * Query test, using examples from http://www.w3.org/TR/xquery-30-use-cases that show uses cases for XQuery 3.0.
@@ -38,7 +38,7 @@ import org.scalatest.funsuite.AnyFunSuite
  *
  * @author Chris de Vreeze
  */
-abstract class AbstractXQuery3UseCasesTest extends AnyFunSuite {
+abstract class AbstractXQuery3UseCasesTest extends FunSuite {
 
   type E <: ScopedNodes.Elem with ScopedElemApi.Aux[E]
 

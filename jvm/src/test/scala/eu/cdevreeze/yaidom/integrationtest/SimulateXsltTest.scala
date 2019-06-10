@@ -23,7 +23,7 @@ import eu.cdevreeze.yaidom.queryapi.ElemWithPath
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.simple.Node
-import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.FunSuite
 
 /**
  * Test case simulating XSLT. Thanks to Daniel K. Schneider for the examples.
@@ -31,7 +31,7 @@ import org.scalatest.funsuite.AnyFunSuite
  *
  * @author Chris de Vreeze
  */
-class SimulateXsltTest extends AnyFunSuite {
+class SimulateXsltTest extends FunSuite {
 
   import Node._
 

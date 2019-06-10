@@ -32,7 +32,7 @@ import eu.cdevreeze.yaidom.dom.DomText
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi._
 import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
-import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.FunSuite
 import org.xml.sax.EntityResolver
 import org.xml.sax.ErrorHandler
 import org.xml.sax.InputSource
@@ -49,7 +49,7 @@ import org.xml.sax.SAXParseException
  *
  * @author Chris de Vreeze
  */
-class DomWrapperTest extends AnyFunSuite {
+class DomWrapperTest extends FunSuite {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 
