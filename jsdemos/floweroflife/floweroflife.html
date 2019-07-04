@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Flower of life</title>
+    <link rel="stylesheet" href="floweroflife.css" type="text/css">
+</head>
+
+<body>
+<!-- Include Scala.js compiled code -->
+<script type="text/javascript" src="../../js/target/scala-2.12/yaidom-fastopt.js"></script>
+
+<script type="text/javascript" src="../../js/target/scala-2.12/yaidom-jsdeps.js"></script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function() {
+  FlowerOfLife.retrieveConfigurationAndDisplayFlower("floweroflife.xml", document.getElementById("canvas"));
+});
+</script>
+
+
+<h1 id="title">Flower of Life</h1>
+
+<div id="flower">
+    <canvas style="display: block" id="canvas" width="200" height="650"/>
+</div>
+
+</body>
+</html>
