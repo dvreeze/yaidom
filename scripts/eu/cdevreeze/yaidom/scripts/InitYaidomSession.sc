@@ -44,10 +44,6 @@ object ENameUtil {
 
 import ENameUtil._
 
-// Easy creation of element predicates, even implicitly from ENames
-
-import queryapi.HasENameApi._
-
 ENameProvider.globalENameProvider.become(jvm.CaffeineENameProvider.fromMaximumCacheSize(5000))
 QNameProvider.globalQNameProvider.become(jvm.CaffeineQNameProvider.fromMaximumCacheSize(5000))
 

@@ -39,4 +39,8 @@ package eu.cdevreeze.yaidom
  *
  * @author Chris de Vreeze
  */
-package object queryapi
+package object queryapi {
+
+  @deprecated(message = "Use ClarkElemApi companion object instead", since = "1.10.0")
+  val HasENameApi = ClarkElemApi
+}

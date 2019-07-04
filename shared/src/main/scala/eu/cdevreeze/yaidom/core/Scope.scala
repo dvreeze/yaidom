@@ -94,7 +94,7 @@ import eu.cdevreeze.yaidom.XmlStringUtils
  *
  * This is exactly equivalent to the following query:
  * {{{
- * import HasENameApi._
+ * import ClarkElemApi._
  *
  * val elemDecls = schemaElem \\ withEName("http://www.w3.org/2001/XMLSchema", "element")
  * }}}

@@ -17,10 +17,6 @@ import eu.cdevreeze.yaidom._
 
 import net.sf.saxon.s9api.Processor
 
-// Easy creation of element predicates, even implicitly from ENames
-
-import queryapi.HasENameApi._
-
 ENameProvider.globalENameProvider.become(jvm.CaffeineENameProvider.fromMaximumCacheSize(5000))
 QNameProvider.globalQNameProvider.become(jvm.CaffeineQNameProvider.fromMaximumCacheSize(5000))
 
