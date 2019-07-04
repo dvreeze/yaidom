@@ -9,14 +9,14 @@
 
 import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 
-val scalaVer = "2.12.8"
-val crossScalaVer = Seq(scalaVer, "2.13.0")
+val scalaVer = "2.13.0"
+val crossScalaVer = Seq(scalaVer, "2.12.8")
 
 lazy val commonSettings = Seq(
   name         := "yaidom",
   description  := "Extensible XML query API with multiple DOM-like implementations",
   organization := "eu.cdevreeze.yaidom",
-  version      := "1.9.1-SNAPSHOT",
+  version      := "1.10.0-SNAPSHOT",
 
   scalaVersion       := scalaVer,
   crossScalaVersions := crossScalaVer,
@@ -131,7 +131,7 @@ lazy val yaidom = crossProject(JSPlatform, JVMPlatform)
 
     testOptions += Tests.Argument(TestFrameworks.JUnit, "+q", "-v"),
 
-    mimaPreviousArtifacts := Set("eu.cdevreeze.yaidom" %%% "yaidom" % "1.8.1")
+    mimaPreviousArtifacts := Set("eu.cdevreeze.yaidom" %%% "yaidom" % "1.9.0")
   )
   .jsSettings(
     // Do we need this jsEnv?
@@ -178,7 +178,7 @@ lazy val yaidom = crossProject(JSPlatform, JVMPlatform)
       }
     },
 
-    mimaPreviousArtifacts := Set("eu.cdevreeze.yaidom" %%% "yaidom" % "1.8.1")
+    mimaPreviousArtifacts := Set("eu.cdevreeze.yaidom" %%% "yaidom" % "1.9.0")
   )
 
 lazy val yaidomJVM = yaidom.jvm

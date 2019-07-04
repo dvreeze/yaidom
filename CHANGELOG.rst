@@ -3,6 +3,19 @@ CHANGELOG
 =========
 
 
+1.10.0
+======
+
+Yaidom 1.10.0 is a release that targets Scala 2.13 (and 2.12), and drops support for Scala 2.11. The other most important changes are:
+
+* Slightly cleaned up the query API by removing the separate traits ``HasENameApi`` and ``HasTextApi`` (and their partial implementations)
+* Upgraded dependencies
+
+There are only a few minor breaking changes compared to version 1.9.0. MiMa did not run successfully this time, so its output is not included
+here. The most important breaking change is the disappearance of implicit class "HasENameApi.ToHasElemApi". This can be fixed
+in user code by importing all members of the ClarkElemApi companion object (using a wildcard import), for example.
+
+
 1.9.0
 =====
 

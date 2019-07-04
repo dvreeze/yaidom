@@ -26,22 +26,25 @@ Indeed, yaidom has several nice properties:
 Usage
 =====
 
-Yaidom versions can be found in the Maven central repository. Assuming version 1.9.0, yaidom can be added as dependency
+Yaidom versions can be found in the Maven central repository. Assuming version 1.10.0, yaidom can be added as dependency
 as follows (in an SBT or Maven build):
 
 **SBT**::
 
-    libraryDependencies += "eu.cdevreeze.yaidom" %%% "yaidom" % "1.9.0"
+    libraryDependencies += "eu.cdevreeze.yaidom" %%% "yaidom" % "1.10.0"
 
 **Maven2**::
 
     <dependency>
       <groupId>eu.cdevreeze.yaidom</groupId>
-      <artifactId>yaidom_2.12</artifactId>
-      <version>1.9.0</version>
+      <artifactId>yaidom_2.13</artifactId>
+      <version>1.10.0</version>
     </dependency>
 
 Note that yaidom itself has a few dependencies, which will be transitive dependencies in projects that use yaidom.
 Yaidom has been cross-built for several Scala versions, leading to artifactIds referring to different Scala (binary) versions.
+
+One transitive dependency is Saxon-HE (9.9). If Saxon-EE is used in combination with yaidom, the Saxon-HE dependency must
+be explicitly excluded!
 
 Yaidom (1.8.X and later) requires Java version 1.8 or later!
