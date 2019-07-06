@@ -79,28 +79,36 @@ object FlowerOfLife {
     }
   }
 
+  def drawArc(renderer: dom.CanvasRenderingContext2D, arc: Arc, colour: String): Unit = {
+    renderer.beginPath()
+    renderer.strokeStyle = colour
+    renderer.arc(arc.center.x, arc.center.y, arc.radius, arc.startAngle, arc.endAngle, arc.anticlockwise)
+    renderer.stroke()
+  }
+
   def findAllFlowerOfLifeArcs(center: Point, radius: Double): Seq[Arc] = {
     val circleResult = findAllFlowerOfLifeCircles(center, radius)
 
-    val (deltaX, deltaY) = (cos(asin(0.5)) * radius, radius / 2)
+    val thirtyDegreesInRadians = asin(0.5)
+    val (deltaX, deltaY) = (cos(thirtyDegreesInRadians) * radius, radius / 2)
 
     val centralCircle: Circle = Circle(center, radius)
 
     val topLeftPartialCircleCenter: Point = center.up(radius * 2).left(deltaX).up(deltaY)
     val topLeftPartialCircle: Arc =
-      PartialCircleArc(topLeftPartialCircleCenter, radius, -asin(0.5), -asin(0.5) + Pi, false)
+      PartialCircleArc(topLeftPartialCircleCenter, radius, -thirtyDegreesInRadians, -thirtyDegreesInRadians + Pi, false)
 
     val topRightPartialCircleCenter: Point = center.up(radius * 2).right(deltaX).up(deltaY)
     val topRightPartialCircle: Arc =
-      PartialCircleArc(topRightPartialCircleCenter, radius, asin(0.5), asin(0.5) + Pi, false)
+      PartialCircleArc(topRightPartialCircleCenter, radius, thirtyDegreesInRadians, thirtyDegreesInRadians + Pi, false)
 
     val bottomLeftPartialCircleCenter: Point = center.down(radius * 2).left(deltaX).down(deltaY)
     val bottomLeftPartialCircle: Arc =
-      PartialCircleArc(bottomLeftPartialCircleCenter, radius, asin(0.5) - Pi, asin(0.5), false)
+      PartialCircleArc(bottomLeftPartialCircleCenter, radius, thirtyDegreesInRadians - Pi, thirtyDegreesInRadians, false)
 
     val bottomRightPartialCircleCenter: Point = center.down(radius * 2).right(deltaX).down(deltaY)
     val bottomRightPartialCircle: Arc =
-      PartialCircleArc(bottomRightPartialCircleCenter, radius, -asin(0.5) - Pi, -asin(0.5), false)
+      PartialCircleArc(bottomRightPartialCircleCenter, radius, -thirtyDegreesInRadians - Pi, -thirtyDegreesInRadians, false)
 
     val leftArc =
       centralCircle.left(deltaX * 3).up(deltaY).downgrade.withStartAngle(-Pi / 2).withEndAngle(Pi / 2)
@@ -109,62 +117,62 @@ object FlowerOfLife {
       centralCircle.right(deltaX * 3).down(deltaY).downgrade.withStartAngle(Pi / 2).withEndAngle(Pi / 2 + Pi)
 
     val partialCircleResultWithoutOuterLayer: Seq[Arc] =
-      (0 until 2).map(i => topLeftPartialCircle.move(-deltaX * i, deltaY * i)) ++
-        Seq(topLeftPartialCircle.move(-deltaX * 2, deltaY * 2).downgrade.withEndAngle(Pi / 2)) ++
-        (0 until 2).map(i => topRightPartialCircle.move(deltaX * i, deltaY * i)) ++
-        Seq(topRightPartialCircle.move(deltaX * 2, deltaY * 2).downgrade.withStartAngle(Pi / 2)) ++
-        (0 until 2).map(i => bottomLeftPartialCircle.move(-deltaX * i, -deltaY * i)) ++
-        Seq(bottomLeftPartialCircle.move(-deltaX * 2, -deltaY * 2).downgrade.withStartAngle(-Pi / 2)) ++
-        (0 until 2).map(i => bottomRightPartialCircle.move(deltaX * i, -deltaY * i)) ++
-        Seq(bottomRightPartialCircle.move(deltaX * 2, -deltaY * 2).downgrade.withEndAngle(-Pi / 2)) ++
+      (0 until 2).map(i => topLeftPartialCircle.translate(-deltaX * i, deltaY * i)) ++
+        Seq(topLeftPartialCircle.translate(-deltaX * 2, deltaY * 2).downgrade.withEndAngle(Pi / 2)) ++
+        (0 until 2).map(i => topRightPartialCircle.translate(deltaX * i, deltaY * i)) ++
+        Seq(topRightPartialCircle.translate(deltaX * 2, deltaY * 2).downgrade.withStartAngle(Pi / 2)) ++
+        (0 until 2).map(i => bottomLeftPartialCircle.translate(-deltaX * i, -deltaY * i)) ++
+        Seq(bottomLeftPartialCircle.translate(-deltaX * 2, -deltaY * 2).downgrade.withStartAngle(-Pi / 2)) ++
+        (0 until 2).map(i => bottomRightPartialCircle.translate(deltaX * i, -deltaY * i)) ++
+        Seq(bottomRightPartialCircle.translate(deltaX * 2, -deltaY * 2).downgrade.withEndAngle(-Pi / 2)) ++
         Seq(leftArc, leftArc.down(radius)) ++
         Seq(rightArc, rightArc.up(radius)) ++
         Seq.empty
 
-    val outerLeftArc = centralCircle.left(deltaX * 4).downgrade.withStartAngle(-asin(0.5)).withEndAngle(asin(0.5))
+    val outerLeftArc = centralCircle.left(deltaX * 4).downgrade.withStartAngle(-thirtyDegreesInRadians).withEndAngle(thirtyDegreesInRadians)
 
     val outerRightArc =
-      centralCircle.right(deltaX * 4).downgrade.withStartAngle(Pi - asin(0.5)).withEndAngle(Pi + asin(0.5))
+      centralCircle.right(deltaX * 4).downgrade.withStartAngle(Pi - thirtyDegreesInRadians).withEndAngle(Pi + thirtyDegreesInRadians)
 
     val outerUpperLeftArc =
-      centralCircle.left(deltaX).up(3.5 * radius).downgrade.withStartAngle(asin(0.5)).withEndAngle(Pi / 2)
+      centralCircle.left(deltaX).up(3.5 * radius).downgrade.withStartAngle(thirtyDegreesInRadians).withEndAngle(Pi / 2)
 
     val outerLowerLeftArc = centralCircle
       .left(deltaX)
       .down(3.5 * radius)
       .downgrade
       .withStartAngle(-Pi / 2)
-      .withEndAngle(-Pi / 2 + 2 * asin(0.5))
+      .withEndAngle(-Pi / 2 + 2 * thirtyDegreesInRadians)
 
     val outerUpperRightArc =
-      centralCircle.right(deltaX).up(3.5 * radius).downgrade.withStartAngle(Pi / 2).withEndAngle(Pi / 2 + 2 * asin(0.5))
+      centralCircle.right(deltaX).up(3.5 * radius).downgrade.withStartAngle(Pi / 2).withEndAngle(Pi / 2 + 2 * thirtyDegreesInRadians)
 
     val outerLowerRightArc = centralCircle
       .right(deltaX)
       .down(3.5 * radius)
       .downgrade
-      .withStartAngle(-Pi / 2 - 2 * asin(0.5))
+      .withStartAngle(-Pi / 2 - 2 * thirtyDegreesInRadians)
       .withEndAngle(-Pi / 2)
 
     val outerLayer: Seq[Arc] =
       Seq(outerLeftArc, outerLeftArc.up(radius), outerLeftArc.down(radius)) ++
         Seq(outerRightArc, outerRightArc.up(radius), outerRightArc.down(radius)) ++
-        Seq(outerUpperLeftArc, outerUpperLeftArc.move(-deltaX, deltaY), outerUpperLeftArc.move(-deltaX * 2, deltaY * 2)) ++
+        Seq(outerUpperLeftArc, outerUpperLeftArc.translate(-deltaX, deltaY), outerUpperLeftArc.translate(-deltaX * 2, deltaY * 2)) ++
         Seq(
           outerLowerLeftArc,
-          outerLowerLeftArc.move(-deltaX, -deltaY),
-          outerLowerLeftArc.move(-deltaX * 2, -deltaY * 2)) ++
+          outerLowerLeftArc.translate(-deltaX, -deltaY),
+          outerLowerLeftArc.translate(-deltaX * 2, -deltaY * 2)) ++
         Seq(
           outerUpperRightArc,
-          outerUpperRightArc.move(deltaX, deltaY),
-          outerUpperRightArc.move(deltaX * 2, deltaY * 2)) ++
+          outerUpperRightArc.translate(deltaX, deltaY),
+          outerUpperRightArc.translate(deltaX * 2, deltaY * 2)) ++
         Seq(
           outerLowerRightArc,
-          outerLowerRightArc.move(deltaX, -deltaY),
-          outerLowerRightArc.move(deltaX * 2, -deltaY * 2)) ++
+          outerLowerRightArc.translate(deltaX, -deltaY),
+          outerLowerRightArc.translate(deltaX * 2, -deltaY * 2)) ++
         Seq(
-          centralCircle.up(radius * 3).downgrade.withStartAngle(asin(0.5)).withEndAngle(Pi - asin(0.5)),
-          centralCircle.down(radius * 3).downgrade.withStartAngle(asin(0.5) - Pi).withEndAngle(-asin(0.5)))
+          centralCircle.up(radius * 3).downgrade.withStartAngle(thirtyDegreesInRadians).withEndAngle(Pi - thirtyDegreesInRadians),
+          centralCircle.down(radius * 3).downgrade.withStartAngle(thirtyDegreesInRadians - Pi).withEndAngle(-thirtyDegreesInRadians))
 
     circleResult ++ partialCircleResultWithoutOuterLayer ++ outerLayer
   }
@@ -191,13 +199,6 @@ object FlowerOfLife {
     (leftResult ++ rightResult).distinct
   }
 
-  private def drawArc(renderer: dom.CanvasRenderingContext2D, arc: Arc, colour: String): Unit = {
-    renderer.beginPath()
-    renderer.strokeStyle = colour
-    renderer.arc(arc.center.x, arc.center.y, arc.radius, arc.startAngle, arc.endAngle, arc.anticlockwise)
-    renderer.stroke()
-  }
-
   private def nextLeftColumnOfCircles(arcColumn: Seq[Circle]): Seq[Circle] = {
     nextColumnOfCircles(arcColumn, true)
   }
@@ -215,7 +216,7 @@ object FlowerOfLife {
     val deltaX = cos(asin(0.5)) * radius
     val effectiveDeltaX = if (left) -deltaX else deltaX
 
-    circleColumn.init.map(arc => arc.move(effectiveDeltaX, radius / 2))
+    circleColumn.init.map(arc => arc.translate(effectiveDeltaX, radius / 2))
   }
 
   private def middleColumnOfCircles(center: Point, radius: Double): Seq[Circle] = {
@@ -251,7 +252,7 @@ object FlowerOfLife {
 
     def anticlockwise: Boolean
 
-    def move(deltaX: Double, deltaY: Double): ThisArc
+    def translate(deltaX: Double, deltaY: Double): ThisArc
 
     def moveTo(newCenter: Point): ThisArc
 
@@ -276,7 +277,7 @@ object FlowerOfLife {
 
     type ThisArc = PartialCircleArc
 
-    def move(deltaX: Double, deltaY: Double): ThisArc = right(deltaX).down(deltaY)
+    def translate(deltaX: Double, deltaY: Double): ThisArc = right(deltaX).down(deltaY)
 
     def moveTo(newCenter: Point): ThisArc = copy(center = newCenter)
 
@@ -297,15 +298,11 @@ object FlowerOfLife {
 
     def anticlockwise: Boolean = false
 
-    def move(deltaX: Double, deltaY: Double): ThisArc = right(deltaX).down(deltaY)
+    def translate(deltaX: Double, deltaY: Double): ThisArc = right(deltaX).down(deltaY)
 
     def moveTo(newCenter: Point): ThisArc = copy(center = newCenter)
 
     def downgrade: PartialCircleArc = {
-      new PartialCircleArc(center, radius, startAngle, endAngle, anticlockwise)
-    }
-
-    def clip(startAngle: Double, endAngle: Double, anticlockwise: Boolean): PartialCircleArc = {
       new PartialCircleArc(center, radius, startAngle, endAngle, anticlockwise)
     }
   }
