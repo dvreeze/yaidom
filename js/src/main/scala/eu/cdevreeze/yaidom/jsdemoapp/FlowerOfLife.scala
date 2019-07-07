@@ -87,7 +87,7 @@ object FlowerOfLife {
   }
 
   def findAllFlowerOfLifeArcs(center: Point, radius: Double): Seq[Arc] = {
-    val circleResult = findAllFlowerOfLifeCircles(center, radius)
+    val circleResult: Seq[Circle] = findAllFlowerOfLifeCircles(center, radius)
 
     val thirtyDegreesInRadians = asin(0.5)
     val (deltaX, deltaY) = (cos(thirtyDegreesInRadians) * radius, radius / 2)
@@ -112,7 +112,8 @@ object FlowerOfLife {
       prevFilledCircle.map(translation)
     }
 
-    circleResult ++ fullyFilledCircles.flatten
+    val circleSet: Set[Circle] = circleResult.toSet
+    circleResult ++ (fullyFilledCircles.flatten.distinct.filter(arc => !circleSet.contains(arc.toCircle)))
   }
 
   private def findAllFlowerOfLifeCircles(center: Point, radius: Double): Seq[Circle] = {
@@ -207,9 +208,11 @@ object FlowerOfLife {
     val outside5 = PartialCircleArc(center.left(deltaX).up(radius * 1.5), radius, Pi / 2 - sixtyDegreesInRadians, Pi / 2, false)
     val outside6 = PartialCircleArc(center.right(deltaX).up(radius * 1.5), radius, Pi / 2, Pi / 2 + sixtyDegreesInRadians, false)
 
-    val outside = Seq(outside1, outside2, outside3, outside4, outside5, outside6)
+    val outside = Seq[PartialCircleArc](outside1, outside2, outside3, outside4, outside5, outside6)
 
-    circle +: (Seq(spoke1, spoke2, spoke3, spoke4, spoke5, spoke6).flatten ++ outside)
+    val partialCircles = Seq[Seq[PartialCircleArc]](spoke1, spoke2, spoke3, spoke4, spoke5, spoke6).flatten ++ outside
+
+    circle +: partialCircles.distinct
   }
 
   // Data structures
@@ -244,6 +247,8 @@ object FlowerOfLife {
     def moveTo(newCenter: Point): ThisArc
 
     def downgrade: PartialCircleArc
+
+    final def toCircle: Circle = Circle(center, radius)
 
     final def up(amount: Double): ThisArc = moveTo(center.up(amount))
 
