@@ -92,89 +92,27 @@ object FlowerOfLife {
     val thirtyDegreesInRadians = asin(0.5)
     val (deltaX, deltaY) = (cos(thirtyDegreesInRadians) * radius, radius / 2)
 
-    val centralCircle: Circle = Circle(center, radius)
+    val fullyFilledCircle: Seq[Arc] = findFullyFilledCircle(center, radius).map(_.right(deltaX * 2))
 
-    val topLeftPartialCircleCenter: Point = center.up(radius * 2).left(deltaX).up(deltaY)
-    val topLeftPartialCircle: Arc =
-      PartialCircleArc(topLeftPartialCircleCenter, radius, -thirtyDegreesInRadians, -thirtyDegreesInRadians + Pi, false)
+    val translations: Seq[Arc => Arc] = Seq(
+      _.down(radius),
+      _.left(deltaX).down(radius / 2),
+      _.left(deltaX).down(radius / 2),
+      _.left(deltaX).up(radius / 2),
+      _.left(deltaX).up(radius / 2),
+      _.up(radius),
+      _.up(radius),
+      _.right(deltaX).up(radius / 2),
+      _.right(deltaX).up(radius / 2),
+      _.right(deltaX).down(radius / 2),
+      _.right(deltaX).down(radius / 2),
+    )
 
-    val topRightPartialCircleCenter: Point = center.up(radius * 2).right(deltaX).up(deltaY)
-    val topRightPartialCircle: Arc =
-      PartialCircleArc(topRightPartialCircleCenter, radius, thirtyDegreesInRadians, thirtyDegreesInRadians + Pi, false)
+    val fullyFilledCircles: Seq[Seq[Arc]] = translations.scanLeft(fullyFilledCircle) { case (prevFilledCircle, translation) =>
+      prevFilledCircle.map(translation)
+    }
 
-    val bottomLeftPartialCircleCenter: Point = center.down(radius * 2).left(deltaX).down(deltaY)
-    val bottomLeftPartialCircle: Arc =
-      PartialCircleArc(bottomLeftPartialCircleCenter, radius, thirtyDegreesInRadians - Pi, thirtyDegreesInRadians, false)
-
-    val bottomRightPartialCircleCenter: Point = center.down(radius * 2).right(deltaX).down(deltaY)
-    val bottomRightPartialCircle: Arc =
-      PartialCircleArc(bottomRightPartialCircleCenter, radius, -thirtyDegreesInRadians - Pi, -thirtyDegreesInRadians, false)
-
-    val leftArc =
-      centralCircle.left(deltaX * 3).up(deltaY).downgrade.withStartAngle(-Pi / 2).withEndAngle(Pi / 2)
-
-    val rightArc =
-      centralCircle.right(deltaX * 3).down(deltaY).downgrade.withStartAngle(Pi / 2).withEndAngle(Pi / 2 + Pi)
-
-    val partialCircleResultWithoutOuterLayer: Seq[Arc] =
-      (0 until 2).map(i => topLeftPartialCircle.translate(-deltaX * i, deltaY * i)) ++
-        Seq(topLeftPartialCircle.translate(-deltaX * 2, deltaY * 2).downgrade.withEndAngle(Pi / 2)) ++
-        (0 until 2).map(i => topRightPartialCircle.translate(deltaX * i, deltaY * i)) ++
-        Seq(topRightPartialCircle.translate(deltaX * 2, deltaY * 2).downgrade.withStartAngle(Pi / 2)) ++
-        (0 until 2).map(i => bottomLeftPartialCircle.translate(-deltaX * i, -deltaY * i)) ++
-        Seq(bottomLeftPartialCircle.translate(-deltaX * 2, -deltaY * 2).downgrade.withStartAngle(-Pi / 2)) ++
-        (0 until 2).map(i => bottomRightPartialCircle.translate(deltaX * i, -deltaY * i)) ++
-        Seq(bottomRightPartialCircle.translate(deltaX * 2, -deltaY * 2).downgrade.withEndAngle(-Pi / 2)) ++
-        Seq(leftArc, leftArc.down(radius)) ++
-        Seq(rightArc, rightArc.up(radius)) ++
-        Seq.empty
-
-    val outerLeftArc = centralCircle.left(deltaX * 4).downgrade.withStartAngle(-thirtyDegreesInRadians).withEndAngle(thirtyDegreesInRadians)
-
-    val outerRightArc =
-      centralCircle.right(deltaX * 4).downgrade.withStartAngle(Pi - thirtyDegreesInRadians).withEndAngle(Pi + thirtyDegreesInRadians)
-
-    val outerUpperLeftArc =
-      centralCircle.left(deltaX).up(3.5 * radius).downgrade.withStartAngle(thirtyDegreesInRadians).withEndAngle(Pi / 2)
-
-    val outerLowerLeftArc = centralCircle
-      .left(deltaX)
-      .down(3.5 * radius)
-      .downgrade
-      .withStartAngle(-Pi / 2)
-      .withEndAngle(-Pi / 2 + 2 * thirtyDegreesInRadians)
-
-    val outerUpperRightArc =
-      centralCircle.right(deltaX).up(3.5 * radius).downgrade.withStartAngle(Pi / 2).withEndAngle(Pi / 2 + 2 * thirtyDegreesInRadians)
-
-    val outerLowerRightArc = centralCircle
-      .right(deltaX)
-      .down(3.5 * radius)
-      .downgrade
-      .withStartAngle(-Pi / 2 - 2 * thirtyDegreesInRadians)
-      .withEndAngle(-Pi / 2)
-
-    val outerLayer: Seq[Arc] =
-      Seq(outerLeftArc, outerLeftArc.up(radius), outerLeftArc.down(radius)) ++
-        Seq(outerRightArc, outerRightArc.up(radius), outerRightArc.down(radius)) ++
-        Seq(outerUpperLeftArc, outerUpperLeftArc.translate(-deltaX, deltaY), outerUpperLeftArc.translate(-deltaX * 2, deltaY * 2)) ++
-        Seq(
-          outerLowerLeftArc,
-          outerLowerLeftArc.translate(-deltaX, -deltaY),
-          outerLowerLeftArc.translate(-deltaX * 2, -deltaY * 2)) ++
-        Seq(
-          outerUpperRightArc,
-          outerUpperRightArc.translate(deltaX, deltaY),
-          outerUpperRightArc.translate(deltaX * 2, deltaY * 2)) ++
-        Seq(
-          outerLowerRightArc,
-          outerLowerRightArc.translate(deltaX, -deltaY),
-          outerLowerRightArc.translate(deltaX * 2, -deltaY * 2)) ++
-        Seq(
-          centralCircle.up(radius * 3).downgrade.withStartAngle(thirtyDegreesInRadians).withEndAngle(Pi - thirtyDegreesInRadians),
-          centralCircle.down(radius * 3).downgrade.withStartAngle(thirtyDegreesInRadians - Pi).withEndAngle(-thirtyDegreesInRadians))
-
-    circleResult ++ partialCircleResultWithoutOuterLayer ++ outerLayer
+    circleResult ++ fullyFilledCircles.flatten
   }
 
   private def findAllFlowerOfLifeCircles(center: Point, radius: Double): Seq[Circle] = {
@@ -223,6 +161,55 @@ object FlowerOfLife {
     val topmostCircle = Circle(center, radius).up(radius * 2)
 
     (0 until 5).map(i => topmostCircle.down(radius * i))
+  }
+
+  private def findFullyFilledCircle(center: Point, radius: Double): Seq[Arc] = {
+    val thirtyDegreesInRadians = asin(0.5)
+    val sixtyDegreesInRadians = thirtyDegreesInRadians * 2
+    val (deltaX, deltaY) = (cos(thirtyDegreesInRadians) * radius, radius / 2)
+
+    val circle: Circle = Circle(center, radius)
+
+    val spoke1 = Seq(
+      PartialCircleArc(center.down(radius), radius, -Pi / 2, -Pi / 2 + sixtyDegreesInRadians, false),
+      PartialCircleArc(center.right(deltaX).up(radius / 2), radius, Pi / 2, Pi / 2 + sixtyDegreesInRadians, false)
+    )
+
+    val spoke2 = Seq(
+      PartialCircleArc(center.left(deltaX).down(radius / 2), radius, -thirtyDegreesInRadians, thirtyDegreesInRadians, false),
+      PartialCircleArc(center.right(deltaX).down(radius / 2), radius, Pi - thirtyDegreesInRadians, Pi + thirtyDegreesInRadians, false)
+    )
+
+    val spoke3 = Seq(
+      PartialCircleArc(center.down(radius), radius, -Pi / 2 - sixtyDegreesInRadians, -Pi / 2, false),
+      PartialCircleArc(center.left(deltaX).up(radius / 2), radius, Pi / 2 - sixtyDegreesInRadians, Pi / 2, false)
+    )
+
+    val spoke4 = Seq(
+      PartialCircleArc(center.up(radius), radius, Pi / 2, Pi / 2 + sixtyDegreesInRadians, false),
+      PartialCircleArc(center.left(deltaX).down(radius / 2), radius, -Pi / 2, -Pi / 2 + sixtyDegreesInRadians, false)
+    )
+
+    val spoke5 = Seq(
+      PartialCircleArc(center.right(deltaX).up(radius / 2), radius, Pi - thirtyDegreesInRadians, Pi + thirtyDegreesInRadians, false),
+      PartialCircleArc(center.left(deltaX).up(radius / 2), radius, -thirtyDegreesInRadians, thirtyDegreesInRadians, false)
+    )
+
+    val spoke6 = Seq(
+      PartialCircleArc(center.right(deltaX).down(radius / 2), radius, -Pi / 2 - sixtyDegreesInRadians, -Pi / 2, false),
+      PartialCircleArc(center.up(radius), radius, Pi / 2 - sixtyDegreesInRadians, Pi / 2, false)
+    )
+
+    val outside1 = PartialCircleArc(center.right(deltaX * 2), radius, Pi - thirtyDegreesInRadians, Pi + thirtyDegreesInRadians, false)
+    val outside2 = PartialCircleArc(center.right(deltaX).down(radius * 1.5), radius, -Pi / 2 - sixtyDegreesInRadians, -Pi / 2, false)
+    val outside3 = PartialCircleArc(center.left(deltaX).down(radius * 1.5), radius, -Pi / 2, -Pi / 2 + sixtyDegreesInRadians, false)
+    val outside4 = PartialCircleArc(center.left(deltaX * 2), radius, -thirtyDegreesInRadians, thirtyDegreesInRadians, false)
+    val outside5 = PartialCircleArc(center.left(deltaX).up(radius * 1.5), radius, Pi / 2 - sixtyDegreesInRadians, Pi / 2, false)
+    val outside6 = PartialCircleArc(center.right(deltaX).up(radius * 1.5), radius, Pi / 2, Pi / 2 + sixtyDegreesInRadians, false)
+
+    val outside = Seq(outside1, outside2, outside3, outside4, outside5, outside6)
+
+    circle +: (Seq(spoke1, spoke2, spoke3, spoke4, spoke5, spoke6).flatten ++ outside)
   }
 
   // Data structures
