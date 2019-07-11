@@ -72,7 +72,7 @@ object FlowerOfLife {
 
     val center = Point(canvas.width.toDouble / 2, canvas.height.toDouble / 2)
 
-    val arcs: Seq[Arc] = findAllFlowerOfLifeArcs(center, radius)
+    val arcs: Seq[Arc] = findAllFlowerOfLifeArcs(center, radius) :+ Circle(center, radius * 3)
 
     arcs.foreach { arc =>
       drawArc(renderer, arc, colour)
