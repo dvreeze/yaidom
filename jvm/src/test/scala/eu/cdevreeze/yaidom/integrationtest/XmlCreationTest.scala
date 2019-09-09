@@ -123,6 +123,41 @@ class XmlCreationTest extends FunSuite with BeforeAndAfterAll {
     println()
     println(xmlString)
   }
+
+  test("testCreateTimesheetXmlFor2019") {
+    val timesheetAfterFirstPass: Timesheet =
+      getTimesheetAfterFirstPass(
+        LocalDate.of(2019, 1, 1),
+        LocalDate.of(2019, 9, 6), // Make that 2019-12-31 at the end of the year
+        dutchHolidays2019,
+        onVacation2019,
+        sickLeaveDays2019,
+        defaultTasksPerDay2019)
+
+    val timesheet =
+      refineTimesheet(timesheetAfterFirstPass, refinementsPerDay2019)
+
+    assertResult(true) {
+      timesheet.days.size >= 120 // Make that 250 at the end of the year
+    }
+
+    assertResult(true) {
+      timesheet.days.count(_.dayOfWeek == DayOfWeek.MONDAY) >= 15 && // Make that at least 35 at the end of the year
+        timesheet.days.count(_.dayOfWeek == DayOfWeek.MONDAY) < 70
+    }
+
+    assertResult(Set(8)) {
+      timesheet.days.map(_.totalHours).toSet
+    }
+
+    val docPrinter = DocumentPrinterUsingDom.newInstance()
+
+    val timesheetSimpleElem = simple.Elem.from(timesheet)
+
+    val xmlString = docPrinter.print(simple.Document(timesheetSimpleElem.prettify(2)))
+    println()
+    println(xmlString)
+  }
 }
 
 object XmlCreationTest {
@@ -259,7 +294,7 @@ object XmlCreationTest {
               .plusAttribute(EName("dayOfWeek"), day.getDayOfWeek.toString)
           })
 
-    val timesheetElem = emptyTimesheetElem transformChildElems {
+    val timesheetElem = emptyTimesheetElem.transformChildElems {
       case elm if elm.localName == "day" =>
         val day = TimesheetElem(indexed.Elem(simple.Elem.from(elm, Scope.Empty))).asInstanceOf[Day]
 
@@ -306,7 +341,7 @@ object XmlCreationTest {
 
     val rawResultTimesheetElem =
       resolved.Elem.from(prevTimesheet).updateElems(paths) {
-        case (elm, path) =>
+        case (elm, _) =>
           assert(elm.localName == "day")
 
           val date = LocalDate.parse(elm.attribute(EName("date")))
@@ -328,9 +363,9 @@ object XmlCreationTest {
 
   private def onLeave(day: Day): Boolean = {
     !isWeekend(day.date) &&
-      ((day.tasks.exists(_.taskName == OfficialHoliday)) ||
-        (day.tasks.exists(_.taskName == Vacation)) ||
-        (day.tasks.exists(_.taskName == Sick)))
+      (day.tasks.exists(_.taskName == OfficialHoliday) ||
+        day.tasks.exists(_.taskName == Vacation) ||
+        day.tasks.exists(_.taskName == Sick))
   }
 
   // Adding and updating tasks
@@ -622,4 +657,51 @@ object XmlCreationTest {
       LocalDate.of(2018, 12, 5) -> Map("Meeting" -> 2),
       LocalDate.of(2018, 12, 20) -> Map("Borrel" -> 1))
   }
+
+  // Timesheet data 2019
+
+  // Pass 1
+
+  private val dutchHolidays2019: Set[LocalDate] = {
+    Set(
+      LocalDate.of(2019, 1, 1),
+      LocalDate.of(2019, 4, 22),
+      LocalDate.of(2019, 5, 30),
+      LocalDate.of(2019, 6, 10),
+      /* LocalDate.of(2019, 12, 25), */
+      /* LocalDate.of(2019, 12, 26) */)
+  }
+
+  private val onVacation2019: Set[LocalDate] = {
+    Set(LocalDate.of(2019, 5, 31))
+      .union(getPeriodAsLocalDateSeq(LocalDate.of(2019, 1, 1), LocalDate.of(2019, 1, 4)).toSet)
+      .union(getPeriodAsLocalDateSeq(LocalDate.of(2019, 6, 3), LocalDate.of(2019, 6, 4)).toSet)
+      .union(getPeriodAsLocalDateSeq(LocalDate.of(2019, 7, 17), LocalDate.of(2019, 8, 9)).toSet)
+  }
+
+  private val sickLeaveDays2019: Set[LocalDate] = {
+    getPeriodAsLocalDateSeq(LocalDate.of(2019, 2, 27), LocalDate.of(2019, 3, 1)).toSet
+  }
+
+  private val defaultTasksPerDay2019: Map[LocalDate, Map[String, Int]] = {
+    val maintenanceDates: immutable.IndexedSeq[LocalDate] =
+      getPeriodAsLocalDateSeq(LocalDate.of(2019, 1, 1), LocalDate.of(2019, 6, 30))
+
+    val devDates: immutable.IndexedSeq[LocalDate] =
+      getPeriodAsLocalDateSeq(LocalDate.of(2019, 7, 1), LocalDate.of(2019, 9, 6)) // Adapt at end of year
+
+    maintenanceDates.distinct.map(d => d -> Map("Gegevenstooling maintenance" -> 8)).toMap ++
+      devDates.distinct.map(d => d -> Map("Gegevenstooling development" -> 8)).toMap
+  }
+
+  // Pass 2
+
+  // TODO Check with agenda (e.g. recurring meetings) and commits in Github
+
+  private val refinementsPerDay2019: Map[LocalDate, Map[String, Int]] = {
+    Map(
+      LocalDate.of(2019, 6, 25) -> Map("Meeting" -> 1),
+    )
+  }
+
 }
