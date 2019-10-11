@@ -182,7 +182,7 @@ final class SaxonElem(
   }
 
   def findTopmostElems(p: ThisElem => Boolean): immutable.IndexedSeq[ThisElem] = {
-    findAllChildElems flatMap { ch => ch findTopmostElemsOrSelf p }
+    findAllChildElems.flatMap { ch => ch findTopmostElemsOrSelf p }
   }
 
   def findTopmostElemsOrSelf(p: ThisElem => Boolean): immutable.IndexedSeq[ThisElem] = {
@@ -293,7 +293,7 @@ final class SaxonElem(
   }
 
   def attributeOption(expandedName: EName): Option[String] = {
-    resolvedAttributes.find { case (en, v) => (en == expandedName) }.map(_._2)
+    Option(wrappedNode.getAttributeValue(expandedName.namespaceUriOption.getOrElse(""), expandedName.localPart))
   }
 
   def attribute(expandedName: EName): String = {
@@ -301,7 +301,11 @@ final class SaxonElem(
   }
 
   def findAttributeByLocalName(localName: String): Option[String] = {
-    resolvedAttributes.find { case (en, v) => en.localPart == localName }.map(_._2)
+    val it = wrappedNode.iterateAxis(AxisInfo.ATTRIBUTE)
+
+    val nodes = Iterator.continually(it.next()).takeWhile(_ ne null)
+
+    nodes.find { _.getLocalPart == localName }.map(_.getStringValue)
   }
 
   // ClarkElemApi: HasTextApi part
