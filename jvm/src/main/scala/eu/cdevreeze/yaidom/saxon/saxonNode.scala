@@ -18,7 +18,6 @@ package eu.cdevreeze.yaidom.saxon
 
 import java.net.URI
 
-import scala.Vector
 import scala.collection.immutable
 import scala.collection.mutable
 
@@ -213,7 +212,7 @@ final class SaxonElem(
   def findAllChildElemsWithPathEntries: immutable.IndexedSeq[(ThisElem, Path.Entry)] = {
     val nextEntries = mutable.Map[EName, Int]()
 
-    findAllChildElems map { e =>
+    findAllChildElems.map { e =>
       val ename = e.resolvedName
       val entry = Path.Entry(ename, nextEntries.getOrElse(ename, 0))
       nextEntries.put(ename, entry.index + 1)
@@ -285,7 +284,7 @@ final class SaxonElem(
 
     val nodes = Iterator.continually(it.next()).takeWhile(_ ne null).toVector
 
-    nodes map { nodeInfo => nodeInfo2EName(nodeInfo) -> nodeInfo.getStringValue }
+    nodes.map { nodeInfo => nodeInfo2EName(nodeInfo) -> nodeInfo.getStringValue }
   }
 
   // scalastyle:off method.name
@@ -294,7 +293,7 @@ final class SaxonElem(
   }
 
   def attributeOption(expandedName: EName): Option[String] = {
-    resolvedAttributes find { case (en, v) => (en == expandedName) } map (_._2)
+    resolvedAttributes.find { case (en, v) => (en == expandedName) }.map(_._2)
   }
 
   def attribute(expandedName: EName): String = {
@@ -302,13 +301,13 @@ final class SaxonElem(
   }
 
   def findAttributeByLocalName(localName: String): Option[String] = {
-    resolvedAttributes find { case (en, v) => en.localPart == localName } map (_._2)
+    resolvedAttributes.find { case (en, v) => en.localPart == localName }.map(_._2)
   }
 
   // ClarkElemApi: HasTextApi part
 
   def text: String = {
-    val textStrings = textChildren map { t => t.text }
+    val textStrings = textChildren.map { t => t.text }
     textStrings.mkString
   }
 
@@ -333,7 +332,7 @@ final class SaxonElem(
 
     val nodes = Iterator.continually(it.next()).takeWhile(_ ne null).toVector
 
-    nodes map { nodeInfo => nodeInfo2QName(nodeInfo) -> nodeInfo.getStringValue }
+    nodes.map { nodeInfo => nodeInfo2QName(nodeInfo) -> nodeInfo.getStringValue }
   }
 
   // ScopedElemApi: HasScope part
@@ -345,7 +344,7 @@ final class SaxonElem(
 
     val resultMap = {
       val result =
-        nodes map { nodeInfo =>
+        nodes.map { nodeInfo =>
           // Not very transparent: prefix is "display name" and namespace URI is "string value"
           val prefix = nodeInfo.getDisplayName
           val nsUri = nodeInfo.getStringValue
@@ -378,7 +377,7 @@ final class SaxonElem(
   }
 
   def attributeAsResolvedQNameOption(expandedName: EName): Option[EName] = {
-    attributeAsQNameOption(expandedName) map { qn =>
+    attributeAsQNameOption(expandedName).map { qn =>
       scope.resolveQNameOption(qn).getOrElse(
         sys.error(s"Could not resolve QName-valued attribute value $qn, given scope [${scope}]"))
     }
@@ -445,7 +444,7 @@ final class SaxonElem(
   }
 
   def namespaces: Declarations = {
-    val parentScope = parentOption map { _.scope } getOrElse (Scope.Empty)
+    val parentScope = parentOption.map { _.scope }.getOrElse (Scope.Empty)
     parentScope.relativize(scope)
   }
 
