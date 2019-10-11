@@ -94,9 +94,12 @@ trait ClarkElemLike extends ClarkElemApi with ElemLike with IsNavigable {
 
   /**
    * Returns the value of the attribute with the given expanded name, if any, wrapped in an `Option`.
+   *
+   * Note that this method can be far more expensive than a custom implementation for a specific element implementation.
+   * Therefore this method is non-final and can be overridden.
    */
-  final def attributeOption(expandedName: EName): Option[String] = {
-    resolvedAttributes find { case (en, v) => (en == expandedName) } map (_._2)
+  def attributeOption(expandedName: EName): Option[String] = {
+    resolvedAttributes.find { case (en, v) => (en == expandedName) }.map (_._2)
   }
 
   /**
@@ -109,9 +112,12 @@ trait ClarkElemLike extends ClarkElemApi with ElemLike with IsNavigable {
   /**
    * Returns the first found attribute value of an attribute with the given local name, if any, wrapped in an `Option`.
    * Because of differing namespaces, it is possible that more than one such attribute exists, although this is not often the case.
+   *
+   * Note that this method can be far more expensive than a custom implementation for a specific element implementation.
+   * Therefore this method is non-final and can be overridden.
    */
-  final def findAttributeByLocalName(localName: String): Option[String] = {
-    resolvedAttributes find { case (en, v) => en.localPart == localName } map (_._2)
+  def findAttributeByLocalName(localName: String): Option[String] = {
+    resolvedAttributes.find { case (en, v) => en.localPart == localName }.map (_._2)
   }
 
   /**
