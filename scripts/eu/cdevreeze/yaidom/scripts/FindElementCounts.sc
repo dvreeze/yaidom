@@ -82,7 +82,7 @@ type Depth = Int
 def groupElementCounts(elementDepths: immutable.IndexedSeq[ElementDepth]): Map[EName, Map[Depth, Int]] = {
   elementDepths
     .groupBy(_.elementName)
-    .mapValues(_.groupBy(_.depth).mapValues(_.size))
+    .view.mapValues(_.groupBy(_.depth).view.mapValues(_.size).toMap).toMap
 }
 
 // The script itself
@@ -123,7 +123,7 @@ def findElementCounts(rootDir: File): Unit = {
         }
     }
     
-  val elementNameCounts: Map[EName, Int] = groupedElementCounts.mapValues(_.values.toIndexedSeq.sum)
+  val elementNameCounts: Map[EName, Int] = groupedElementCounts.view.mapValues(_.values.toIndexedSeq.sum).toMap
   
   println()
   println("Most occurring element names:")

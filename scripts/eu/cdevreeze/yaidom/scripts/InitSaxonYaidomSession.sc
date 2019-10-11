@@ -35,7 +35,7 @@ def parseDocument(uri: URI): saxon.SaxonDocument = {
 }
 
 def queryForPathCounts(doc: saxon.SaxonDocument): Map[List[EName], Int] = {
-  doc.documentElement.findAllElemsOrSelf.groupBy(_.reverseAncestryOrSelfENames.toList).mapValues(_.size)
+  doc.documentElement.findAllElemsOrSelf.groupBy(_.reverseAncestryOrSelfENames.toList).view.mapValues(_.size).toMap
 }
 
 println("Now the REPL has been set up for ad-hoc yaidom querying and transformations, using Saxon tiny trees")
