@@ -208,9 +208,7 @@ final class Elem(
   override val resolvedAttributes: immutable.IndexedSeq[(EName, String)] = {
     val attrScope = attributeScope
 
-    attributes map { kv =>
-      val attName = kv._1
-      val attValue = kv._2
+    attributes.map { case (attName, attValue) =>
       val expandedName =
         attrScope.resolveQNameOption(attName).getOrElse(sys.error(s"Attribute name '${attName}' should resolve to an EName in scope [${attrScope}]"))
       (expandedName -> attValue)

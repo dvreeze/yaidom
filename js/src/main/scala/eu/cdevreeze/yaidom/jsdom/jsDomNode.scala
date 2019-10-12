@@ -119,6 +119,10 @@ final class JsDomElem(
     JsDomConversions.extractResolvedAttributes(wrappedNode.attributes)
   }
 
+  override def findAttributeByLocalName(localName: String): Option[String] = {
+    attributes.find { case (qn, v) => qn.localPart == localName }.map (_._2)
+  }
+
   override def qname: QName = JsDomConversions.toQName(wrappedNode)
 
   override def attributes: immutable.IndexedSeq[(QName, String)] = {

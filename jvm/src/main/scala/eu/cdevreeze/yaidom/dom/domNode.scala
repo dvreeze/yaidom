@@ -109,7 +109,7 @@ final class DomElem(
   override def resolvedAttributes: immutable.IndexedSeq[(EName, String)] = {
     val attrScope = attributeScope
 
-    attributes map { kv =>
+    attributes.map { kv =>
       val attName = kv._1
       val attValue = kv._2
       val expandedName =
@@ -117,6 +117,23 @@ final class DomElem(
 
       (expandedName -> attValue)
     }
+  }
+
+  override def attributeOption(expandedName: EName): Option[String] = {
+    val attrScope = attributeScope
+
+    val filteredAttrs = attributes.filter(_._1.localPart == expandedName.localPart).map {
+      case (attrName, attrValue) =>
+        val ename = attrScope.resolveQNameOption(attrName).getOrElse(
+          sys.error(s"Attribute name '${attrName}' should resolve to an EName in scope [${attrScope}]"))
+        (ename, attrValue)
+    }
+
+    filteredAttrs.find { case (en, v) => (en == expandedName) }.map (_._2)
+  }
+
+  override def findAttributeByLocalName(localName: String): Option[String] = {
+    attributes.find { case (qn, v) => qn.localPart == localName }.map (_._2)
   }
 
   override def qname: QName = DomConversions.toQName(wrappedNode)

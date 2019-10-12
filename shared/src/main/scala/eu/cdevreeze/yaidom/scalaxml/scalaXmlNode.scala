@@ -101,12 +101,30 @@ final class ScalaXmlElem(
    */
   override def resolvedAttributes: immutable.IndexedSeq[(EName, String)] = {
     val attrScope = scope.withoutDefaultNamespace
-    attributes map {
+
+    attributes.map {
       case (attrName, attrValue) =>
         val ename = attrScope.resolveQNameOption(attrName).getOrElse(
           sys.error(s"Could not resolve attribute name $attrName"))
         (ename, attrValue)
     }
+  }
+
+  override def attributeOption(expandedName: EName): Option[String] = {
+    val attrScope = scope.withoutDefaultNamespace
+
+    val filteredAttrs = attributes.filter(_._1.localPart == expandedName.localPart).map {
+      case (attrName, attrValue) =>
+        val ename = attrScope.resolveQNameOption(attrName).getOrElse(
+          sys.error(s"Could not resolve attribute name $attrName"))
+        (ename, attrValue)
+    }
+
+    filteredAttrs.find { case (en, v) => (en == expandedName) }.map (_._2)
+  }
+
+  override def findAttributeByLocalName(localName: String): Option[String] = {
+    attributes.find { case (qn, v) => qn.localPart == localName }.map (_._2)
   }
 
   def children: immutable.IndexedSeq[ScalaXmlNode] = {
