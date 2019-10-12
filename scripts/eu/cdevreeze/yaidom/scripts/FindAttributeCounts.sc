@@ -49,35 +49,27 @@ def filterFiles(rootDir: File, p: File => Boolean): immutable.IndexedSeq[File] =
 
 // Data and logic used by the script
 
-final case class ElementDepth(elementName: EName, depth: Int)
+final case class AttributeValue(attributeName: EName, attributeValue: String)
 
-def extractElementDepths(rootElem: queryapi.BackingNodes.Elem): immutable.IndexedSeq[ElementDepth] = {
+def extractAttributeValues(rootElem: queryapi.BackingNodes.Elem): immutable.IndexedSeq[AttributeValue] = {
   rootElem
     .findAllElemsOrSelf
-    .map(e => ElementDepth(e.resolvedName, e.path.entries.size))
+    .flatMap(e => e.resolvedAttributes.map(_._1).map(attrName => AttributeValue(attrName, e.attribute(attrName))))
 }
 
-def extractElementDepthsFromFile(f: File): immutable.IndexedSeq[ElementDepth] = {
+def extractAttributeValuesFromFile(f: File): immutable.IndexedSeq[AttributeValue] = {
   // Note that the DOM tree is only local to this method, so it is ready for garbage collection almost immediately
-  
+
   val optSaxonDoc =
     Try(processor.newDocumentBuilder().build(f)).map(node => saxon.SaxonDocument.wrapDocument(node.getUnderlyingNode.getTreeInfo))
       .toOption
 
-  optSaxonDoc.toIndexedSeq.flatMap(doc => extractElementDepths(doc.documentElement))
-}
-
-type Depth = Int
-
-def groupElementCounts(elementDepths: immutable.IndexedSeq[ElementDepth]): Map[EName, Map[Depth, Int]] = {
-  elementDepths
-    .groupBy(_.elementName)
-    .view.mapValues(_.groupBy(_.depth).view.mapValues(_.size).toMap).toMap
+  optSaxonDoc.toIndexedSeq.flatMap(doc => extractAttributeValues(doc.documentElement))
 }
 
 // The script itself
 
-def findElementCounts(rootDir: File): Unit = {
+def findAttributeCounts(rootDir: File): Unit = {
   val start = System.currentTimeMillis()
 
   val probableXmlFiles = filterFiles(rootDir, isProbableXmlFile)
@@ -87,42 +79,30 @@ def findElementCounts(rootDir: File): Unit = {
 
   println()  
   
-  val elementDepths = probableXmlFiles.zipWithIndex
+  val attributeValues = probableXmlFiles.zipWithIndex
     .flatMap { case (f, idx) =>
       if (idx % 500 == 0) {
         println(s"Processed $idx (probable) XML documents so far")
       }
       
-      extractElementDepthsFromFile(f)
+      extractAttributeValuesFromFile(f)
     }
 
   println(s"Processed all ${probableXmlFiles.size} (probable) XML documents")
 
   println()  
-  println(s"Found ${elementDepths.size} elements (with their depths)")
+  println(s"Found ${attributeValues.size} attributes")
 
-  println(s"Found ${elementDepths.groupBy(_.elementName).keySet.size} different element names")
-  
-  val groupedElementCounts = groupElementCounts(elementDepths)
+  println(s"Found ${attributeValues.groupBy(_.attributeName).keySet.size} different attribute names")
 
-  println()  
-  
-  groupedElementCounts.toIndexedSeq.sortBy(_._1.toString)
-    .foreach { case (ename, depthCounts) =>
-      depthCounts.toIndexedSeq.sortBy(_._1)
-        .foreach { case (depth, count) =>
-          println(s"[ name: $ename, depth: $depth, count: $count ]")
-        }
-    }
-    
-  val elementNameCounts: Map[EName, Int] = groupedElementCounts.view.mapValues(_.values.toIndexedSeq.sum).toMap
+  val attributeCounts: Map[EName, Int] = attributeValues.groupBy(_.attributeName).view.mapValues(_.size).toMap
   
   println()
-  println("Most occurring element names:")
+  println("Most occurring attribute names:")
   println()
   
   for {
-    (ename, count) <- elementNameCounts.toIndexedSeq.sortBy(_._2).reverse.take(30)
+    (ename, count) <- attributeCounts.toIndexedSeq.sortBy(_._2).reverse.take(30)
   } {
     println(s"[ name: $ename, count: $count ]")
   }
@@ -133,5 +113,5 @@ def findElementCounts(rootDir: File): Unit = {
   println(s"This function took ${end - start} ms (about ${(end - start) / 1000} seconds)")
 }
 
-// Now call function findElementCounts(rootDir), passing a rootDir as File object.
+// Now call function findAttributeCounts(rootDir), passing a rootDir as File object.
 
