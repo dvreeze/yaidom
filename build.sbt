@@ -16,7 +16,7 @@ lazy val commonSettings = Seq(
   name         := "yaidom",
   description  := "Extensible XML query API with multiple DOM-like implementations",
   organization := "eu.cdevreeze.yaidom",
-  version      := "1.10.1",
+  version      := "1.11.0-SNAPSHOT",
 
   scalaVersion       := scalaVer,
   crossScalaVersions := crossScalaVer,
