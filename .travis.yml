@@ -11,11 +11,11 @@ install:
 matrix:
   include:
   - jdk: openjdk11
-    scala: 2.12.8
+    scala: 2.12.10
   - jdk: oraclejdk9
-    scala: 2.12.8
+    scala: 2.12.10
   - jdk: oraclejdk9
-    scala: 2.13.0
+    scala: 2.13.1
 
 script:
  - sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3G test
