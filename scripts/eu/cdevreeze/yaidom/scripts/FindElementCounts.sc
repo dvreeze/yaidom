@@ -2,9 +2,9 @@
 // Run amm in scripts folder
 // In amm session, use command "import $exec.eu.cdevreeze.yaidom.scripts.FindElementCounts"
 
-// Taking yaidom version 1.10.0
+// Taking yaidom version 1.10.1
 
-import $ivy.`eu.cdevreeze.yaidom::yaidom:1.10.0`
+import $ivy.`eu.cdevreeze.yaidom::yaidom:1.10.1`
 
 import java.io._
 import javax.xml.stream._

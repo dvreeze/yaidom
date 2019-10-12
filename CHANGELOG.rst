@@ -3,6 +3,19 @@ CHANGELOG
 =========
 
 
+1.10.1
+======
+
+Yaidom 1.10.1 is a performance bug fix release and drop-in replacement for version 1.10.0.
+
+* Fixed performance bug in single attribute querying for Saxon wrapper elements (methods ``attributeOption`` and ``findAttributeByLocalName``)
+* Made methods ``attributeOption`` and ``findAttributeByLocalName`` in ``ClarkElemLike`` overridable, for performance improvements
+* Using these overridable attribute query methods, improved their performance in yaidom wrapper elements for DOM, DOM-JS and Scala XML
+
+There are no breaking changes compared to version 1.10.0. However, MiMa did not run successfully this time, so its output is not included
+here.
+
+
 1.10.0
 ======
 
