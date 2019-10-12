@@ -9,8 +9,8 @@
 
 import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 
-val scalaVer = "2.13.0"
-val crossScalaVer = Seq(scalaVer, "2.12.8")
+val scalaVer = "2.13.1"
+val crossScalaVer = Seq(scalaVer, "2.12.10")
 
 lazy val commonSettings = Seq(
   name         := "yaidom",
@@ -64,7 +64,7 @@ lazy val yaidom = crossProject(JSPlatform, JVMPlatform)
   .jvmSettings(
     // By all means, override this version of Saxon if needed, possibly with a Saxon-EE release!
 
-    libraryDependencies += "net.sf.saxon" % "Saxon-HE" % "9.9.1-3",
+    libraryDependencies += "net.sf.saxon" % "Saxon-HE" % "9.9.1-5",
 
     libraryDependencies ++= {
       scalaBinaryVersion.value match {
@@ -73,13 +73,13 @@ lazy val yaidom = crossProject(JSPlatform, JVMPlatform)
       }
     },
 
-    libraryDependencies += "com.github.ben-manes.caffeine" % "caffeine" % "2.7.0",
+    libraryDependencies += "com.github.ben-manes.caffeine" % "caffeine" % "2.8.0",
 
     libraryDependencies += "com.google.code.findbugs" % "jsr305" % "3.0.2",
 
     libraryDependencies += "junit" % "junit" % "4.12" % "test",
 
-    libraryDependencies += "org.scalacheck" %%% "scalacheck" % "1.14.0" % "test",
+    libraryDependencies += "org.scalacheck" %%% "scalacheck" % "1.14.2" % "test",
 
     // JUnit tests (the ones intentionally written in Java) should run as well
 
@@ -88,17 +88,17 @@ lazy val yaidom = crossProject(JSPlatform, JVMPlatform)
     libraryDependencies ++= {
       scalaBinaryVersion.value match {
         case "2.13" => Seq()
-        case _      => Seq("org.scalameta" %%% "scalameta" % "4.1.11" % "test")
+        case _      => Seq("org.scalameta" %%% "scalameta" % "4.2.3" % "test")
       }
     },
 
     libraryDependencies += "org.ccil.cowan.tagsoup" % "tagsoup" % "1.2.1" % "test",
 
-    libraryDependencies += "org.jdom" % "jdom" % "2.0.2" % "test",
+    libraryDependencies += "org.jdom" % "jdom2" % "2.0.6" % "test",
 
     libraryDependencies += ("xom" % "xom" % "1.3.2" % "test").intransitive(),
 
-    libraryDependencies += ("com.fasterxml.woodstox" % "woodstox-core" % "5.2.1" % "test").intransitive(),
+    libraryDependencies += ("com.fasterxml.woodstox" % "woodstox-core" % "6.0.1" % "test").intransitive(),
 
     libraryDependencies += "org.codehaus.woodstox" % "stax2-api" % "4.2" % "test",
 
@@ -164,7 +164,7 @@ lazy val yaidom = crossProject(JSPlatform, JVMPlatform)
     libraryDependencies ++= {
       scalaBinaryVersion.value match {
         case "2.13" => Seq()
-        case _      => Seq("com.lihaoyi" %%% "scalatags" % "0.6.8" % "optional")
+        case _      => Seq("com.lihaoyi" %%% "scalatags" % "0.7.0" % "optional")
       }
     },
 
