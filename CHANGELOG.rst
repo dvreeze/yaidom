@@ -3,6 +3,28 @@ CHANGELOG
 =========
 
 
+1.10.2
+======
+
+Yaidom 1.10.2 enables performance bug fixes in element implementations outside of yaidom that mix in yaidom query API partial
+implementation traits.
+
+The motivation for this release is as follows. TQA mixes in yaidom query API traits like ``ScopedElemLike`` in types like
+TaxonomyElem. This is arguably not a good thing, because ``ScopedElemLike`` is an implementation trait, and purely abstract trait
+``ScopedElemApi`` would have been a better mixin from an API stability point of view. Yet that is not what this yaidom release solves.
+It solves the issue that performance issues in type TQA TaxonomyElem cannot be solved in a non-breaking way. After all, the yaidom
+query API traits with partial implementations were not overridable, so TQA could only fix those performance issues by no longer
+mixing in traits like ``ScopedElemLike``, thus introducing a breaking change. Hence this yaidom release, enabling overriding
+of the methods in the query API traits having partial implementations, enabling TQA to fix the performance issues without changing
+the public (be it somewhat unstable) API. Obviously this is not a fundamental solution, but more like a workaround that enables us
+to keep TQA element APIs somewhat stable while fixing performance issues.
+
+* Made all element query API partial implementation traits overridable in all their methods
+* Upgraded dependencies
+
+There are no breaking changes compared to version 1.10.1, according to MiMa (in SBT, run: yaidomJVM/*:mimaReportBinaryIssues).
+
+
 1.10.1
 ======
 

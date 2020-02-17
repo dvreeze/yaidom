@@ -2,9 +2,9 @@
 // Run amm in scripts folder
 // In amm session, use command "import $exec.eu.cdevreeze.yaidom.scripts.FindElementCounts"
 
-// Taking yaidom version 1.10.1
+// Taking yaidom version 1.10.2
 
-import $ivy.`eu.cdevreeze.yaidom::yaidom:1.10.1`
+import $ivy.`eu.cdevreeze.yaidom::yaidom:1.10.2`
 
 import java.io._
 import scala.collection.immutable
