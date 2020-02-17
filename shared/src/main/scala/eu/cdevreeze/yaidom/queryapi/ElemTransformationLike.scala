@@ -25,10 +25,7 @@ import scala.collection.immutable
  * In other words, this trait has abstract methods `transformChildElems` and `transformChildElemsToNodeSeq`. Based on these
  * abstract methods, this trait offers a rich API for transforming descendant elements or descendant-or-self elements.
  *
- * All methods are overridable. Hence element implementations mixing in this partial implementation trait can change the
- * implementation without breaking its API, caused by otherwise needed removal of this mixin. Arguably this trait should not
- * exist as part of the public API, because implementation details should not be part of the public API. Such implementation details
- * may be subtle, such as the (runtime) boundary on the ElemType type member.
+ * All methods are overridable.
  *
  * @author Chris de Vreeze
  */
