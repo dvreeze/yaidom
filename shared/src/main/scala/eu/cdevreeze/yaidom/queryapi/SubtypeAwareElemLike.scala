@@ -24,57 +24,62 @@ import ElemApi.anyElem
 /**
  * Default implementation of SubtypeAwareElemApi.
  *
+ * All methods are overridable. Hence element implementations mixing in this partial implementation trait can change the
+ * implementation without breaking its API, caused by otherwise needed removal of this mixin. Arguably this trait should not
+ * exist as part of the public API, because implementation details should not be part of the public API. Such implementation details
+ * may be subtle, such as the (runtime) boundary on the ThisElem type member.
+ *
  * @author Chris de Vreeze
  */
 trait SubtypeAwareElemLike extends ElemLike with SubtypeAwareElemApi {
 
   type ThisElem <: SubtypeAwareElemLike.Aux[ThisElem]
 
-  final def findAllChildElemsOfType[B <: ThisElem](subType: ClassTag[B]): immutable.IndexedSeq[B] = {
+  def findAllChildElemsOfType[B <: ThisElem](subType: ClassTag[B]): immutable.IndexedSeq[B] = {
     filterChildElemsOfType(subType)(anyElem)
   }
 
-  final def filterChildElemsOfType[B <: ThisElem](subType: ClassTag[B])(p: B => Boolean): immutable.IndexedSeq[B] = {
+  def filterChildElemsOfType[B <: ThisElem](subType: ClassTag[B])(p: B => Boolean): immutable.IndexedSeq[B] = {
     filter(subType)(p) { pred => filterChildElems(pred) }
   }
 
-  final def findAllElemsOfType[B <: ThisElem](subType: ClassTag[B]): immutable.IndexedSeq[B] = {
+  def findAllElemsOfType[B <: ThisElem](subType: ClassTag[B]): immutable.IndexedSeq[B] = {
     filterElemsOfType(subType)(anyElem)
   }
 
-  final def filterElemsOfType[B <: ThisElem](subType: ClassTag[B])(p: B => Boolean): immutable.IndexedSeq[B] = {
+  def filterElemsOfType[B <: ThisElem](subType: ClassTag[B])(p: B => Boolean): immutable.IndexedSeq[B] = {
     filter(subType)(p) { pred => filterElems(pred) }
   }
 
-  final def findAllElemsOrSelfOfType[B <: ThisElem](subType: ClassTag[B]): immutable.IndexedSeq[B] = {
+  def findAllElemsOrSelfOfType[B <: ThisElem](subType: ClassTag[B]): immutable.IndexedSeq[B] = {
     filterElemsOrSelfOfType(subType)(anyElem)
   }
 
-  final def filterElemsOrSelfOfType[B <: ThisElem](subType: ClassTag[B])(p: B => Boolean): immutable.IndexedSeq[B] = {
+  def filterElemsOrSelfOfType[B <: ThisElem](subType: ClassTag[B])(p: B => Boolean): immutable.IndexedSeq[B] = {
     filter(subType)(p) { pred => filterElemsOrSelf(pred) }
   }
 
-  final def findChildElemOfType[B <: ThisElem](subType: ClassTag[B])(p: B => Boolean): Option[B] = {
+  def findChildElemOfType[B <: ThisElem](subType: ClassTag[B])(p: B => Boolean): Option[B] = {
     find(subType)(p) { pred => findChildElem(pred) }
   }
 
-  final def findElemOfType[B <: ThisElem](subType: ClassTag[B])(p: B => Boolean): Option[B] = {
+  def findElemOfType[B <: ThisElem](subType: ClassTag[B])(p: B => Boolean): Option[B] = {
     find(subType)(p) { pred => findElem(pred) }
   }
 
-  final def findElemOrSelfOfType[B <: ThisElem](subType: ClassTag[B])(p: B => Boolean): Option[B] = {
+  def findElemOrSelfOfType[B <: ThisElem](subType: ClassTag[B])(p: B => Boolean): Option[B] = {
     find(subType)(p) { pred => findElemOrSelf(pred) }
   }
 
-  final def findTopmostElemsOfType[B <: ThisElem](subType: ClassTag[B])(p: B => Boolean): immutable.IndexedSeq[B] = {
+  def findTopmostElemsOfType[B <: ThisElem](subType: ClassTag[B])(p: B => Boolean): immutable.IndexedSeq[B] = {
     filter(subType)(p) { pred => findTopmostElems(pred) }
   }
 
-  final def findTopmostElemsOrSelfOfType[B <: ThisElem](subType: ClassTag[B])(p: B => Boolean): immutable.IndexedSeq[B] = {
+  def findTopmostElemsOrSelfOfType[B <: ThisElem](subType: ClassTag[B])(p: B => Boolean): immutable.IndexedSeq[B] = {
     filter(subType)(p) { pred => findTopmostElemsOrSelf(pred) }
   }
 
-  final def getChildElemOfType[B <: ThisElem](subType: ClassTag[B])(p: B => Boolean): B = {
+  def getChildElemOfType[B <: ThisElem](subType: ClassTag[B])(p: B => Boolean): B = {
     val result = findChildElemOfType(subType)(p)
     require(result.size == 1, s"Expected exactly 1 matching child element, but found ${result.size} of them")
     result.head
@@ -87,13 +92,13 @@ trait SubtypeAwareElemLike extends ElemLike with SubtypeAwareElemApi {
   // combining the 2 functions would have made it more difficult to come up with a good method name, making the method
   // more difficult to understand.
 
-  private final def filter[B <: ThisElem](
-    subType: ClassTag[B])(p: B => Boolean)(f: ((ThisElem => Boolean) => immutable.IndexedSeq[ThisElem])): immutable.IndexedSeq[B] = {
+  private def filter[B <: ThisElem](
+    subType: ClassTag[B])(p: B => Boolean)(f: (ThisElem => Boolean) => immutable.IndexedSeq[ThisElem]): immutable.IndexedSeq[B] = {
 
     // Implicit ClassTag[B] to make pattern matching below work (the implicit ClassTag "undoes" type erasure)
-    implicit val ct = subType
+    implicit val ct: ClassTag[B] = subType
 
-    val p2: (ThisElem => Boolean) = {
+    val p2: ThisElem => Boolean = {
       case elem: B if p(elem) => true
       case _                  => false
     }
@@ -103,13 +108,13 @@ trait SubtypeAwareElemLike extends ElemLike with SubtypeAwareElemApi {
     }
   }
 
-  private final def find[B <: ThisElem](
-    subType: ClassTag[B])(p: B => Boolean)(f: ((ThisElem => Boolean) => Option[ThisElem])): Option[B] = {
+  private def find[B <: ThisElem](
+    subType: ClassTag[B])(p: B => Boolean)(f: (ThisElem => Boolean) => Option[ThisElem]): Option[B] = {
 
     // Implicit ClassTag[B] to make pattern matching below work (the implicit ClassTag "undoes" type erasure)
-    implicit val ct = subType
+    implicit val ct: ClassTag[B] = subType
 
-    val p2: (ThisElem => Boolean) = {
+    val p2: ThisElem => Boolean = {
       case elem: B if p(elem) => true
       case _                  => false
     }

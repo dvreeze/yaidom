@@ -27,6 +27,11 @@ import scala.collection.immutable
  * The purely abstract API offered by this trait is [[eu.cdevreeze.yaidom.queryapi.TransformableElemApi]]. See the documentation of that trait
  * for examples of usage.
  *
+ * All methods are overridable. Hence element implementations mixing in this partial implementation trait can change the
+ * implementation without breaking its API, caused by otherwise needed removal of this mixin. Arguably this trait should not
+ * exist as part of the public API, because implementation details should not be part of the public API. Such implementation details
+ * may be subtle, such as the (runtime) boundary on the ThisElem type member.
+ *
  * @author Chris de Vreeze
  */
 trait TransformableElemLike extends TransformableElemApi {
@@ -37,18 +42,18 @@ trait TransformableElemLike extends TransformableElemApi {
 
   def transformChildElemsToNodeSeq(f: ThisElem => immutable.IndexedSeq[ThisNode]): ThisElem
 
-  final def transformElemsOrSelf(f: ThisElem => ThisElem): ThisElem = {
+  def transformElemsOrSelf(f: ThisElem => ThisElem): ThisElem = {
     f(transformChildElems(e => e.transformElemsOrSelf(f)))
   }
 
-  final def transformElems(f: ThisElem => ThisElem): ThisElem =
+  def transformElems(f: ThisElem => ThisElem): ThisElem =
     transformChildElems(e => e.transformElemsOrSelf(f))
 
-  final def transformElemsOrSelfToNodeSeq(f: ThisElem => immutable.IndexedSeq[ThisNode]): immutable.IndexedSeq[ThisNode] = {
+  def transformElemsOrSelfToNodeSeq(f: ThisElem => immutable.IndexedSeq[ThisNode]): immutable.IndexedSeq[ThisNode] = {
     f(transformChildElemsToNodeSeq(e => e.transformElemsOrSelfToNodeSeq(f)))
   }
 
-  final def transformElemsToNodeSeq(f: ThisElem => immutable.IndexedSeq[ThisNode]): ThisElem = {
+  def transformElemsToNodeSeq(f: ThisElem => immutable.IndexedSeq[ThisNode]): ThisElem = {
     transformChildElemsToNodeSeq(e => e.transformElemsOrSelfToNodeSeq(f))
   }
 }

@@ -22,38 +22,43 @@ import eu.cdevreeze.yaidom.core.QName
 /**
  * Partial implementation of `ScopedElemApi`.
  *
+ * All methods are overridable. Hence element implementations mixing in this partial implementation trait can change the
+ * implementation without breaking its API, caused by otherwise needed removal of this mixin. Arguably this trait should not
+ * exist as part of the public API, because implementation details should not be part of the public API. Such implementation details
+ * may be subtle, such as the (runtime) boundary on the ThisElem type member.
+ *
  * @author Chris de Vreeze
  */
 trait ScopedElemLike extends ScopedElemApi with ClarkElemLike {
 
   type ThisElem <: ScopedElemLike.Aux[ThisElem]
 
-  final def attributeAsQNameOption(expandedName: EName): Option[QName] = {
+  def attributeAsQNameOption(expandedName: EName): Option[QName] = {
     attributeOption(expandedName).map(v => QName(v.trim))
   }
 
-  final def attributeAsQName(expandedName: EName): QName = {
+  def attributeAsQName(expandedName: EName): QName = {
     attributeAsQNameOption(expandedName).getOrElse(
       sys.error(s"Missing QName-valued attribute $expandedName"))
   }
 
-  final def attributeAsResolvedQNameOption(expandedName: EName): Option[EName] = {
+  def attributeAsResolvedQNameOption(expandedName: EName): Option[EName] = {
     attributeAsQNameOption(expandedName) map { qn =>
       scope.resolveQNameOption(qn).getOrElse(
         sys.error(s"Could not resolve QName-valued attribute value $qn, given scope [${scope}]"))
     }
   }
 
-  final def attributeAsResolvedQName(expandedName: EName): EName = {
+  def attributeAsResolvedQName(expandedName: EName): EName = {
     attributeAsResolvedQNameOption(expandedName).getOrElse(
       sys.error(s"Missing QName-valued attribute $expandedName"))
   }
 
-  final def textAsQName: QName = {
+  def textAsQName: QName = {
     QName(text.trim)
   }
 
-  final def textAsResolvedQName: EName = {
+  def textAsResolvedQName: EName = {
     scope.resolveQNameOption(textAsQName).getOrElse(
       sys.error(s"Could not resolve QName-valued element text $textAsQName, given scope [${scope}]"))
   }

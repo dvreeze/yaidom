@@ -25,6 +25,11 @@ import scala.collection.immutable
  *
  * Based on abstract method `parentOption` alone, this trait offers a rich API for querying the element ancestry of an element.
  *
+ * All methods are overridable. Hence element implementations mixing in this partial implementation trait can change the
+ * implementation without breaking its API, caused by otherwise needed removal of this mixin. Arguably this trait should not
+ * exist as part of the public API, because implementation details should not be part of the public API. Such implementation details
+ * may be subtle, such as the (runtime) boundary on the ThisElem type member.
+ *
  * @author Chris de Vreeze
  */
 trait HasParent extends HasParentApi {
@@ -34,24 +39,24 @@ trait HasParent extends HasParentApi {
   /**
    * Returns the equivalent `parentOption.get`, throwing an exception if this is the root element
    */
-  final def parent: ThisElem = parentOption.getOrElse(sys.error("There is no parent element"))
+  def parent: ThisElem = parentOption.getOrElse(sys.error("There is no parent element"))
 
   /**
    * Returns all ancestor elements or self
    */
-  final def ancestorsOrSelf: immutable.IndexedSeq[ThisElem] =
+  def ancestorsOrSelf: immutable.IndexedSeq[ThisElem] =
     thisElem +: (parentOption.toIndexedSeq flatMap ((e: ThisElem) => e.ancestorsOrSelf))
 
   /**
    * Returns `ancestorsOrSelf.drop(1)`
    */
-  final def ancestors: immutable.IndexedSeq[ThisElem] = ancestorsOrSelf.drop(1)
+  def ancestors: immutable.IndexedSeq[ThisElem] = ancestorsOrSelf.drop(1)
 
   /**
    * Returns the first found ancestor-or-self element obeying the given predicate, if any, wrapped in an Option
    */
   // @tailrec
-  final def findAncestorOrSelf(p: ThisElem => Boolean): Option[ThisElem] = {
+  def findAncestorOrSelf(p: ThisElem => Boolean): Option[ThisElem] = {
     if (p(thisElem)) Some(thisElem) else {
       val optParent = parentOption
       if (optParent.isEmpty) None else optParent.get.findAncestorOrSelf(p)
@@ -61,7 +66,7 @@ trait HasParent extends HasParentApi {
   /**
    * Returns the first found ancestor element obeying the given predicate, if any, wrapped in an Option
    */
-  final def findAncestor(p: ThisElem => Boolean): Option[ThisElem] = {
+  def findAncestor(p: ThisElem => Boolean): Option[ThisElem] = {
     parentOption flatMap { e => e.findAncestorOrSelf(p) }
   }
 }

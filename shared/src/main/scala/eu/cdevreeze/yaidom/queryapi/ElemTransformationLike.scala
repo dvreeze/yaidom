@@ -25,6 +25,11 @@ import scala.collection.immutable
  * In other words, this trait has abstract methods `transformChildElems` and `transformChildElemsToNodeSeq`. Based on these
  * abstract methods, this trait offers a rich API for transforming descendant elements or descendant-or-self elements.
  *
+ * All methods are overridable. Hence element implementations mixing in this partial implementation trait can change the
+ * implementation without breaking its API, caused by otherwise needed removal of this mixin. Arguably this trait should not
+ * exist as part of the public API, because implementation details should not be part of the public API. Such implementation details
+ * may be subtle, such as the (runtime) boundary on the ElemType type member.
+ *
  * @author Chris de Vreeze
  */
 trait ElemTransformationLike extends ElemTransformationApi {
@@ -37,19 +42,19 @@ trait ElemTransformationLike extends ElemTransformationApi {
 
   def transformChildElemsToNodeSeq(elem: ElemType, f: ElemType => immutable.IndexedSeq[NodeType]): ElemType
 
-  final def transformElemsOrSelf(elem: ElemType, f: ElemType => ElemType): ElemType = {
+  def transformElemsOrSelf(elem: ElemType, f: ElemType => ElemType): ElemType = {
     f(transformChildElems(elem, e => transformElemsOrSelf(e, f)))
   }
 
-  final def transformElems(elem: ElemType, f: ElemType => ElemType): ElemType = {
+  def transformElems(elem: ElemType, f: ElemType => ElemType): ElemType = {
     transformChildElems(elem, e => transformElemsOrSelf(e, f))
   }
 
-  final def transformElemsOrSelfToNodeSeq(elem: ElemType, f: ElemType => immutable.IndexedSeq[NodeType]): immutable.IndexedSeq[NodeType] = {
+  def transformElemsOrSelfToNodeSeq(elem: ElemType, f: ElemType => immutable.IndexedSeq[NodeType]): immutable.IndexedSeq[NodeType] = {
     f(transformChildElemsToNodeSeq(elem, e => transformElemsOrSelfToNodeSeq(e, f)))
   }
 
-  final def transformElemsToNodeSeq(elem: ElemType, f: ElemType => immutable.IndexedSeq[NodeType]): ElemType = {
+  def transformElemsToNodeSeq(elem: ElemType, f: ElemType => immutable.IndexedSeq[NodeType]): ElemType = {
     transformChildElemsToNodeSeq(elem, e => transformElemsOrSelfToNodeSeq(e, f))
   }
 }

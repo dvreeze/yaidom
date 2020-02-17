@@ -24,6 +24,11 @@ import eu.cdevreeze.yaidom.core.Path
  * This is the partially implemented (functional) element update API, as function API instead of OO API. That is, this is the function
  * API corresponding to trait [[eu.cdevreeze.yaidom.queryapi.UpdatableElemLike]].
  *
+ * All methods are overridable. Hence element implementations mixing in this partial implementation trait can change the
+ * implementation without breaking its API, caused by otherwise needed removal of this mixin. Arguably this trait should not
+ * exist as part of the public API, because implementation details should not be part of the public API. Such implementation details
+ * may be subtle, such as the (runtime) boundary on the ElemType type member.
+ *
  * @author Chris de Vreeze
  */
 trait ElemUpdateLike extends ElemUpdateApi {
@@ -40,23 +45,23 @@ trait ElemUpdateLike extends ElemUpdateApi {
 
   def findAllChildElemsWithPathEntries(elem: ElemType): immutable.IndexedSeq[(ElemType, Path.Entry)]
 
-  final def childNodeIndex(elem: ElemType, pathEntry: Path.Entry): Int = {
+  def childNodeIndex(elem: ElemType, pathEntry: Path.Entry): Int = {
     collectChildNodeIndexes(elem, Set(pathEntry)).getOrElse(pathEntry, -1)
   }
 
-  final def withChildSeqs(elem: ElemType, newChildSeqs: immutable.IndexedSeq[immutable.IndexedSeq[NodeType]]): ElemType = {
+  def withChildSeqs(elem: ElemType, newChildSeqs: immutable.IndexedSeq[immutable.IndexedSeq[NodeType]]): ElemType = {
     withChildren(elem, newChildSeqs.flatten)
   }
 
-  final def withUpdatedChildren(elem: ElemType, index: Int, newChild: NodeType): ElemType = {
+  def withUpdatedChildren(elem: ElemType, index: Int, newChild: NodeType): ElemType = {
     withChildren(elem, children(elem).updated(index, newChild))
   }
 
-  final def withPatchedChildren(elem: ElemType, from: Int, newChildren: immutable.IndexedSeq[NodeType], replace: Int): ElemType = {
+  def withPatchedChildren(elem: ElemType, from: Int, newChildren: immutable.IndexedSeq[NodeType], replace: Int): ElemType = {
     withChildren(elem, children(elem).patch(from, newChildren, replace))
   }
 
-  final def plusChild(elem: ElemType, index: Int, child: NodeType): ElemType = {
+  def plusChild(elem: ElemType, index: Int, child: NodeType): ElemType = {
     val childNodes = children(elem)
 
     require(
@@ -70,23 +75,23 @@ trait ElemUpdateLike extends ElemUpdateApi {
     }
   }
 
-  final def plusChild(elem: ElemType, child: NodeType): ElemType = {
+  def plusChild(elem: ElemType, child: NodeType): ElemType = {
     withChildren(elem, children(elem) :+ child)
   }
 
-  final def plusChildOption(elem: ElemType, index: Int, childOption: Option[NodeType]): ElemType = {
+  def plusChildOption(elem: ElemType, index: Int, childOption: Option[NodeType]): ElemType = {
     if (childOption.isEmpty) elem else plusChild(elem, index, childOption.get)
   }
 
-  final def plusChildOption(elem: ElemType, childOption: Option[NodeType]): ElemType = {
+  def plusChildOption(elem: ElemType, childOption: Option[NodeType]): ElemType = {
     if (childOption.isEmpty) elem else plusChild(elem, childOption.get)
   }
 
-  final def plusChildren(elem: ElemType, childSeq: immutable.IndexedSeq[NodeType]): ElemType = {
+  def plusChildren(elem: ElemType, childSeq: immutable.IndexedSeq[NodeType]): ElemType = {
     withChildren(elem, children(elem) ++ childSeq)
   }
 
-  final def minusChild(elem: ElemType, index: Int): ElemType = {
+  def minusChild(elem: ElemType, index: Int): ElemType = {
     val childNodes = children(elem)
 
     require(
@@ -96,39 +101,39 @@ trait ElemUpdateLike extends ElemUpdateApi {
     withPatchedChildren(elem, index, Vector(), 1)
   }
 
-  final def updateChildElem(elem: ElemType, pathEntry: Path.Entry)(f: ElemType => ElemType): ElemType = {
+  def updateChildElem(elem: ElemType, pathEntry: Path.Entry)(f: ElemType => ElemType): ElemType = {
     updateChildElems(elem, Set(pathEntry)) { case (che, pe) => f(che) }
   }
 
-  final def updateChildElem(elem: ElemType, pathEntry: Path.Entry, newElem: ElemType): ElemType = {
+  def updateChildElem(elem: ElemType, pathEntry: Path.Entry, newElem: ElemType): ElemType = {
     updateChildElem(elem, pathEntry) { e => newElem }
   }
 
-  final def updateChildElemWithNodeSeq(elem: ElemType, pathEntry: Path.Entry)(f: ElemType => immutable.IndexedSeq[NodeType]): ElemType = {
+  def updateChildElemWithNodeSeq(elem: ElemType, pathEntry: Path.Entry)(f: ElemType => immutable.IndexedSeq[NodeType]): ElemType = {
     updateChildElemsWithNodeSeq(elem, Set(pathEntry)) { case (che, pe) => f(che) }
   }
 
-  final def updateChildElemWithNodeSeq(elem: ElemType, pathEntry: Path.Entry, newNodes: immutable.IndexedSeq[NodeType]): ElemType = {
+  def updateChildElemWithNodeSeq(elem: ElemType, pathEntry: Path.Entry, newNodes: immutable.IndexedSeq[NodeType]): ElemType = {
     updateChildElemWithNodeSeq(elem, pathEntry) { e => newNodes }
   }
 
-  final def updateElemOrSelf(elem: ElemType, path: Path)(f: ElemType => ElemType): ElemType = {
+  def updateElemOrSelf(elem: ElemType, path: Path)(f: ElemType => ElemType): ElemType = {
     updateElemsOrSelf(elem, Set(path)) { case (e, path) => f(e) }
   }
 
-  final def updateElemOrSelf(elem: ElemType, path: Path, newElem: ElemType): ElemType = {
+  def updateElemOrSelf(elem: ElemType, path: Path, newElem: ElemType): ElemType = {
     updateElemOrSelf(elem, path) { e => newElem }
   }
 
-  final def updateElemWithNodeSeq(elem: ElemType, path: Path)(f: ElemType => immutable.IndexedSeq[NodeType]): ElemType = {
+  def updateElemWithNodeSeq(elem: ElemType, path: Path)(f: ElemType => immutable.IndexedSeq[NodeType]): ElemType = {
     updateElemsWithNodeSeq(elem, Set(path)) { case (e, path) => f(e) }
   }
 
-  final def updateElemWithNodeSeq(elem: ElemType, path: Path, newNodes: immutable.IndexedSeq[NodeType]): ElemType = {
+  def updateElemWithNodeSeq(elem: ElemType, path: Path, newNodes: immutable.IndexedSeq[NodeType]): ElemType = {
     updateElemWithNodeSeq(elem, path) { e => newNodes }
   }
 
-  final def updateChildElems(elem: ElemType, pathEntries: Set[Path.Entry])(f: (ElemType, Path.Entry) => ElemType): ElemType = {
+  def updateChildElems(elem: ElemType, pathEntries: Set[Path.Entry])(f: (ElemType, Path.Entry) => ElemType): ElemType = {
     // For efficiency, not delegating to updateChildElemsWithNodeSeq
 
     if (pathEntries.isEmpty) {
@@ -147,7 +152,7 @@ trait ElemUpdateLike extends ElemUpdateApi {
     }
   }
 
-  final def updateChildElemsWithNodeSeq(elem: ElemType, pathEntries: Set[Path.Entry])(f: (ElemType, Path.Entry) => immutable.IndexedSeq[NodeType]): ElemType = {
+  def updateChildElemsWithNodeSeq(elem: ElemType, pathEntries: Set[Path.Entry])(f: (ElemType, Path.Entry) => immutable.IndexedSeq[NodeType]): ElemType = {
     if (pathEntries.isEmpty) {
       elem
     } else {
@@ -164,7 +169,7 @@ trait ElemUpdateLike extends ElemUpdateApi {
     }
   }
 
-  final def updateElemsOrSelf(elem: ElemType, paths: Set[Path])(f: (ElemType, Path) => ElemType): ElemType = {
+  def updateElemsOrSelf(elem: ElemType, paths: Set[Path])(f: (ElemType, Path) => ElemType): ElemType = {
     val pathsByFirstEntry: Map[Path.Entry, Set[Path]] = paths.filterNot(_.isEmpty).groupBy(_.firstEntry)
 
     val descendantUpdateResult =
@@ -180,7 +185,7 @@ trait ElemUpdateLike extends ElemUpdateApi {
     if (paths.contains(Path.Empty)) f(descendantUpdateResult, Path.Empty) else descendantUpdateResult
   }
 
-  final def updateElems(elem: ElemType, paths: Set[Path])(f: (ElemType, Path) => ElemType): ElemType = {
+  def updateElems(elem: ElemType, paths: Set[Path])(f: (ElemType, Path) => ElemType): ElemType = {
     val pathsByFirstEntry: Map[Path.Entry, Set[Path]] = paths.filterNot(_.isEmpty).groupBy(_.firstEntry)
 
     updateChildElems(elem, pathsByFirstEntry.keySet) {
@@ -192,7 +197,7 @@ trait ElemUpdateLike extends ElemUpdateApi {
     }
   }
 
-  final def updateElemsOrSelfWithNodeSeq(elem: ElemType, paths: Set[Path])(f: (ElemType, Path) => immutable.IndexedSeq[NodeType]): immutable.IndexedSeq[NodeType] = {
+  def updateElemsOrSelfWithNodeSeq(elem: ElemType, paths: Set[Path])(f: (ElemType, Path) => immutable.IndexedSeq[NodeType]): immutable.IndexedSeq[NodeType] = {
     val pathsByFirstEntry: Map[Path.Entry, Set[Path]] = paths.filterNot(_.isEmpty).groupBy(_.firstEntry)
 
     val descendantUpdateResult =
@@ -208,7 +213,7 @@ trait ElemUpdateLike extends ElemUpdateApi {
     if (paths.contains(Path.Empty)) f(descendantUpdateResult, Path.Empty) else Vector(descendantUpdateResult)
   }
 
-  final def updateElemsWithNodeSeq(elem: ElemType, paths: Set[Path])(f: (ElemType, Path) => immutable.IndexedSeq[NodeType]): ElemType = {
+  def updateElemsWithNodeSeq(elem: ElemType, paths: Set[Path])(f: (ElemType, Path) => immutable.IndexedSeq[NodeType]): ElemType = {
     val pathsByFirstEntry: Map[Path.Entry, Set[Path]] = paths.filterNot(_.isEmpty).groupBy(_.firstEntry)
 
     updateChildElemsWithNodeSeq(elem, pathsByFirstEntry.keySet) {
@@ -220,7 +225,7 @@ trait ElemUpdateLike extends ElemUpdateApi {
     }
   }
 
-  final def updateChildElems(elem: ElemType, f: (ElemType, Path.Entry) => Option[ElemType]): ElemType = {
+  def updateChildElems(elem: ElemType, f: (ElemType, Path.Entry) => Option[ElemType]): ElemType = {
     val editsByPathEntries: Map[Path.Entry, ElemType] =
       findAllChildElemsWithPathEntries(elem).flatMap({ case (che, pe) => f(che, pe).map(newE => (pe, newE)) }).toMap
 
@@ -230,7 +235,7 @@ trait ElemUpdateLike extends ElemUpdateApi {
     }
   }
 
-  final def updateChildElemsWithNodeSeq(elem: ElemType, f: (ElemType, Path.Entry) => Option[immutable.IndexedSeq[NodeType]]): ElemType = {
+  def updateChildElemsWithNodeSeq(elem: ElemType, f: (ElemType, Path.Entry) => Option[immutable.IndexedSeq[NodeType]]): ElemType = {
     val editsByPathEntries: Map[Path.Entry, immutable.IndexedSeq[NodeType]] =
       findAllChildElemsWithPathEntries(elem).flatMap({ case (che, pe) => f(che, pe).map(newNodes => (pe, newNodes)) }).toMap
 

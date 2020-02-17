@@ -26,6 +26,11 @@ import eu.cdevreeze.yaidom.core.Path
 /**
  * Partial implementation of `ClarkElemApi`.
  *
+ * All methods are overridable. Hence element implementations mixing in this partial implementation trait can change the
+ * implementation without breaking its API, caused by otherwise needed removal of this mixin. Arguably this trait should not
+ * exist as part of the public API, because implementation details should not be part of the public API. Such implementation details
+ * may be subtle, such as the (runtime) boundary on the ThisElem type member.
+ *
  * @author Chris de Vreeze
  */
 trait ClarkElemLike extends ClarkElemApi with ElemLike with IsNavigable {
@@ -41,7 +46,7 @@ trait ClarkElemLike extends ClarkElemApi with ElemLike with IsNavigable {
    * On the other hand, those wrapper element implementations are convenient, but not intended for heavy use in
    * production. Hence, this method should typically be fast enough.
    */
-  final override def findChildElemByPathEntry(entry: Path.Entry): Option[ThisElem] = {
+  override def findChildElemByPathEntry(entry: Path.Entry): Option[ThisElem] = {
     // The previous implementation used immutable.IndexedSeq.toStream, which turned out to be surprisingly inefficient.
     // This inefficiency was noticed when calling method IsNavigable.findReverseAncestryOrSelfByPath
     // (and therefore this method) many times. Thanks to Johan Walters for pointing out this performance issue.
@@ -74,7 +79,7 @@ trait ClarkElemLike extends ClarkElemApi with ElemLike with IsNavigable {
    * On the other hand, those wrapper element implementations are convenient, but not intended for heavy use in
    * production. Hence, this method should typically be fast enough.
    */
-  final override def findAllChildElemsWithPathEntries: immutable.IndexedSeq[(ThisElem, Path.Entry)] = {
+  override def findAllChildElemsWithPathEntries: immutable.IndexedSeq[(ThisElem, Path.Entry)] = {
     val nextEntries = mutable.Map[EName, Int]()
 
     findAllChildElems map { e =>
@@ -88,7 +93,7 @@ trait ClarkElemLike extends ClarkElemApi with ElemLike with IsNavigable {
   /**
    * The local name, that is, the local part of the EName
    */
-  final def localName: String = {
+  def localName: String = {
     resolvedName.localPart
   }
 
@@ -99,13 +104,13 @@ trait ClarkElemLike extends ClarkElemApi with ElemLike with IsNavigable {
    * Therefore this method is non-final and can be overridden.
    */
   def attributeOption(expandedName: EName): Option[String] = {
-    resolvedAttributes.find { case (en, v) => (en == expandedName) }.map (_._2)
+    resolvedAttributes.find { case (en, _) => en == expandedName }.map (_._2)
   }
 
   /**
    * Returns the value of the attribute with the given expanded name, and throws an exception otherwise.
    */
-  final def attribute(expandedName: EName): String = {
+  def attribute(expandedName: EName): String = {
     attributeOption(expandedName).getOrElse(sys.error(s"Missing attribute $expandedName"))
   }
 
@@ -117,23 +122,23 @@ trait ClarkElemLike extends ClarkElemApi with ElemLike with IsNavigable {
    * Therefore this method is non-final and can be overridden.
    */
   def findAttributeByLocalName(localName: String): Option[String] = {
-    resolvedAttributes.find { case (en, v) => en.localPart == localName }.map (_._2)
+    resolvedAttributes.find { case (en, _) => en.localPart == localName }.map (_._2)
   }
 
   /**
    * Shorthand for `attributeOption(expandedName)`.
    */
-  final def \@(expandedName: EName): Option[String] = {
+  def \@(expandedName: EName): Option[String] = {
     attributeOption(expandedName)
   }
 
   /** Returns `text.trim`. */
-  final def trimmedText: String = {
+  def trimmedText: String = {
     text.trim
   }
 
   /** Returns `XmlStringUtils.normalizeString(text)`. */
-  final def normalizedText: String = {
+  def normalizedText: String = {
     XmlStringUtils.normalizeString(text)
   }
 }

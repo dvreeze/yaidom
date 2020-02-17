@@ -29,6 +29,11 @@ import eu.cdevreeze.yaidom.core.Path
  * The purely abstract API offered by this trait is [[eu.cdevreeze.yaidom.queryapi.IsNavigableApi]]. See the documentation of that trait
  * for more information.
  *
+ * All methods are overridable. Hence element implementations mixing in this partial implementation trait can change the
+ * implementation without breaking its API, caused by otherwise needed removal of this mixin. Arguably this trait should not
+ * exist as part of the public API, because implementation details should not be part of the public API. Such implementation details
+ * may be subtle, such as the (runtime) boundary on the ThisElem type member.
+ *
  * @author Chris de Vreeze
  */
 trait IsNavigable extends IsNavigableApi {
@@ -39,19 +44,19 @@ trait IsNavigable extends IsNavigableApi {
 
   def findChildElemByPathEntry(entry: Path.Entry): Option[ThisElem]
 
-  final def getChildElemByPathEntry(entry: Path.Entry): ThisElem = {
+  def getChildElemByPathEntry(entry: Path.Entry): ThisElem = {
     findChildElemByPathEntry(entry).getOrElse(sys.error(s"Expected existing path entry $entry from root $thisElem"))
   }
 
-  final def findElemOrSelfByPath(path: Path): Option[ThisElem] = {
+  def findElemOrSelfByPath(path: Path): Option[ThisElem] = {
     findReverseAncestryOrSelfByPath(path).map(_.last)
   }
 
-  final def getElemOrSelfByPath(path: Path): ThisElem = {
+  def getElemOrSelfByPath(path: Path): ThisElem = {
     findElemOrSelfByPath(path).getOrElse(sys.error(s"Expected existing path $path from root $thisElem"))
   }
 
-  final def findReverseAncestryOrSelfByPath(path: Path): Option[immutable.IndexedSeq[ThisElem]] = {
+  def findReverseAncestryOrSelfByPath(path: Path): Option[immutable.IndexedSeq[ThisElem]] = {
     // This implementation avoids "functional updates" on the path, and therefore unnecessary object creation
 
     val entryCount = path.entries.size
@@ -75,7 +80,7 @@ trait IsNavigable extends IsNavigableApi {
     findReverseAncestryOrSelfByPath(thisElem, 0, Vector())
   }
 
-  final def getReverseAncestryOrSelfByPath(path: Path): immutable.IndexedSeq[ThisElem] = {
+  def getReverseAncestryOrSelfByPath(path: Path): immutable.IndexedSeq[ThisElem] = {
     findReverseAncestryOrSelfByPath(path).getOrElse(sys.error(s"Expected existing path $path from root $thisElem"))
   }
 }

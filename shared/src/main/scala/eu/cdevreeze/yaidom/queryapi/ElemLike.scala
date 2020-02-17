@@ -29,6 +29,11 @@ import scala.collection.mutable
  * of important properties obeyed by methods of this API. It shows the <em>mathematical</em> rigor of the yaidom query API.
  * API users that are only interested in how to use the API can safely skip that formal treatment.
  *
+ * All methods are overridable. Hence element implementations mixing in this partial implementation trait can change the
+ * implementation without breaking its API, caused by otherwise needed removal of this mixin. Arguably this trait should not
+ * exist as part of the public API, because implementation details should not be part of the public API. Such implementation details
+ * may be subtle, such as the (runtime) boundary on the ThisElem type member.
+ *
  * ==ElemLike more formally==
  *
  * '''In order to get started using the API, this more formal section can safely be skipped. On the other hand, this section
@@ -227,26 +232,26 @@ trait ElemLike extends ElemApi {
 
   def findAllChildElems: immutable.IndexedSeq[ThisElem]
 
-  final def filterChildElems(p: ThisElem => Boolean): immutable.IndexedSeq[ThisElem] = {
+  def filterChildElems(p: ThisElem => Boolean): immutable.IndexedSeq[ThisElem] = {
     findAllChildElems filter p
   }
 
-  final def \(p: ThisElem => Boolean): immutable.IndexedSeq[ThisElem] = {
+  def \(p: ThisElem => Boolean): immutable.IndexedSeq[ThisElem] = {
     filterChildElems(p)
   }
 
-  final def findChildElem(p: ThisElem => Boolean): Option[ThisElem] = {
+  def findChildElem(p: ThisElem => Boolean): Option[ThisElem] = {
     val result = filterChildElems(p)
     result.headOption
   }
 
-  final def getChildElem(p: ThisElem => Boolean): ThisElem = {
+  def getChildElem(p: ThisElem => Boolean): ThisElem = {
     val result = filterChildElems(p)
     require(result.size == 1, s"Expected exactly 1 matching child element, but found ${result.size} of them")
     result.head
   }
 
-  final def findAllElemsOrSelf: immutable.IndexedSeq[ThisElem] = {
+  def findAllElemsOrSelf: immutable.IndexedSeq[ThisElem] = {
     val result = mutable.ArrayBuffer[ThisElem]()
 
     // Not tail-recursive, but the depth should typically be limited
@@ -259,7 +264,7 @@ trait ElemLike extends ElemApi {
     result.toIndexedSeq
   }
 
-  final def filterElemsOrSelf(p: ThisElem => Boolean): immutable.IndexedSeq[ThisElem] = {
+  def filterElemsOrSelf(p: ThisElem => Boolean): immutable.IndexedSeq[ThisElem] = {
     val result = mutable.ArrayBuffer[ThisElem]()
 
     // Not tail-recursive, but the depth should typically be limited
@@ -272,19 +277,19 @@ trait ElemLike extends ElemApi {
     result.toIndexedSeq
   }
 
-  final def \\(p: ThisElem => Boolean): immutable.IndexedSeq[ThisElem] = {
+  def \\(p: ThisElem => Boolean): immutable.IndexedSeq[ThisElem] = {
     filterElemsOrSelf(p)
   }
 
-  final def findAllElems: immutable.IndexedSeq[ThisElem] = {
+  def findAllElems: immutable.IndexedSeq[ThisElem] = {
     findAllChildElems flatMap { ch => ch.findAllElemsOrSelf }
   }
 
-  final def filterElems(p: ThisElem => Boolean): immutable.IndexedSeq[ThisElem] = {
+  def filterElems(p: ThisElem => Boolean): immutable.IndexedSeq[ThisElem] = {
     findAllChildElems flatMap { ch => ch filterElemsOrSelf p }
   }
 
-  final def findTopmostElemsOrSelf(p: ThisElem => Boolean): immutable.IndexedSeq[ThisElem] = {
+  def findTopmostElemsOrSelf(p: ThisElem => Boolean): immutable.IndexedSeq[ThisElem] = {
     val result = mutable.ArrayBuffer[ThisElem]()
 
     // Not tail-recursive, but the depth should typically be limited
@@ -298,15 +303,15 @@ trait ElemLike extends ElemApi {
     result.toIndexedSeq
   }
 
-  final def \\!(p: ThisElem => Boolean): immutable.IndexedSeq[ThisElem] = {
+  def \\!(p: ThisElem => Boolean): immutable.IndexedSeq[ThisElem] = {
     findTopmostElemsOrSelf(p)
   }
 
-  final def findTopmostElems(p: ThisElem => Boolean): immutable.IndexedSeq[ThisElem] = {
+  def findTopmostElems(p: ThisElem => Boolean): immutable.IndexedSeq[ThisElem] = {
     findAllChildElems flatMap { ch => ch findTopmostElemsOrSelf p }
   }
 
-  final def findElemOrSelf(p: ThisElem => Boolean): Option[ThisElem] = {
+  def findElemOrSelf(p: ThisElem => Boolean): Option[ThisElem] = {
     // Not tail-recursive, but the depth should typically be limited
     def findMatch(elm: ThisElem): Option[ThisElem] = {
       if (p(elm)) Some(elm) else {
@@ -327,7 +332,7 @@ trait ElemLike extends ElemApi {
     findMatch(thisElem)
   }
 
-  final def findElem(p: ThisElem => Boolean): Option[ThisElem] = {
+  def findElem(p: ThisElem => Boolean): Option[ThisElem] = {
     val elms = thisElem.findAllChildElems.view flatMap { ch => ch findElemOrSelf p }
     elms.headOption
   }
