@@ -16,7 +16,6 @@
 
 package eu.cdevreeze.yaidom.core
 
-import Scope.DefaultNsPrefix
 import eu.cdevreeze.yaidom.XmlStringUtils
 
 /**
@@ -316,10 +315,13 @@ final case class Scope(prefixNamespaceMap: Map[String, String]) {
     qname match {
       case unprefixedName: UnprefixedName if defaultNamespaceOption.isEmpty => Some(getNoNsEName(unprefixedName.localPart))
       case unprefixedName: UnprefixedName => Some(getEName(defaultNamespaceOption.get, unprefixedName.localPart))
-      case prefixedName: PrefixedName =>
-        // The prefix scope (as Map), with the implicit "xml" namespace added
-        val completePrefixScopeMap: Map[String, String] = (prefixNamespaceMap - DefaultNsPrefix) + ("xml" -> XmlNamespace)
-        completePrefixScopeMap.get(prefixedName.prefix) map { nsUri => getEName(nsUri, prefixedName.localPart) }
+      case PrefixedName(prefix, localPart) =>
+        // Thanks to Johan Walters for pointing to a performance bottleneck in previous versions of this code
+        prefix match {
+          case "xml" => Some(getEName(XmlNamespace, localPart))
+          case "" => None // Quirk to keep old behavior of "allowing" empty prefixes and ignoring them when resolving the name
+          case _ => prefixNamespaceMap.get(prefix).map(nsUri => getEName(nsUri, localPart))
+        }
     }
   }
 
@@ -408,7 +410,7 @@ final case class Scope(prefixNamespaceMap: Map[String, String]) {
     // Method mapValues deprecated since Scala 2.13.0.
     val result = nsPrefixPairsGroupedByNs.map {
       case (ns, xs) =>
-        val result = xs map { case (ns, prefix) => prefix }
+        val result = xs.map { case (ns, prefix) => prefix }
         ns -> result.toSet
     }
 
