@@ -3,6 +3,14 @@ CHANGELOG
 =========
 
 
+1.10.3
+======
+
+Performance bug fix release, thanks to Johan Walters. Resolving a ``QName`` against a ``Scope`` was too inefficient, and this release fixes that.
+
+There are no breaking changes compared to version 1.10.2, according to MiMa (in SBT, run: yaidomJVM/*:mimaReportBinaryIssues).
+
+
 1.10.2
 ======
 
