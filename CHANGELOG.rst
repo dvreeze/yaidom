@@ -3,6 +3,74 @@ CHANGELOG
 =========
 
 
+Remarks about the current element type in yaidom
+================================================
+
+The element query API of yaidom uses **type members** for the "self" type in query API traits. Typically some form of F-bounded
+polymorphism is used in such cases to restrict the "self" type to, well, the "self" type, to the extent possible.
+
+Earlier yaidom versions used type parameters for the element type, and later yaidom versions switched to type members instead.
+This turned out to reduce the amount of boilerplate in practice, for example when using arbitrary element implementations in
+"yaidom dialects". So the use of type members instead of type parameters turned out to be a good choice. Morever, we can still
+express pretty much the same with type members and type parameters (although type members cannot be used in self types).
+
+After all:
+
+* Type ``ElemApi`` (using type members) is essentially type ``ElemApi[_]`` (using type parameters)
+* Type ``ElemApi { type ThisElem = E } `` (using type members) is essentially type ``ElemApi[E]`` (using type parameters)
+
+It's just that for yaidom type members turned out to cause less "clutter" than type parameters.
+
+What if we had used type classes instead to model F-bounded polymorphism? In our case, it would not have helped much:
+
+* How do type classes for element query function APIs help for native yaidom elements?
+* How do these type classes help model node type hierarchies, supporting other kinds of nodes than just elements?
+* Even when exposing these type classes through generic OO APIs, we would still want to write specific optimized OO element APIs
+* After all, OO APIs can contain private redundant state, for optimal performance
+* In other words, custom OO element APIs can encapsulate performance improvements, without introducing any breaking changes
+
+Given that yaidom is an important low-level dependency used in several critical production applications, the possibility to
+improve performance without breaking the API is quite desirable. Note that with type classes we could still develop a custom
+SaxonElem implementation delegating to a custom Saxon-oriented type class instance, but what's the point of query API type classes then?
+
+So, using type members for the "current element type" in the yaidom element query API is still a good choice. No need for
+type parameters, or for type classes. The purely abstract element query API traits even relax type safety to the point where
+the ThisElem type member is only restricted to be a sub-type of the enclosing trait. Only implementations "fix" this type member
+to the concrete element type itself.
+
+Still, the need for release 1.10.2 of yaidom shows that not all is well. Implementation traits like ``ScopedElemLike`` have
+become part of the public API of custom element implementations (often outside of yaidom, sometimes in "yaidom dialects").
+This potentially makes it hard to optimize such custom element implementations in a non-breaking way.
+
+This is also an issue in a subtle way, when we look with javap into the class files of custom element implementations.
+Recall that the class files still contain generics (at one level) in the method signatures (of methods like filterElemsOrSelf), and that erasure
+only affects the byte code, not the method declarations. What we can see in class files are method signatures like:
+
+* def filterElemsOrSelf(p: ScopedElemLike => Boolean): immutable.IndexedSeq[ScopedElemLike]
+
+Optimizing the custom element implementation by removing (and replacing) the ``ScopedElemLike`` mix-in would thus be a
+breaking change. In TQA (which uses yaidom), for class ``TaxonomyElem``, I would rather see a more stable "javap" method signature like:
+
+* def filterElemsOrSelf(p: TaxonomyElem => Boolean): immutable.IndexedSeq[TaxonomyElem]
+
+There is a lesson to be learnt from this when further evolving the yaidom query API. Query API methods containing the ThisElem
+element type in the method signature should be implemented only in the concrete element class. For yaidom dialects this would
+be the common dialect element super-class. This may be at odds with the DRY principle, but API stability is more important here.
+
+So, evolving yaidom further should ideally be as follows with respect to the "curent element type" in the query API:
+
+* Keep using type members for the "current element type" (no type parameters, no type classes)
+* Keep using the purely abstract element query API traits, with relaxed type constraints on the element type member
+* Yet **remove and no longer use the partial implementation traits**, especially for methods with the element type in the signature
+
+Then we can achieve the following:
+
+* Easy (but sometimes cumbersome) implementation of different yaidom elements, including yaidom dialects (mostly outside of yaidom), like is the case now
+* Ability to tweak performance of (custom) element implementations, without affecting API stability
+
+It is the latter that needs more attention from now on.
+
+
 1.10.3
 ======
 
