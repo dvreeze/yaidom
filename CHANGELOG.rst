@@ -6,24 +6,23 @@ CHANGELOG
 Remarks about the current element type in yaidom
 ================================================
 
-The element query API of yaidom uses **type members** for the "self" type in query API traits. Typically some form of F-bounded
-polymorphism is used in such cases to restrict the "self" type to, well, the "self" type, to the extent possible.
+The element query API of yaidom uses **type members** for the "current element" type in query API traits. Typically some form of F-bounded
+polymorphism is used in such cases to restrict the "current element" type to, well, the "current element" type, to the extent
+that this is possible.
 
 Earlier yaidom versions used type parameters for the element type, and later yaidom versions switched to type members instead.
 This turned out to reduce the amount of boilerplate in practice, for example when using arbitrary element implementations in
-"yaidom dialects". So the use of type members instead of type parameters turned out to be a good choice. Morever, we can still
+"yaidom dialects". Indeed the use of type members instead of type parameters turned out to be a good choice. Morever, we can still
 express pretty much the same with type members and type parameters (although type members cannot be used in self types).
 
 After all:
 
-* Type ``ElemApi`` (using type members) is essentially type ``ElemApi[_]`` (using type parameters)
-* Type ``ElemApi { type ThisElem = E }`` (using type members) is essentially type ``ElemApi[E]`` (using type parameters)
+* Type ``ElemApi`` (using a type member for the element type) is essentially type ``ElemApi[_]`` (using a type parameter for the element type)
+* Type ``ElemApi { type ThisElem = E }`` (using a type member for the element type) is essentially type ``ElemApi[E]`` (using a type parameter for the element type)
 
-It's just that for yaidom type members turned out to cause less "clutter" than type parameters.
+What if we had used type classes instead of type members or type parameters to model F-bounded polymorphism? In our case, it would not have helped much:
 
-What if we had used type classes instead to model F-bounded polymorphism? In our case, it would not have helped much:
-
-* How do type classes for element query function APIs help for native yaidom elements?
+* How do type classes for element query function APIs help for native yaidom elements? What do these native yaidom element types without the query API look like?
 * How do these type classes help model node type hierarchies, supporting other kinds of nodes than just elements?
 * Even when exposing these type classes through generic OO APIs, we would still want to write specific optimized OO element APIs
 * After all, OO APIs can contain private redundant state, for optimal performance
@@ -31,11 +30,11 @@ What if we had used type classes instead to model F-bounded polymorphism? In our
 
 Given that yaidom is an important low-level dependency used in several critical production applications, the possibility to
 improve performance without breaking the API is quite desirable. Note that with type classes we could still develop a custom
-SaxonElem implementation delegating to a custom Saxon-oriented type class instance, but what's the point of query API type classes then?
+SaxonElem implementation delegating to a custom Saxon-oriented type class instance, but what's the point of (query API) type classes then?
 
 So, using type members for the "current element type" in the yaidom element query API is still a good choice. No need for
-type parameters, or for type classes. The purely abstract element query API traits even relax type safety to the point where
-the ThisElem type member is only restricted to be a sub-type of the enclosing trait. Only implementations "fix" this type member
+type parameters, nor for type classes. The purely abstract element query API traits even relax type safety to the point where
+the ThisElem type member is only restricted to be a sub-type of the enclosing trait. Only element implementations "fix" this type member
 to the concrete element type itself.
 
 Still, the need for release 1.10.2 of yaidom shows that not all is well. Implementation traits like ``ScopedElemLike`` have
@@ -57,23 +56,24 @@ There is a lesson to be learnt from this when further evolving the yaidom query 
 element type in the method signature should be implemented only in the concrete element class. For yaidom dialects this would
 be the common dialect element super-class. This may be at odds with the DRY principle, but API stability is more important here.
 
-So, evolving yaidom further should ideally be as follows with respect to the "current element type" in the query API:
+So, evolving yaidom further should ideally be done as follows with respect to the "current element type" in the query API:
 
 * Keep using type members for the "current element type" (no type parameters, no type classes)
-* Keep using the purely abstract element query API traits, with relaxed type constraints on the element type member
-* Yet **remove and no longer use the partial implementation traits**, especially for methods with the element type in the signature
+* Restrict these type members to be sub-types of the enclosing query API trait, but do not add any more complex type constraints (not even self types)
+* Keep using the purely abstract element query API traits, with the above-mentioned relaxed type constraints on the element type member
+* Yet **remove and no longer use the partial implementation traits**, especially for methods containing the element type in the signature
 
 Then we can achieve the following:
 
 * Easy (but sometimes cumbersome) implementation of different yaidom elements, including yaidom dialects (mostly outside of yaidom), like is the case now
-* Ability to tweak performance of (custom) element implementations, without affecting API stability
+* Ability to **tweak performance** of (custom) element implementations, without affecting **API stability**
 
-It is the latter that needs more attention from now on.
+It is the latter bullet point that needs more attention from now on.
 
 There is a moral to the story, especially when modelling complex typing scenarios like F-bounded polymorphism. Although the Scala
-compiler tries to abstract away the encoding of Scala code in class files, sometimes this is a **leaky abstraction**. Sometimes it
-does make a difference to the compiler whether it sees **Scala source code on the one hand or class files compiled from Scala source code**
-on the other hand.
+compiler tries to abstract away the encoding of Scala code in class files, sometimes this may be a **leaky abstraction**. Sometimes it
+makes sense to look at the **class files generated by the Scala compiler**, to get a feeling for what the Scala compiler sees
+when loading the class file in the absence of the corresponding source file.
 
 
 1.10.3
