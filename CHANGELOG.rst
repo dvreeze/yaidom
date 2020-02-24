@@ -27,7 +27,7 @@ What if we had used type classes instead to model F-bounded polymorphism? In our
 * How do these type classes help model node type hierarchies, supporting other kinds of nodes than just elements?
 * Even when exposing these type classes through generic OO APIs, we would still want to write specific optimized OO element APIs
 * After all, OO APIs can contain private redundant state, for optimal performance
-* In other words, custom OO element APIs can encapsulate performance improvements, without introducing any breaking changes
+* In other words, custom OO element APIs can **encapsulate** performance improvements, without introducing any breaking changes
 
 Given that yaidom is an important low-level dependency used in several critical production applications, the possibility to
 improve performance without breaking the API is quite desirable. Note that with type classes we could still develop a custom
@@ -44,7 +44,7 @@ This potentially makes it hard to optimize such custom element implementations i
 
 This is also an issue in a subtle way, when we look with javap into the class files of custom element implementations.
 Recall that the class files still contain generics (at one level) in the method signatures (of methods like filterElemsOrSelf), and that erasure
-only affects the byte code, not the method declarations. What we can see in class files are method signatures like:
+only affects the byte code, not the method declarations (at one level of generics). What we can see in class files are method signatures like:
 
 * def filterElemsOrSelf(p: ScopedElemLike => Boolean): immutable.IndexedSeq[ScopedElemLike]
 
@@ -57,7 +57,7 @@ There is a lesson to be learnt from this when further evolving the yaidom query 
 element type in the method signature should be implemented only in the concrete element class. For yaidom dialects this would
 be the common dialect element super-class. This may be at odds with the DRY principle, but API stability is more important here.
 
-So, evolving yaidom further should ideally be as follows with respect to the "curent element type" in the query API:
+So, evolving yaidom further should ideally be as follows with respect to the "current element type" in the query API:
 
 * Keep using type members for the "current element type" (no type parameters, no type classes)
 * Keep using the purely abstract element query API traits, with relaxed type constraints on the element type member
