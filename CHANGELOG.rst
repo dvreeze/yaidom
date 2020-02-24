@@ -78,7 +78,7 @@ when loading the class file in the absence of the corresponding source file.
 Related to this is that it makes sense to use **MiMa** on a regular basis in order to prevent any unwanted binary incompatibilities.
 For more background on binary (and source) compatibility, see `binary-compatibility`_.
 
-_`binary-compatibility`: https://docs.scala-lang.org/overviews/core/binary-compatibility-for-library-authors.html
+.. _`binary-compatibility`: https://docs.scala-lang.org/overviews/core/binary-compatibility-for-library-authors.html
 
 
 1.10.3
