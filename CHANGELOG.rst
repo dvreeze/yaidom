@@ -17,7 +17,7 @@ express pretty much the same with type members and type parameters (although typ
 After all:
 
 * Type ``ElemApi`` (using type members) is essentially type ``ElemApi[_]`` (using type parameters)
-* Type ``ElemApi { type ThisElem = E } `` (using type members) is essentially type ``ElemApi[E]`` (using type parameters)
+* Type ``ElemApi { type ThisElem = E }`` (using type members) is essentially type ``ElemApi[E]`` (using type parameters)
 
 It's just that for yaidom type members turned out to cause less "clutter" than type parameters.
 
