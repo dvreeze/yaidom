@@ -70,6 +70,11 @@ Then we can achieve the following:
 
 It is the latter that needs more attention from now on.
 
+There is a moral to the story, especially when modelling complex typing scenarios like F-bounded polymorphism. Although the Scala
+compiler tries to abstract away the encoding of Scala code in class files, sometimes this is a **leaky abstraction**. Sometimes it
+does make a difference to the compiler whether it sees **Scala source code on the one hand or class files compiled from Scala source code**
+on the other hand.
+
 
 1.10.3
 ======
