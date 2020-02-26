@@ -133,7 +133,7 @@ lazy val yaidom = crossProject(JSPlatform, JVMPlatform)
 
     testOptions += Tests.Argument(TestFrameworks.JUnit, "+q", "-v"),
 
-    mimaPreviousArtifacts := Set("eu.cdevreeze.yaidom" %%% "yaidom" % "1.10.2")
+    mimaPreviousArtifacts := Set("eu.cdevreeze.yaidom" %%% "yaidom" % "1.10.3")
   )
   .jsConfigure(_.enablePlugins(TzdbPlugin))
   .jsSettings(
@@ -156,7 +156,7 @@ lazy val yaidom = crossProject(JSPlatform, JVMPlatform)
       }
     },
 
-    mimaPreviousArtifacts := Set("eu.cdevreeze.yaidom" %%% "yaidom" % "1.10.2")
+    mimaPreviousArtifacts := Set("eu.cdevreeze.yaidom" %%% "yaidom" % "1.10.3")
   )
 
 lazy val yaidomJVM = yaidom.jvm
