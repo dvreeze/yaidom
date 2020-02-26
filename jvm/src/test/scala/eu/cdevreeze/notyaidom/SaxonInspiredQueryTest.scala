@@ -18,7 +18,7 @@ package eu.cdevreeze.notyaidom
 
 import scala.collection.immutable
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * Query test case, using a very naive mini version of an alternative yaidom, inspired by the streaming API
@@ -30,7 +30,7 @@ import org.scalatest.FunSuite
  *
  * @author Chris de Vreeze
  */
-class SaxonInspiredQueryTest extends FunSuite {
+class SaxonInspiredQueryTest extends AnyFunSuite {
 
   import SaxonInspiredQueryTest.ElemStepFactory._
   import SaxonInspiredQueryTest._

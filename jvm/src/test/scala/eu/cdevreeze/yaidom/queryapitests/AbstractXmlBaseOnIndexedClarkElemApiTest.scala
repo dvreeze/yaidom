@@ -23,14 +23,14 @@ import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi._
 import eu.cdevreeze.yaidom.queryapi.IndexedClarkElemApi
 import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * XML Base test case using an IndexedClarkElemApi.
  *
  * @author Chris de Vreeze
  */
-abstract class AbstractXmlBaseOnIndexedClarkElemApiTest extends FunSuite {
+abstract class AbstractXmlBaseOnIndexedClarkElemApiTest extends AnyFunSuite {
 
   private val XmlBaseEName = EName("http://www.w3.org/XML/1998/namespace", "base")
   private val XLinkNs = "http://www.w3.org/1999/xlink"

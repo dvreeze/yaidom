@@ -30,7 +30,7 @@ import eu.cdevreeze.yaidom.simple.NodeBuilder
 import eu.cdevreeze.yaidom.simple.NodeBuilder.elem
 import eu.cdevreeze.yaidom.simple.NodeBuilder.emptyElem
 import eu.cdevreeze.yaidom.simple.NodeBuilder.textElem
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import org.xml.sax.InputSource
 
 /**
@@ -44,7 +44,7 @@ import org.xml.sax.InputSource
  *
  * @author Chris de Vreeze
  */
-class BasicXmlProcessingTest extends FunSuite {
+class BasicXmlProcessingTest extends AnyFunSuite {
 
   import BasicXmlProcessingTest._
 

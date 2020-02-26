@@ -28,14 +28,14 @@ import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.simple.Document
 import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.simple.Node
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * Another XML functional update test case. More precisely, mainly a transformation test case.
  *
  * @author Chris de Vreeze
  */
-class AnotherUpdateTest extends FunSuite {
+class AnotherUpdateTest extends AnyFunSuite {
 
   private val docParser = DocumentParserUsingDom.newInstance()
 

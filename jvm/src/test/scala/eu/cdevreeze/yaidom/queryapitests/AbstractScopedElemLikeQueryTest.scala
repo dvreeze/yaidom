@@ -24,14 +24,14 @@ import eu.cdevreeze.yaidom.queryapi.ClarkElemApi.withEName
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi.withLocalName
 import eu.cdevreeze.yaidom.queryapi.ScopedElemApi
 import eu.cdevreeze.yaidom.queryapi.ScopedNodes
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * ScopedElemLike-based query test case.
  *
  * @author Chris de Vreeze
  */
-abstract class AbstractScopedElemLikeQueryTest extends FunSuite {
+abstract class AbstractScopedElemLikeQueryTest extends AnyFunSuite {
 
   type E <: ScopedNodes.Elem with ScopedElemApi.Aux[E]
 

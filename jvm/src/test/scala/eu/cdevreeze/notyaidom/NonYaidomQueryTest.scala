@@ -18,7 +18,7 @@ package eu.cdevreeze.notyaidom
 
 import scala.collection.immutable
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * Query test case, using a very naive mini version of yaidom, thus showing how
@@ -36,7 +36,7 @@ import org.scalatest.FunSuite
  *
  * @author Chris de Vreeze
  */
-class NonYaidomQueryTest extends FunSuite {
+class NonYaidomQueryTest extends AnyFunSuite {
 
   import NonYaidomQueryTest._
 

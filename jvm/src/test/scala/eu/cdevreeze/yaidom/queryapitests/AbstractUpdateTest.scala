@@ -28,14 +28,14 @@ import eu.cdevreeze.yaidom.queryapi.ElemWithPath
 import eu.cdevreeze.yaidom.queryapi.TransformableElemApi
 import eu.cdevreeze.yaidom.queryapi.UpdatableElemApi
 import eu.cdevreeze.yaidom.simple.Elem
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * Update test, using different yaidom methods of updating.
  *
  * @author Chris de Vreeze
  */
-abstract class AbstractUpdateTest extends FunSuite {
+abstract class AbstractUpdateTest extends AnyFunSuite {
 
   // Note below how we prevent the following error: "inferred type ... contains type selection from volatile type ..."
   // We do this by type E no longer extending type N.

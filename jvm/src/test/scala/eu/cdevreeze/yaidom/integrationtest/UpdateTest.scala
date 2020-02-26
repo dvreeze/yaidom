@@ -34,14 +34,14 @@ import eu.cdevreeze.yaidom.simple.NodeBuilder
 import eu.cdevreeze.yaidom.simple.Text
 import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.transform.TransformerFactory
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * XML functional update test case.
  *
  * @author Chris de Vreeze
  */
-class UpdateTest extends FunSuite {
+class UpdateTest extends AnyFunSuite {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 

@@ -30,14 +30,14 @@ import eu.cdevreeze.yaidom.utils.NamespaceUtils.findENamesInElementItself
 import eu.cdevreeze.yaidom.utils.NamespaceUtils.findNamespacesInElementItself
 import eu.cdevreeze.yaidom.utils.NamespaceUtils.pushUpPrefixedNamespaces
 import eu.cdevreeze.yaidom.utils.NamespaceUtils.stripUnusedNamespaces
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * NamespaceUtilsTest test case. See http://www.lenzconsulting.com/namespaces/ for the test data.
  *
  * @author Chris de Vreeze
  */
-class NamespaceUtilsTest extends FunSuite {
+class NamespaceUtilsTest extends AnyFunSuite {
 
   private val docParser = DocumentParserUsingSax.newInstance
 

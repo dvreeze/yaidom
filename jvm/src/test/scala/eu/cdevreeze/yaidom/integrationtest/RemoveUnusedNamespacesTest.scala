@@ -31,7 +31,7 @@ import eu.cdevreeze.yaidom.utils.NamespaceUtils.pushUpPrefixedNamespaces
 import eu.cdevreeze.yaidom.utils.NamespaceUtils.stripUnusedNamespaces
 import eu.cdevreeze.yaidom.utils.SimpleTextENameExtractor
 import eu.cdevreeze.yaidom.utils.TextENameExtractor
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * Test case for removing unused namespaces, which is a somewhat shady area of XML. Yaidom makes automatic unused namespace removal quite possible,
@@ -42,7 +42,7 @@ import org.scalatest.FunSuite
  *
  * @author Chris de Vreeze
  */
-class RemoveUnusedNamespacesTest extends FunSuite {
+class RemoveUnusedNamespacesTest extends AnyFunSuite {
 
   /**
    * See http://stackoverflow.com/questions/23002655/xquery-how-to-remove-unused-namespace-in-xml-node.

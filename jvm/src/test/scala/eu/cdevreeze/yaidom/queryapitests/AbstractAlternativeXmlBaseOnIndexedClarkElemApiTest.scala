@@ -25,7 +25,7 @@ import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
 import eu.cdevreeze.yaidom.queryapi.IndexedClarkElemApi
 import eu.cdevreeze.yaidom.queryapi.XmlBaseSupport
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * Alternative XML Base test case.
@@ -36,7 +36,7 @@ import org.scalatest.FunSuite
  *
  * @author Chris de Vreeze
  */
-abstract class AbstractAlternativeXmlBaseOnIndexedClarkElemApiTest extends FunSuite {
+abstract class AbstractAlternativeXmlBaseOnIndexedClarkElemApiTest extends AnyFunSuite {
 
   import yaidom.simple.Node._
 

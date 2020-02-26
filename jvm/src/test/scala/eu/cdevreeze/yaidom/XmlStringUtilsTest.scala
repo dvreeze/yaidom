@@ -16,7 +16,7 @@
 
 package eu.cdevreeze.yaidom
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * Test case for [[eu.cdevreeze.yaidom.XmlStringUtils]].
@@ -26,7 +26,7 @@ import org.scalatest.FunSuite
  * @author Chris de Vreeze
  */
 
-class XmlStringUtilsTest extends FunSuite {
+class XmlStringUtilsTest extends AnyFunSuite {
 
   test("testNameValidity") {
     import XmlStringUtils._

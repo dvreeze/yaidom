@@ -40,9 +40,11 @@ lazy val commonSettings = Seq(
   pomExtra := pomData,
   pomIncludeRepository := { _ => false },
 
-  libraryDependencies += "org.scala-lang.modules" %%% "scala-xml" % "1.2.0",
+  libraryDependencies += "org.scala-lang.modules" %%% "scala-xml" % "2.0.0-M1",
 
-  libraryDependencies += "org.scalatest" %%% "scalatest" % "3.0.8" % "test"
+  libraryDependencies += "org.scalatest" %%% "scalatest" % "3.1.1" % "test",
+
+  libraryDependencies += "org.scalatestplus" %%% "scalacheck-1-14" % "3.1.1.1" % "test"
 )
 
 lazy val root = project.in(file("."))
@@ -79,7 +81,7 @@ lazy val yaidom = crossProject(JSPlatform, JVMPlatform)
 
     libraryDependencies += "junit" % "junit" % "4.12" % "test",
 
-    libraryDependencies += "org.scalacheck" %%% "scalacheck" % "1.14.2" % "test",
+    libraryDependencies += "org.scalacheck" %%% "scalacheck" % "1.14.3" % "test",
 
     // JUnit tests (the ones intentionally written in Java) should run as well
 
@@ -133,6 +135,7 @@ lazy val yaidom = crossProject(JSPlatform, JVMPlatform)
 
     mimaPreviousArtifacts := Set("eu.cdevreeze.yaidom" %%% "yaidom" % "1.10.2")
   )
+  .jsConfigure(_.enablePlugins(TzdbPlugin))
   .jsSettings(
     // Add support for the DOM in `run` and `test`
     jsEnv := new org.scalajs.jsenv.jsdomnodejs.JSDOMNodeJSEnv(),
@@ -157,7 +160,7 @@ lazy val yaidom = crossProject(JSPlatform, JVMPlatform)
   )
 
 lazy val yaidomJVM = yaidom.jvm
-lazy val yaidomJS = yaidom.js.enablePlugins(TzdbPlugin)
+lazy val yaidomJS = yaidom.js
 
 lazy val pomData =
   <url>https://github.com/dvreeze/yaidom</url>

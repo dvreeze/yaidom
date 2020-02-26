@@ -35,14 +35,14 @@ import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.scalaxml.ScalaXmlElem
 import eu.cdevreeze.yaidom.simple.Document
 import eu.cdevreeze.yaidom.simple.Elem
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * Test case using yaidom for mileage records.
  *
  * @author Chris de Vreeze
  */
-class MileageRecordsTest extends FunSuite {
+class MileageRecordsTest extends AnyFunSuite {
 
   import MileageRecordsTest.MileageRecords
 

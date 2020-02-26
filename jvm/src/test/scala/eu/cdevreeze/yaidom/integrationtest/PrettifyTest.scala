@@ -27,7 +27,7 @@ import eu.cdevreeze.yaidom.simple.Node
 import eu.cdevreeze.yaidom.simple.Text
 import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import org.xml.sax.EntityResolver
 import org.xml.sax.InputSource
 
@@ -42,7 +42,7 @@ import org.xml.sax.InputSource
  *
  * @author Chris de Vreeze
  */
-class PrettifyTest extends FunSuite {
+class PrettifyTest extends AnyFunSuite {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 

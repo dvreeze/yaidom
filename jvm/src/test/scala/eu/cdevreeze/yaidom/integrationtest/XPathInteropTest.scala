@@ -30,7 +30,7 @@ import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
 import javax.xml.xpath.XPathConstants
 import javax.xml.xpath.XPathFactory
 import org.scalatest.BeforeAndAfterAll
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import org.w3c.dom.Node
 import org.w3c.dom.NodeList
 
@@ -40,7 +40,7 @@ import org.w3c.dom.NodeList
  *
  * @author Chris de Vreeze
  */
-class XPathInteropTest extends FunSuite with BeforeAndAfterAll {
+class XPathInteropTest extends AnyFunSuite with BeforeAndAfterAll {
 
   test("testProcessXPathResults") {
     val ns = "http://bookstore"

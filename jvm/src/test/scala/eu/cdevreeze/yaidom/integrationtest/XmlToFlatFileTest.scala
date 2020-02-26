@@ -21,7 +21,7 @@ import java.{io => jio}
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingStax
 import eu.cdevreeze.yaidom.simple.Elem
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import org.xml.sax.InputSource
 
 /**
@@ -30,7 +30,7 @@ import org.xml.sax.InputSource
  *
  * @author Chris de Vreeze
  */
-class XmlToFlatFileTest extends FunSuite {
+class XmlToFlatFileTest extends AnyFunSuite {
 
   test("testConvertXmlToFlatFile") {
     val docParser = DocumentParserUsingStax.newInstance

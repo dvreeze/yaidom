@@ -24,7 +24,7 @@ import eu.cdevreeze.yaidom.dom
 import eu.cdevreeze.yaidom.indexed
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.simple.Elem
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * Alternative updates test case. It demonstrates many ways of performing functional updates.
@@ -35,7 +35,7 @@ import org.scalatest.FunSuite
  *
  * @author Chris de Vreeze
  */
-class AlternativeUpdatesTest extends FunSuite {
+class AlternativeUpdatesTest extends AnyFunSuite {
 
   test("testRetainFirstAuthorsUsingTransformElemsOrSelf") {
     val updatedElem = bookstore transformElemsOrSelf {

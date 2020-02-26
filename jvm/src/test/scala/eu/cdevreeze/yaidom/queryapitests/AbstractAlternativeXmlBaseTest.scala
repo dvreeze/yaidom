@@ -26,7 +26,7 @@ import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.queryapi.DocumentApi
 import eu.cdevreeze.yaidom.queryapi.ScopedElemApi
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * Alternative XML Base test case. It tests some expectations about XML Base support for different element implementations.
@@ -38,7 +38,7 @@ import org.scalatest.FunSuite
  *
  * @author Chris de Vreeze
  */
-abstract class AbstractAlternativeXmlBaseTest extends FunSuite {
+abstract class AbstractAlternativeXmlBaseTest extends AnyFunSuite {
 
   import yaidom.simple.Node._
 

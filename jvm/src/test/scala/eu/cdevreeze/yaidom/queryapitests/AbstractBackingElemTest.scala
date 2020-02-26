@@ -25,14 +25,14 @@ import eu.cdevreeze.yaidom.core.PathBuilder
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.queryapi.BackingNodes
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * BackingElemNodeApi test case.
  *
  * @author Chris de Vreeze
  */
-abstract class AbstractBackingElemTest extends FunSuite {
+abstract class AbstractBackingElemTest extends AnyFunSuite {
 
   private val XsNamespace = "http://www.w3.org/2001/XMLSchema"
   private val XLinkNamespace = "http://www.w3.org/1999/xlink"

@@ -27,7 +27,7 @@ import eu.cdevreeze.yaidom.simple
 import org.scalajs.dom.experimental.domparser.DOMParser
 import org.scalajs.dom.experimental.domparser.SupportedType
 import org.scalatest.BeforeAndAfterAll
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * DOM wrapper test case.
@@ -38,7 +38,7 @@ import org.scalatest.FunSuite
  *
  * @author Chris de Vreeze
  */
-class JsDomWrapperTest extends FunSuite with BeforeAndAfterAll {
+class JsDomWrapperTest extends AnyFunSuite with BeforeAndAfterAll {
 
   private val nsBookstore = "http://bookstore"
   private val nsGoogle = "http://www.google.com"

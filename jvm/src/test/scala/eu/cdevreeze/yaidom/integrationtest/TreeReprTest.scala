@@ -24,7 +24,7 @@ import eu.cdevreeze.yaidom.simple.DocBuilder
 import eu.cdevreeze.yaidom.simple.Document
 import eu.cdevreeze.yaidom.simple.EntityRef
 import javax.xml.parsers.DocumentBuilderFactory
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import org.xml.sax.InputSource
 
 /**
@@ -40,7 +40,7 @@ import org.xml.sax.InputSource
  *
  * @author Chris de Vreeze
  */
-class TreeReprTest extends FunSuite {
+class TreeReprTest extends AnyFunSuite {
 
   import eu.cdevreeze.yaidom.simple.DocBuilder._
   import eu.cdevreeze.yaidom.simple.NodeBuilder._

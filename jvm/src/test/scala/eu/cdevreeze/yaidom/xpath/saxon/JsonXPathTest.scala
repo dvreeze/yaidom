@@ -18,14 +18,14 @@ package eu.cdevreeze.yaidom.xpath.saxon
 
 import eu.cdevreeze.yaidom.core.EName
 import net.sf.saxon.s9api.Processor
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * JSON XPath test case using JAXP backed by Saxon.
  *
  * @author Chris de Vreeze
  */
-class JsonXPathTest extends FunSuite {
+class JsonXPathTest extends AnyFunSuite {
 
   private val processor = new Processor(false)
 

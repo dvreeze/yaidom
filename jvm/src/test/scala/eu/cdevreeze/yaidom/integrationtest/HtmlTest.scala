@@ -28,7 +28,7 @@ import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.simple.Elem
 import org.ccil.cowan.tagsoup.jaxp.SAXFactoryImpl
 import org.scalatest.BeforeAndAfterAll
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import org.xml.sax.InputSource
 
 /**
@@ -36,7 +36,7 @@ import org.xml.sax.InputSource
  *
  * @author Chris de Vreeze
  */
-class HtmlTest extends FunSuite with BeforeAndAfterAll {
+class HtmlTest extends AnyFunSuite with BeforeAndAfterAll {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 

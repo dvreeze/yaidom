@@ -24,14 +24,14 @@ import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.indexed.IndexedClarkElem
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi.withEName
 import eu.cdevreeze.yaidom.queryapi.ClarkNodes
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * ElemLike-based query test case, using an XBRL instance as sample data.
  *
  * @author Chris de Vreeze
  */
-abstract class AbstractXbrlInstanceQueryTest extends FunSuite {
+abstract class AbstractXbrlInstanceQueryTest extends AnyFunSuite {
 
   type E <: ClarkNodes.Elem.Aux[_, E]
 

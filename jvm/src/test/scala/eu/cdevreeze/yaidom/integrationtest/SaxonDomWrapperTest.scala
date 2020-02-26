@@ -30,7 +30,7 @@ import javax.xml.transform.stream.StreamSource
 import net.sf.saxon.dom.NodeOverNodeInfo
 import net.sf.saxon.lib.ParseOptions
 import net.sf.saxon.s9api.Processor
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import org.xml.sax.EntityResolver
 import org.xml.sax.InputSource
 
@@ -43,7 +43,7 @@ import org.xml.sax.InputSource
  *
  * @author Chris de Vreeze
  */
-class SaxonDomWrapperTest extends FunSuite {
+class SaxonDomWrapperTest extends AnyFunSuite {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 

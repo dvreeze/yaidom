@@ -23,14 +23,14 @@ import eu.cdevreeze.yaidom.core.jvm.CaffeineQNameProvider
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
 import eu.cdevreeze.yaidom.simple.Document
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * Name pooling test, using Google Guava cache based EName and QName providers.
  *
  * @author Chris de Vreeze
  */
-class NamePoolingTest extends FunSuite {
+class NamePoolingTest extends AnyFunSuite {
 
   import ClarkElemApi._
   import NamePoolingTest._

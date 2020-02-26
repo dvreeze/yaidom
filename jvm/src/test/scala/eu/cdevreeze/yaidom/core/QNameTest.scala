@@ -16,14 +16,14 @@
 
 package eu.cdevreeze.yaidom.core
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * QName test case.
  *
  * @author Chris de Vreeze
  */
-class QNameTest extends FunSuite {
+class QNameTest extends AnyFunSuite {
 
   test("testUnprefixedName") {
     val qname = UnprefixedName("Bookstore")

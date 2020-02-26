@@ -34,7 +34,7 @@ import eu.cdevreeze.yaidom.utils.DocumentENameExtractor
 import eu.cdevreeze.yaidom.utils.NamespaceUtils
 import eu.cdevreeze.yaidom.utils.SimpleTextENameExtractor
 import eu.cdevreeze.yaidom.utils.TextENameExtractor
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * Code of yaidom XBRL blog ("introducing yaidom, using XBRL examples"). The blog introduces yaidom in the context
@@ -45,7 +45,7 @@ import org.scalatest.FunSuite
  *
  * @author Chris de Vreeze
  */
-class BlogXbrlTest extends FunSuite with AbstractBlogXbrlTestSupport {
+class BlogXbrlTest extends AnyFunSuite with AbstractBlogXbrlTestSupport {
 
   private val sampleXbrlInstanceFile: java.io.File =
     (new java.io.File(classOf[BlogXbrlTest].getResource("sample-Instance-Proof.xml").toURI))

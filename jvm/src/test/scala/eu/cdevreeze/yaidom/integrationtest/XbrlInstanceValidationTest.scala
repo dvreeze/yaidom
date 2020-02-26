@@ -29,14 +29,14 @@ import eu.cdevreeze.yaidom.queryapi.IndexedScopedElemApi
 import eu.cdevreeze.yaidom.queryapi.ScopedElemLike
 import eu.cdevreeze.yaidom.queryapi.SubtypeAwareElemLike
 import eu.cdevreeze.yaidom.simple.Document
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * Test case using yaidom XML dialect support for "schema validation" of XBRL instance w.r.t. the syntactic structure.
  *
  * @author Chris de Vreeze
  */
-class XbrlInstanceValidationTest extends FunSuite {
+class XbrlInstanceValidationTest extends AnyFunSuite {
 
   import XbrlInstanceValidationTest._
 

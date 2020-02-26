@@ -19,14 +19,14 @@ package eu.cdevreeze.yaidom.core
 import scala.jdk.CollectionConverters._
 
 import eu.cdevreeze.yaidom.core.jvm.NamespaceContexts
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * Scope test case.
  *
  * @author Chris de Vreeze
  */
-class ScopeTest extends FunSuite {
+class ScopeTest extends AnyFunSuite {
 
   test("testCreateScope") {
     intercept[Exception] {

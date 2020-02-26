@@ -29,7 +29,7 @@ import eu.cdevreeze.yaidom.queryapi.ClarkElemApi._
 import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.simple.ElemBuilder
 import eu.cdevreeze.yaidom.simple.NodeBuilder
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * ElemLike test case.
@@ -40,7 +40,7 @@ import org.scalatest.FunSuite
  *
  * @author Chris de Vreeze
  */
-class ElemLikeTest extends FunSuite {
+class ElemLikeTest extends AnyFunSuite {
 
   private val ns = "http://bookstore"
 

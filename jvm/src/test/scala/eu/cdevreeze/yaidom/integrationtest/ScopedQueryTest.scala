@@ -22,14 +22,14 @@ import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi._
 import eu.cdevreeze.yaidom.resolved
 import org.scalatest.BeforeAndAfterAll
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * QName-based query test.
  *
  * @author Chris de Vreeze
  */
-class ScopedQueryTest extends FunSuite with BeforeAndAfterAll {
+class ScopedQueryTest extends AnyFunSuite with BeforeAndAfterAll {
 
   test("testQueryBooks") {
     val docParser = DocumentParserUsingSax.newInstance()

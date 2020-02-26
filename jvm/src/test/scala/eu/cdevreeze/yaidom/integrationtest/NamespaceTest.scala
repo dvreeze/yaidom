@@ -27,7 +27,7 @@ import eu.cdevreeze.yaidom.print.DocumentPrinterUsingSax
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.simple.Node
 import eu.cdevreeze.yaidom.simple.NodeBuilder
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import org.xml.sax.InputSource
 
 /**
@@ -37,7 +37,7 @@ import org.xml.sax.InputSource
  *
  * @author Chris de Vreeze
  */
-class NamespaceTest extends FunSuite {
+class NamespaceTest extends AnyFunSuite {
 
   val nsAtom = "http://www.w3.org/2005/Atom"
   val nsXhtml = "http://www.w3.org/1999/xhtml"

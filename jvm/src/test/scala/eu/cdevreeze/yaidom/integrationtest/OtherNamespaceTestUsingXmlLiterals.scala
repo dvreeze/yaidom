@@ -24,7 +24,7 @@ import eu.cdevreeze.yaidom.queryapi.ClarkElemApi._
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.simple.Document
 import eu.cdevreeze.yaidom.simple.NodeBuilder
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * Test case testing the use of namespaces in immutable Documents, using converted Scala XML literals.
@@ -34,7 +34,7 @@ import org.scalatest.FunSuite
  *
  * @author Chris de Vreeze
  */
-class OtherNamespaceTestUsingXmlLiterals extends FunSuite {
+class OtherNamespaceTestUsingXmlLiterals extends AnyFunSuite {
 
   test("testNamespaceDeclaration") {
     val xml =

@@ -35,7 +35,7 @@ import eu.cdevreeze.yaidom.simple.Node
 import eu.cdevreeze.yaidom.simple.NodeBuilder
 import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.parsers.SAXParserFactory
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import org.w3c.dom.DOMException
 import org.xml.sax.InputSource
 import org.xml.sax.SAXParseException
@@ -61,7 +61,7 @@ import org.xml.sax.SAXParseException
  *
  * @author Chris de Vreeze
  */
-class TheCaseForYaidomTest extends FunSuite {
+class TheCaseForYaidomTest extends AnyFunSuite {
 
   /**
    * Our XML, which is not namespace-well-formed.

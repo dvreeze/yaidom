@@ -23,7 +23,7 @@ import org.scalacheck.Gen.listOfN
 import org.scalacheck.Gen.oneOf
 import org.scalacheck.Gen.someOf
 import org.scalacheck.Prop.propBoolean
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import org.scalatestplus.scalacheck.Checkers
 
 /**
@@ -31,7 +31,7 @@ import org.scalatestplus.scalacheck.Checkers
  *
  * @author Chris de Vreeze
  */
-class ScopePropTest extends FunSuite with Checkers {
+class ScopePropTest extends AnyFunSuite with Checkers {
 
   test("testResolveProperty") {
     check({ (scope1: Scope, scope2: Scope) =>

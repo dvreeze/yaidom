@@ -17,7 +17,7 @@
 package eu.cdevreeze.yaidom.blogcode
 
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * Code of yaidom blog 2 ("namespaces in yaidom"). The blog uses the excellent article http://www.lenzconsulting.com/namespaces/.
@@ -33,7 +33,7 @@ import org.scalatest.FunSuite
  *
  * @author Chris de Vreeze
  */
-class Blog2Test extends FunSuite {
+class Blog2Test extends AnyFunSuite {
 
   private val pathToParentDir: java.io.File =
     (new java.io.File(classOf[Blog2Test].getResource("feed1.txt").toURI)).getParentFile

@@ -36,7 +36,7 @@ import eu.cdevreeze.yaidom.simple.NodeBuilder.emptyElem
 import eu.cdevreeze.yaidom.simple.NodeBuilder.textElem
 import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.transform.TransformerFactory
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * Test case using yaidom on the FriendFeed example, used in https://www.ibm.com/developerworks/library/x-scalaxml/.
@@ -45,7 +45,7 @@ import org.scalatest.FunSuite
  *
  * @author Chris de Vreeze
  */
-class FriendFeedTest extends FunSuite {
+class FriendFeedTest extends AnyFunSuite {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 

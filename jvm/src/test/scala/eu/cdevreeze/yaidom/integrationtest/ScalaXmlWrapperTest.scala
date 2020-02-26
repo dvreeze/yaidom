@@ -25,7 +25,7 @@ import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.scalaxml._
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import org.xml.sax.InputSource
 
 /**
@@ -37,7 +37,7 @@ import org.xml.sax.InputSource
  *
  * @author Chris de Vreeze
  */
-class ScalaXmlWrapperTest extends FunSuite {
+class ScalaXmlWrapperTest extends AnyFunSuite {
 
   private val logger: jutil.logging.Logger = jutil.logging.Logger.getLogger("eu.cdevreeze.yaidom.integrationtest")
 

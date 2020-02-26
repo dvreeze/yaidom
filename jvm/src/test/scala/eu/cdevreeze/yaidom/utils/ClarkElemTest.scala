@@ -23,14 +23,14 @@ import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi.withEName
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.simple
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * ClarkElem test case.
  *
  * @author Chris de Vreeze
  */
-class ClarkElemTest extends FunSuite {
+class ClarkElemTest extends AnyFunSuite {
 
   private val docParser = DocumentParserUsingSax.newInstance
 
