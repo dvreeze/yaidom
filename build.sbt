@@ -137,36 +137,11 @@ lazy val yaidom = crossProject(JSPlatform, JVMPlatform)
     // Add support for the DOM in `run` and `test`
     jsEnv := new org.scalajs.jsenv.jsdomnodejs.JSDOMNodeJSEnv(),
 
-    // It turns out that scalajs-jsjoda is far more complete than scalajs-java-time!
-
-    libraryDependencies ++= {
-      scalaBinaryVersion.value match {
-        case "2.13" => Seq()
-        case _      =>
-          Seq(
-            "com.zoepepper" %%% "scalajs-jsjoda" % "1.1.2",
-            "com.zoepepper" %%% "scalajs-jsjoda-as-java-time" % "1.1.2")
-      }
-    },
-
-    jsDependencies ++= {
-      scalaBinaryVersion.value match {
-        case "2.13" => Seq()
-        case _      =>
-          Seq(
-            "org.webjars.npm" % "js-joda" % "1.3.0" / "dist/js-joda.js" minified "dist/js-joda.min.js",
-            "org.webjars.npm" % "js-joda-timezone" % "1.0.0" / "dist/js-joda-timezone.js" minified "dist/js-joda-timezone.min.js")
-      }
-    },
+    libraryDependencies += "io.github.cquiroz" %%% "scala-java-time" % "2.0.0-RC3",
 
     libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "1.0.0",
 
-    libraryDependencies ++= {
-      scalaBinaryVersion.value match {
-        case "2.13" => Seq()
-        case _      => Seq("com.lihaoyi" %%% "scalatags" % "0.7.0" % "optional")
-      }
-    },
+    libraryDependencies += "com.lihaoyi" %%% "scalatags" % "0.8.6" % "optional",
 
     Test / parallelExecution := false,
 
@@ -182,7 +157,7 @@ lazy val yaidom = crossProject(JSPlatform, JVMPlatform)
   )
 
 lazy val yaidomJVM = yaidom.jvm
-lazy val yaidomJS = yaidom.js
+lazy val yaidomJS = yaidom.js.enablePlugins(TzdbPlugin)
 
 lazy val pomData =
   <url>https://github.com/dvreeze/yaidom</url>
