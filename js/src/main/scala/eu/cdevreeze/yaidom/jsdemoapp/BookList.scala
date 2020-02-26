@@ -28,8 +28,9 @@ import scala.util.Success
 
 import org.scalajs.dom.console
 import org.scalajs.dom.window
+import org.scalajs.dom.MouseEvent
 import org.scalajs.dom.ext.Ajax
-import org.scalajs.dom.raw._
+import org.scalajs.dom.html.{Option => _, _}
 
 import eu.cdevreeze.yaidom.convert.JsDomConversions
 import eu.cdevreeze.yaidom.core.EName
@@ -88,7 +89,7 @@ object BookList {
   }
 
   def displayBooks(): Unit = {
-    def detailRow(elem: JsDomElem): HTMLTableRowElement = {
+    def detailRow(elem: JsDomElem): TableRow = {
       tr(attr("data-genre") := elem.attribute(EName("CAT")))(
         td(elem.getChildElem(_.localName == "AUTHOR").text),
         td(elem.getChildElem(_.localName == "TITLE").text),
@@ -98,7 +99,7 @@ object BookList {
     val bookListDocElem: JsDomElem =
       bookListDoc.ensuring(_ != null, s"Document (element) must not be null").documentElement
 
-    val bookTable: HTMLTableElement =
+    val bookTable: Table =
       table(id := "book-table")(
         thead(
           tr(
@@ -112,7 +113,7 @@ object BookList {
   }
 
   def displayGenres(): Unit = {
-    def detailRow(elem: JsDomElem): HTMLTableRowElement = {
+    def detailRow(elem: JsDomElem): TableRow = {
       val code = elem.attribute(EName("CODE"))
 
       tr(
@@ -125,7 +126,7 @@ object BookList {
     val bookListDocElem: JsDomElem =
       bookListDoc.ensuring(_ != null, s"Document (element) must not be null").documentElement
 
-    val genresTable: HTMLTableElement =
+    val genresTable: Table =
       table(id := "genre-table")(
         thead(
           tr(
@@ -134,19 +135,19 @@ object BookList {
         tbody(
           bookListDocElem.filterElems(_.localName == "CATEGORY").map(e => detailRow(e)))).render
 
-    val genresForm: HTMLFormElement = form(genresTable).render
+    val genresForm: Form = form(genresTable).render
 
     genresDiv.appendChild(genresForm)
   }
 
   def addGenreOnclickHandlers(): Unit = {
-    val genreInputElems: immutable.IndexedSeq[HTMLInputElement] = genresDivAsJsDomElem
+    val genreInputElems: immutable.IndexedSeq[Input] = genresDivAsJsDomElem
       .filterElems { e =>
         e.localName.toLowerCase == "input" &&
           e.attributeOption(EName("type")).contains("checkbox") &&
           e.attributeOption(EName("name")).contains("genre")
       }
-      .map(_.wrappedNode.asInstanceOf[HTMLInputElement])
+      .map(_.wrappedNode.asInstanceOf[Input])
 
     genreInputElems.foreach { genreInputElem =>
       genreInputElem.onclick = { event: MouseEvent =>
@@ -170,7 +171,7 @@ object BookList {
 
   def addTableHeaderOnclickHandlers(headerCellElems: immutable.IndexedSeq[JsDomElem]): Unit = {
     headerCellElems.foreach { headerCellElem =>
-      val headerCell = headerCellElem.wrappedNode.asInstanceOf[HTMLTableHeaderCellElement]
+      val headerCell = headerCellElem.wrappedNode.asInstanceOf[TableCell]
 
       headerCell.onclick = { event: MouseEvent =>
         val headerCellJsDomElem =
@@ -194,7 +195,7 @@ object BookList {
   def addTableHeaderOnMouseoverHandlers(headerCellElems: immutable.IndexedSeq[JsDomElem]): Unit = {
     headerCellElems
       .foreach { headerCellElem =>
-        val headerCell = headerCellElem.wrappedNode.asInstanceOf[HTMLTableHeaderCellElement]
+        val headerCell = headerCellElem.wrappedNode.asInstanceOf[TableCell]
 
         headerCell.onmouseover = { event: MouseEvent =>
           sortToolTipDiv.style.left = s"${event.clientX + 30}px"
@@ -207,7 +208,7 @@ object BookList {
   def addTableHeaderOnMouseoutHandlers(headerCellElems: immutable.IndexedSeq[JsDomElem]): Unit = {
     headerCellElems
       .foreach { headerCellElem =>
-        val headerCell = headerCellElem.wrappedNode.asInstanceOf[HTMLTableHeaderCellElement]
+        val headerCell = headerCellElem.wrappedNode.asInstanceOf[TableCell]
 
         headerCell.onmouseout = { event: MouseEvent =>
           sortToolTipDiv.style.visibility = "hidden"
@@ -217,12 +218,12 @@ object BookList {
 
   // Private methods
 
-  private def getBookRowsForGenre(genre: String): immutable.IndexedSeq[HTMLTableRowElement] = {
+  private def getBookRowsForGenre(genre: String): immutable.IndexedSeq[TableRow] = {
     booksDivAsJsDomElem
       .filterElems { e =>
         e.localName.toLowerCase == "tr" && e.attributeOption(EName("data-genre")).contains(genre)
       }
-      .map(_.wrappedNode.asInstanceOf[HTMLTableRowElement])
+      .map(_.wrappedNode.asInstanceOf[TableRow])
   }
 
   // Generic table sort
@@ -294,32 +295,32 @@ object BookList {
     findElemOrSelfByNameAndId("h1", "title").get
   }
 
-  private def titleHeading: HTMLHeadingElement = {
-    titleHeadingAsJsDomElem.wrappedNode.asInstanceOf[HTMLHeadingElement]
+  private def titleHeading: Heading = {
+    titleHeadingAsJsDomElem.wrappedNode.asInstanceOf[Heading]
   }
 
   private def booksDivAsJsDomElem: JsDomElem = {
     findElemOrSelfByNameAndId("div", "books").get
   }
 
-  private def booksDiv: HTMLDivElement = {
-    booksDivAsJsDomElem.wrappedNode.asInstanceOf[HTMLDivElement]
+  private def booksDiv: Div = {
+    booksDivAsJsDomElem.wrappedNode.asInstanceOf[Div]
   }
 
   private def genresDivAsJsDomElem: JsDomElem = {
     findElemOrSelfByNameAndId("div", "genres").get
   }
 
-  private def genresDiv: HTMLDivElement = {
-    genresDivAsJsDomElem.wrappedNode.asInstanceOf[HTMLDivElement]
+  private def genresDiv: Div = {
+    genresDivAsJsDomElem.wrappedNode.asInstanceOf[Div]
   }
 
   private def sortToolTipDivAsJsDomElem: JsDomElem = {
     findElemOrSelfByNameAndId("div", "sortToolTip").get
   }
 
-  private def sortToolTipDiv: HTMLDivElement = {
-    sortToolTipDivAsJsDomElem.wrappedNode.asInstanceOf[HTMLDivElement]
+  private def sortToolTipDiv: Div = {
+    sortToolTipDivAsJsDomElem.wrappedNode.asInstanceOf[Div]
   }
 
   // Helper method for getting DOM content

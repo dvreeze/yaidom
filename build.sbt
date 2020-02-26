@@ -134,7 +134,7 @@ lazy val yaidom = crossProject(JSPlatform, JVMPlatform)
     mimaPreviousArtifacts := Set("eu.cdevreeze.yaidom" %%% "yaidom" % "1.10.2")
   )
   .jsSettings(
-    // Do we need this jsEnv?
+    // Add support for the DOM in `run` and `test`
     jsEnv := new org.scalajs.jsenv.jsdomnodejs.JSDOMNodeJSEnv(),
 
     // It turns out that scalajs-jsjoda is far more complete than scalajs-java-time!
@@ -159,7 +159,7 @@ lazy val yaidom = crossProject(JSPlatform, JVMPlatform)
       }
     },
 
-    libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "0.9.7",
+    libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "1.0.0",
 
     libraryDependencies ++= {
       scalaBinaryVersion.value match {
