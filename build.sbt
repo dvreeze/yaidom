@@ -140,7 +140,7 @@ lazy val yaidom = crossProject(JSPlatform, JVMPlatform)
     // Add support for the DOM in `run` and `test`
     jsEnv := new org.scalajs.jsenv.jsdomnodejs.JSDOMNodeJSEnv(),
 
-    libraryDependencies += "io.github.cquiroz" %%% "scala-java-time" % "2.0.0-RC3",
+    libraryDependencies += "io.github.cquiroz" %%% "scala-java-time" % "2.0.0-RC5",
 
     libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "1.0.0",
 
