@@ -141,14 +141,6 @@ final class Document(
   def updateElemsWithNodeSeq(paths: Set[Path])(f: (Elem, Path) => immutable.IndexedSeq[Node]): Document =
     withDocumentElement(this.documentElement.updateElemsWithNodeSeq(paths)(f))
 
-  /** Returns `withDocumentElement(this.documentElement.updateTopmostElemsOrSelf(f))` */
-  def updateTopmostElemsOrSelf(f: (Elem, Path) => Option[Elem]): Document =
-    withDocumentElement(this.documentElement.updateTopmostElemsOrSelf(f))
-
-  /** Returns `withDocumentElement(this.documentElement.updateTopmostElemsWithNodeSeq(f))` */
-  def updateTopmostElemsWithNodeSeq(f: (Elem, Path) => Option[immutable.IndexedSeq[Node]]): Document =
-    withDocumentElement(this.documentElement.updateTopmostElemsWithNodeSeq(f))
-
   /** Returns `withDocumentElement(this.documentElement.transformElemsOrSelf(f))` */
   def transformElemsOrSelf(f: Elem => Elem): Document =
     withDocumentElement(this.documentElement.transformElemsOrSelf(f))

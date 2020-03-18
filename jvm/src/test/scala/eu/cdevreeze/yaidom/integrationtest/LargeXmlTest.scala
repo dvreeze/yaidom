@@ -453,44 +453,6 @@ class LargeXmlTest extends AnyFunSuite with BeforeAndAfterAll {
     assertResult(false) {
       oldPhoneElm.text == newPhone
     }
-
-    // Update, using a fixed path.
-
-    val start2Ms = System.currentTimeMillis()
-    val newDocElem = doc.documentElement updateTopmostElemsWithNodeSeq { (elem, p) =>
-      if (p == path) Some(Vector(elem.withChildren(Vector(Text(newPhone, false))))) else None
-    }
-    val updatedDoc: Document = doc.withDocumentElement(newDocElem)
-    val end2Ms = System.currentTimeMillis()
-    logger.info(s"Updating an element in the document (using bulk updates) took ${end2Ms - start2Ms} ms")
-
-    val newPhoneElm: Elem = updatedDoc.documentElement.findElemOrSelfByPath(path).getOrElse(sys.error("Expected element at path: " + path))
-
-    assertResult(true) {
-      newPhoneElm.text == newPhone
-    }
-
-    // Comparing the corresponding resolved elements
-
-    val resolvedElm1: resolved.Elem = resolved.Elem.from(doc.documentElement)
-
-    val resolvedDocElm = resolved.Elem.from(doc.documentElement)
-    val resolvedElm2: resolved.Elem = resolvedDocElm updateTopmostElemsWithNodeSeq { (elem, p) =>
-      if (p == path) Some(Vector(elem.withChildren(Vector(resolved.Text(newPhone))))) else None
-    }
-
-    val resolvedElm3: resolved.Elem = resolved.Elem.from(updatedDoc.documentElement)
-
-    assertResult(false) {
-      resolvedElm1 == resolvedElm2
-    }
-    assertResult(false) {
-      resolvedElm1 == resolvedElm3
-    }
-
-    assertResult(true) {
-      resolvedElm2 == resolvedElm3
-    }
   }
 
   test("testTransform") {

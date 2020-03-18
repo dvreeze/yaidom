@@ -35,54 +35,6 @@ class SimulateXsltTest extends AnyFunSuite {
 
   import Node._
 
-  test("testTransformHelloElem") {
-    // Here we use updateTopmostXXX twice, once for the child elements and once for the root element
-    // We can recognize the "pattern matches" (although order of updating topmost elements matters)
-
-    val title = helloElem.findElem(_.resolvedName == EName("title")).map(_.text).getOrElse("")
-
-    val htmlElem =
-      helloElem updateTopmostElemsWithNodeSeq { (elm, path) =>
-        elm.resolvedName match {
-          case EName(None, "title") =>
-            Some(Vector(textElem(QName("h1"), Vector(QName("align") -> "center"), scope, elm.text)))
-          case EName(None, "content") =>
-            Some(Vector(textElem(QName("p"), Vector(QName("align") -> "center"), scope, elm.text)))
-          case EName(None, "comment") =>
-            Some(Vector(
-              emptyElem(QName("hr"), scope),
-              textElem(QName("i"), scope, elm.text)))
-          case _ =>
-            None
-        }
-      } updateTopmostElemsOrSelf { (elm, path) =>
-        elm.resolvedName match {
-          case EName(None, "page") =>
-            val html =
-              emptyElem(QName("html"), scope).
-                plusChild(
-                  elem(
-                    QName("head"),
-                    scope,
-                    Vector(
-                      textElem(QName("title"), scope, title)))).
-                plusChild(
-                  elem(
-                    QName("body"),
-                    Vector(QName("bgcolor") -> "#ffffff"),
-                    scope,
-                    elm.findAllChildElems))
-            Some(html)
-          case _ =>
-            None
-        }
-      }
-
-    assertResult(resolved.Elem.from(expectedHtmlElem).removeAllInterElementWhitespace) {
-      resolved.Elem.from(htmlElem).removeAllInterElementWhitespace
-    }
-  }
-
   test("testTransformHelloElemUsingPaths") {
     // Here we use updateElemsOrSelfWithNodeSeq once, after collecting the paths of the elements to update
     // (of the child elements and the root element)

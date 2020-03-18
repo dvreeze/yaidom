@@ -83,18 +83,6 @@ abstract class AbstractUpdateTest extends AnyFunSuite {
     checkElemAfterMeasureUpdate(newRootElems.head.asInstanceOf[E])
   }
 
-  test("testUpdateTopmostElemsWithNodeSeq") {
-    val newRootElem = rootElem updateTopmostElemsWithNodeSeq { (e: E, p: Path) =>
-      (e, p) match {
-        case (e, p) if e.resolvedName == EName(XbrliNs, "measure") =>
-          Some(Vector(updateMeasure(e)))
-        case (e, p) => None
-      }
-    }
-
-    checkElemAfterMeasureUpdate(newRootElem)
-  }
-
   test("testUpdateElemsOrSelf") {
     val pathAwareClarkElem = IndexedClarkElem(yaidom.resolved.Elem.from(rootElem))
 
@@ -152,20 +140,6 @@ abstract class AbstractUpdateTest extends AnyFunSuite {
     checkElemAfterUnitUpdate(newRootElem)
   }
 
-  test("testUpdateTopmostElemsWithNodeSeqForUnitUpdate") {
-    val newRootElem = rootElem updateTopmostElemsWithNodeSeq { (e: E, p: Path) =>
-      (e, p) match {
-        case (e, p) if e.resolvedName == EName(XbrliNs, "unit") =>
-          Some(Vector(updateUnitId(e)))
-        case (e, p) if e.attributeOption(EName("unitRef")).contains("U-Monetary") =>
-          Some(Vector(updateUnitRef(e)))
-        case (e, p) => None
-      }
-    }
-
-    checkElemAfterUnitUpdate(newRootElem)
-  }
-
   test("testUpdateElemsWithNodeSeqAgainForUnitUpdate") {
     val pathAwareClarkElem = ElemWithPath(rootElem)
 
@@ -181,20 +155,6 @@ abstract class AbstractUpdateTest extends AnyFunSuite {
       case (e, p) if e.resolvedName == EName(XbrliNs, "unit") => updateUnitId(e)
       case (e, p) if e.attributeOption(EName("unitRef")).contains("U-Monetary") => updateUnitRef(e)
       case (e, p) => e
-    }
-
-    checkElemAfterUnitUpdate(newRootElem)
-  }
-
-  test("testUpdateTopmostElemsOrSelfForUnitUpdate") {
-    val newRootElem = rootElem updateTopmostElemsOrSelf { (e: E, p: Path) =>
-      (e, p) match {
-        case (e, p) if e.resolvedName == EName(XbrliNs, "unit") =>
-          Some(updateUnitId(e))
-        case (e, p) if e.attributeOption(EName("unitRef")).contains("U-Monetary") =>
-          Some(updateUnitRef(e))
-        case (e, p) => None
-      }
     }
 
     checkElemAfterUnitUpdate(newRootElem)
@@ -223,20 +183,6 @@ abstract class AbstractUpdateTest extends AnyFunSuite {
     checkElemAfterContextUpdate(newRootElem)
   }
 
-  test("testUpdateTopmostElemsWithNodeSeqForContextUpdate") {
-    val newRootElem = rootElem updateTopmostElemsWithNodeSeq { (e: E, p: Path) =>
-      (e, p) match {
-        case (e, p) if e.resolvedName == EName(XbrliNs, "context") =>
-          Some(Vector(updateContextId(e)))
-        case (e, p) if localNamesForContextUpdate.contains(e.localName) =>
-          Some(Vector(updateContextRef(e)))
-        case (e, p) => None
-      }
-    }
-
-    checkElemAfterContextUpdate(newRootElem)
-  }
-
   test("testUpdateElemsWithNodeSeqAgainForContextUpdate") {
     val pathAwareClarkElem = ElemWithPath(rootElem)
 
@@ -255,55 +201,6 @@ abstract class AbstractUpdateTest extends AnyFunSuite {
     }
 
     checkElemAfterContextUpdate(newRootElem)
-  }
-
-  test("testUpdateTopmostElemsOrSelfForContextUpdate") {
-    val newRootElem = rootElem updateTopmostElemsOrSelf { (e: E, p: Path) =>
-      (e, p) match {
-        case (e, p) if e.resolvedName == EName(XbrliNs, "context") =>
-          Some(updateContextId(e))
-        case (e, p) if localNamesForContextUpdate.contains(e.localName) =>
-          Some(updateContextRef(e))
-        case (e, p) => None
-      }
-    }
-
-    checkElemAfterContextUpdate(newRootElem)
-  }
-
-  // Reorder all explicit members in context entities.
-  // This example shows how method updateTopmostElems helps in updating elements with specific ancestries.
-  // It appears that the updateTopmostXXX methods can do a lot that otherwise could be done using XSLT.
-
-  test("testReorderExplicitMembers") {
-    // Easy to express using updateTopmostElems method
-
-    val newRootElem = rootElem updateTopmostElems { (e, path) =>
-      if (e.localName == "segment" &&
-        path.entries.map(_.elementName.localPart) == List("context", "entity", "segment")) {
-
-        Some(reorderSegmentChildren(e))
-      } else {
-        None
-      }
-    }
-
-    assertResult(false) {
-      rootElem.filterElems(_.localName == "explicitMember") ==
-        newRootElem.filterElems(_.localName == "explicitMember")
-    }
-
-    assertResult(rootElem.filterElems(_.localName == "explicitMember").toSet) {
-      newRootElem.filterElems(_.localName == "explicitMember").toSet
-    }
-
-    def makeSegmentEmpty(elm: E): E = {
-      elm.transformElems(e => if (e.localName == "segment") e.withChildren(Vector()) else e)
-    }
-
-    assertResult(yaidom.resolved.Elem.from(makeSegmentEmpty(rootElem))) {
-      yaidom.resolved.Elem.from(makeSegmentEmpty(newRootElem))
-    }
   }
 
   // Update the value of a specific fact
