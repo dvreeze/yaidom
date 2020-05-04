@@ -9,8 +9,8 @@
 
 import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 
-val scalaVer = "2.13.1"
-val crossScalaVer = Seq(scalaVer, "2.12.10")
+val scalaVer = "2.13.2"
+val crossScalaVer = Seq(scalaVer, "2.12.11")
 
 lazy val commonSettings = Seq(
   name         := "yaidom",
@@ -20,9 +20,6 @@ lazy val commonSettings = Seq(
 
   scalaVersion       := scalaVer,
   crossScalaVersions := crossScalaVer,
-
-  // No longer targeting Java 6 class files, and not only to prevent compilation errors like:
-  // "Static methods in interface require -target:jvm-1.8".
 
   scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-Xfatal-warnings", "-Xlint", "-target:jvm-1.8"),
 
@@ -66,7 +63,7 @@ lazy val yaidom = crossProject(JSPlatform, JVMPlatform)
   .jvmSettings(
     // By all means, override this version of Saxon if needed, possibly with a Saxon-EE release!
 
-    libraryDependencies += "net.sf.saxon" % "Saxon-HE" % "9.9.1-5",
+    libraryDependencies += "net.sf.saxon" % "Saxon-HE" % "9.9.1-7",
 
     libraryDependencies ++= {
       scalaBinaryVersion.value match {
@@ -140,7 +137,7 @@ lazy val yaidom = crossProject(JSPlatform, JVMPlatform)
     // Add support for the DOM in `run` and `test`
     jsEnv := new org.scalajs.jsenv.jsdomnodejs.JSDOMNodeJSEnv(),
 
-    libraryDependencies += "io.github.cquiroz" %%% "scala-java-time" % "2.0.0-RC5",
+    libraryDependencies += "io.github.cquiroz" %%% "scala-java-time" % "2.0.0",
 
     libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "1.0.0",
 

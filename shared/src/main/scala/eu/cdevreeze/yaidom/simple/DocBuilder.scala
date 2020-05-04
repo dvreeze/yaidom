@@ -18,10 +18,8 @@ package eu.cdevreeze.yaidom.simple
 
 import java.net.URI
 
-import scala.Vector
 import scala.collection.immutable
 
-import NodeBuilder.fromCanBeDocumentChild
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.core.XmlDeclaration
 import eu.cdevreeze.yaidom.queryapi.DocumentApi
