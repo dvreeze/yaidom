@@ -84,6 +84,15 @@ For more background on binary (and source) compatibility, see `binary-compatibil
 .. _`binary-compatibility`: https://docs.scala-lang.org/overviews/core/binary-compatibility-for-library-authors.html
 
 
+1.11.0
+======
+
+This release upgraded some dependencies, including Scala (2.13.2 and 2.12.11) and ScalaJS (from 0.6 to 1.0.1),
+and replaced library scalajs-jsjoda by scala-java-time.
+
+It also removed the unsound updateTopmostXXX methods, which is a breaking change.
+
+
 1.10.3
 ======
 
