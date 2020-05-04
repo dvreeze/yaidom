@@ -92,6 +92,73 @@ and replaced library scalajs-jsjoda by scala-java-time.
 
 It also removed the unsound updateTopmostXXX methods, which is a breaking change.
 
+Breaking changes compared to version 1.10.3 (in SBT, run: yaidomJVM/*:mimaReportBinaryIssues):
+
+* method updateTopmostElemsOrSelf(scala.Function2)eu.cdevreeze.yaidom.simple.Document in class eu.cdevreeze.yaidom.simple.Document does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[DirectMissingMethodProblem]("eu.cdevreeze.yaidom.simple.Document.updateTopmostElemsOrSelf")
+* method updateTopmostElemsWithNodeSeq(scala.Function2)eu.cdevreeze.yaidom.simple.Document in class eu.cdevreeze.yaidom.simple.Document does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[DirectMissingMethodProblem]("eu.cdevreeze.yaidom.simple.Document.updateTopmostElemsWithNodeSeq")
+* method updateChildElems(scala.Function2)eu.cdevreeze.yaidom.queryapi.UpdatableElemLike in class eu.cdevreeze.yaidom.simple.Elem does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[DirectMissingMethodProblem]("eu.cdevreeze.yaidom.simple.Elem.updateChildElems")
+* method updateChildElemsWithNodeSeq(scala.Function2)eu.cdevreeze.yaidom.queryapi.UpdatableElemLike in class eu.cdevreeze.yaidom.simple.Elem does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[DirectMissingMethodProblem]("eu.cdevreeze.yaidom.simple.Elem.updateChildElemsWithNodeSeq")
+* method updateTopmostElemsOrSelf(scala.Function2)eu.cdevreeze.yaidom.queryapi.UpdatableElemLike in class eu.cdevreeze.yaidom.simple.Elem does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[DirectMissingMethodProblem]("eu.cdevreeze.yaidom.simple.Elem.updateTopmostElemsOrSelf")
+* method updateTopmostElems(scala.Function2)eu.cdevreeze.yaidom.queryapi.UpdatableElemLike in class eu.cdevreeze.yaidom.simple.Elem does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[DirectMissingMethodProblem]("eu.cdevreeze.yaidom.simple.Elem.updateTopmostElems")
+* method updateTopmostElemsOrSelfWithNodeSeq(scala.Function2)scala.collection.immutable.IndexedSeq in class eu.cdevreeze.yaidom.simple.Elem does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[DirectMissingMethodProblem]("eu.cdevreeze.yaidom.simple.Elem.updateTopmostElemsOrSelfWithNodeSeq")
+* method updateTopmostElemsWithNodeSeq(scala.Function2)eu.cdevreeze.yaidom.queryapi.UpdatableElemLike in class eu.cdevreeze.yaidom.simple.Elem does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[DirectMissingMethodProblem]("eu.cdevreeze.yaidom.simple.Elem.updateTopmostElemsWithNodeSeq")
+* method updateChildElems(scala.Function2)eu.cdevreeze.yaidom.queryapi.UpdatableElemLike in class eu.cdevreeze.yaidom.utils.ClarkNode#Elem does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[DirectMissingMethodProblem]("eu.cdevreeze.yaidom.utils.ClarkNode#Elem.updateChildElems")
+* method updateChildElemsWithNodeSeq(scala.Function2)eu.cdevreeze.yaidom.queryapi.UpdatableElemLike in class eu.cdevreeze.yaidom.utils.ClarkNode#Elem does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[DirectMissingMethodProblem]("eu.cdevreeze.yaidom.utils.ClarkNode#Elem.updateChildElemsWithNodeSeq")
+* method updateTopmostElemsOrSelf(scala.Function2)eu.cdevreeze.yaidom.queryapi.UpdatableElemLike in class eu.cdevreeze.yaidom.utils.ClarkNode#Elem does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[DirectMissingMethodProblem]("eu.cdevreeze.yaidom.utils.ClarkNode#Elem.updateTopmostElemsOrSelf")
+* method updateTopmostElems(scala.Function2)eu.cdevreeze.yaidom.queryapi.UpdatableElemLike in class eu.cdevreeze.yaidom.utils.ClarkNode#Elem does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[DirectMissingMethodProblem]("eu.cdevreeze.yaidom.utils.ClarkNode#Elem.updateTopmostElems")
+* method updateTopmostElemsOrSelfWithNodeSeq(scala.Function2)scala.collection.immutable.IndexedSeq in class eu.cdevreeze.yaidom.utils.ClarkNode#Elem does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[DirectMissingMethodProblem]("eu.cdevreeze.yaidom.utils.ClarkNode#Elem.updateTopmostElemsOrSelfWithNodeSeq")
+* method updateTopmostElemsWithNodeSeq(scala.Function2)eu.cdevreeze.yaidom.queryapi.UpdatableElemLike in class eu.cdevreeze.yaidom.utils.ClarkNode#Elem does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[DirectMissingMethodProblem]("eu.cdevreeze.yaidom.utils.ClarkNode#Elem.updateTopmostElemsWithNodeSeq")
+* method updateChildElems(scala.Function2)eu.cdevreeze.yaidom.queryapi.UpdatableElemLike in interface eu.cdevreeze.yaidom.queryapi.UpdatableElemLike does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[DirectMissingMethodProblem]("eu.cdevreeze.yaidom.queryapi.UpdatableElemLike.updateChildElems")
+* method updateChildElemsWithNodeSeq(scala.Function2)eu.cdevreeze.yaidom.queryapi.UpdatableElemLike in interface eu.cdevreeze.yaidom.queryapi.UpdatableElemLike does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[DirectMissingMethodProblem]("eu.cdevreeze.yaidom.queryapi.UpdatableElemLike.updateChildElemsWithNodeSeq")
+* method updateTopmostElemsOrSelf(scala.Function2)eu.cdevreeze.yaidom.queryapi.UpdatableElemLike in interface eu.cdevreeze.yaidom.queryapi.UpdatableElemLike does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[DirectMissingMethodProblem]("eu.cdevreeze.yaidom.queryapi.UpdatableElemLike.updateTopmostElemsOrSelf")
+* method updateTopmostElems(scala.Function2)eu.cdevreeze.yaidom.queryapi.UpdatableElemLike in interface eu.cdevreeze.yaidom.queryapi.UpdatableElemLike does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[DirectMissingMethodProblem]("eu.cdevreeze.yaidom.queryapi.UpdatableElemLike.updateTopmostElems")
+* method updateTopmostElemsOrSelfWithNodeSeq(scala.Function2)scala.collection.immutable.IndexedSeq in interface eu.cdevreeze.yaidom.queryapi.UpdatableElemLike does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[DirectMissingMethodProblem]("eu.cdevreeze.yaidom.queryapi.UpdatableElemLike.updateTopmostElemsOrSelfWithNodeSeq")
+* method updateTopmostElemsWithNodeSeq(scala.Function2)eu.cdevreeze.yaidom.queryapi.UpdatableElemLike in interface eu.cdevreeze.yaidom.queryapi.UpdatableElemLike does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[DirectMissingMethodProblem]("eu.cdevreeze.yaidom.queryapi.UpdatableElemLike.updateTopmostElemsWithNodeSeq")
+* abstract method updateChildElems(scala.Function2)eu.cdevreeze.yaidom.queryapi.UpdatableElemApi in interface eu.cdevreeze.yaidom.queryapi.UpdatableElemApi does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[DirectMissingMethodProblem]("eu.cdevreeze.yaidom.queryapi.UpdatableElemApi.updateChildElems")
+* abstract method updateChildElemsWithNodeSeq(scala.Function2)eu.cdevreeze.yaidom.queryapi.UpdatableElemApi in interface eu.cdevreeze.yaidom.queryapi.UpdatableElemApi does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[DirectMissingMethodProblem]("eu.cdevreeze.yaidom.queryapi.UpdatableElemApi.updateChildElemsWithNodeSeq")
+* abstract method updateTopmostElemsOrSelf(scala.Function2)eu.cdevreeze.yaidom.queryapi.UpdatableElemApi in interface eu.cdevreeze.yaidom.queryapi.UpdatableElemApi does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[DirectMissingMethodProblem]("eu.cdevreeze.yaidom.queryapi.UpdatableElemApi.updateTopmostElemsOrSelf")
+* abstract method updateTopmostElems(scala.Function2)eu.cdevreeze.yaidom.queryapi.UpdatableElemApi in interface eu.cdevreeze.yaidom.queryapi.UpdatableElemApi does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[DirectMissingMethodProblem]("eu.cdevreeze.yaidom.queryapi.UpdatableElemApi.updateTopmostElems")
+* abstract method updateTopmostElemsOrSelfWithNodeSeq(scala.Function2)scala.collection.immutable.IndexedSeq in interface eu.cdevreeze.yaidom.queryapi.UpdatableElemApi does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[DirectMissingMethodProblem]("eu.cdevreeze.yaidom.queryapi.UpdatableElemApi.updateTopmostElemsOrSelfWithNodeSeq")
+* abstract method updateTopmostElemsWithNodeSeq(scala.Function2)eu.cdevreeze.yaidom.queryapi.UpdatableElemApi in interface eu.cdevreeze.yaidom.queryapi.UpdatableElemApi does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[DirectMissingMethodProblem]("eu.cdevreeze.yaidom.queryapi.UpdatableElemApi.updateTopmostElemsWithNodeSeq")
+* method updateChildElems(scala.Function2)eu.cdevreeze.yaidom.queryapi.UpdatableElemLike in class eu.cdevreeze.yaidom.resolved.Elem does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[DirectMissingMethodProblem]("eu.cdevreeze.yaidom.resolved.Elem.updateChildElems")
+* method updateChildElemsWithNodeSeq(scala.Function2)eu.cdevreeze.yaidom.queryapi.UpdatableElemLike in class eu.cdevreeze.yaidom.resolved.Elem does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[DirectMissingMethodProblem]("eu.cdevreeze.yaidom.resolved.Elem.updateChildElemsWithNodeSeq")
+* method updateTopmostElemsOrSelf(scala.Function2)eu.cdevreeze.yaidom.queryapi.UpdatableElemLike in class eu.cdevreeze.yaidom.resolved.Elem does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[DirectMissingMethodProblem]("eu.cdevreeze.yaidom.resolved.Elem.updateTopmostElemsOrSelf")
+* method updateTopmostElems(scala.Function2)eu.cdevreeze.yaidom.queryapi.UpdatableElemLike in class eu.cdevreeze.yaidom.resolved.Elem does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[DirectMissingMethodProblem]("eu.cdevreeze.yaidom.resolved.Elem.updateTopmostElems")
+* method updateTopmostElemsOrSelfWithNodeSeq(scala.Function2)scala.collection.immutable.IndexedSeq in class eu.cdevreeze.yaidom.resolved.Elem does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[DirectMissingMethodProblem]("eu.cdevreeze.yaidom.resolved.Elem.updateTopmostElemsOrSelfWithNodeSeq")
+* method updateTopmostElemsWithNodeSeq(scala.Function2)eu.cdevreeze.yaidom.queryapi.UpdatableElemLike in class eu.cdevreeze.yaidom.resolved.Elem does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[DirectMissingMethodProblem]("eu.cdevreeze.yaidom.resolved.Elem.updateTopmostElemsWithNodeSeq")
+
 
 1.10.3
 ======
