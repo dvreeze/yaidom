@@ -8,4 +8,6 @@ addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.3.2")
 
 addSbtPlugin("io.github.cquiroz" % "sbt-tzdb" % "1.0.0")
 
+addSbtPlugin("net.vonbuchholtz" % "sbt-dependency-check" % "2.0.0")
+
 libraryDependencies += "org.scala-js" %% "scalajs-env-jsdom-nodejs" % "1.0.0"
