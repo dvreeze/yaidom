@@ -12,41 +12,43 @@ import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 val scalaVer = "2.13.2"
 val crossScalaVer = Seq(scalaVer, "2.12.11")
 
-lazy val commonSettings = Seq(
-  name         := "yaidom",
-  description  := "Extensible XML query API with multiple DOM-like implementations",
-  organization := "eu.cdevreeze.yaidom",
-  version      := "1.12.0-SNAPSHOT",
+ThisBuild / name         := "yaidom"
+ThisBuild / description  := "Extensible XML query API with multiple DOM-like implementations"
+ThisBuild / organization := "eu.cdevreeze.yaidom"
+ThisBuild / version      := "1.12.0-SNAPSHOT"
 
-  scalaVersion       := scalaVer,
-  crossScalaVersions := crossScalaVer,
+ThisBuild / scalaVersion       := scalaVer
+ThisBuild / crossScalaVersions := crossScalaVer
 
-  scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-Xfatal-warnings", "-Xlint", "-target:jvm-1.8"),
+ThisBuild / scalacOptions ++= {
+  scalaBinaryVersion.value match {
+    case "2.13" => Seq("-Wconf:cat=unused-imports:w,cat=unchecked:w,cat=deprecation:w,cat=feature:w,cat=lint:w")
+    case _      => Seq("-unchecked", "-deprecation", "-feature", "-Xfatal-warnings", "-Xlint", "-target:jvm-1.8")
+  }
+}
 
-  Test / publishArtifact := false,
-  publishMavenStyle := true,
+ThisBuild / Test / publishArtifact := false
+ThisBuild / publishMavenStyle := true
 
-  publishTo := {
-    val nexus = "https://oss.sonatype.org/"
-    if (isSnapshot.value)
-      Some("snapshots" at nexus + "content/repositories/snapshots")
-    else
-      Some("releases"  at nexus + "service/local/staging/deploy/maven2")
-    },
+ThisBuild / publishTo := {
+  val nexus = "https://oss.sonatype.org/"
+  if (isSnapshot.value)
+    Some("snapshots" at nexus + "content/repositories/snapshots")
+  else
+    Some("releases"  at nexus + "service/local/staging/deploy/maven2")
+  }
 
-  pomExtra := pomData,
-  pomIncludeRepository := { _ => false },
+ThisBuild / pomExtra := pomData
+ThisBuild / pomIncludeRepository := { _ => false }
 
-  libraryDependencies += "org.scala-lang.modules" %%% "scala-xml" % "2.0.0-M1",
+ThisBuild / libraryDependencies += "org.scala-lang.modules" %%% "scala-xml" % "2.0.0-M1"
 
-  libraryDependencies += "org.scalatest" %%% "scalatest" % "3.1.1" % "test",
+ThisBuild / libraryDependencies += "org.scalatest" %%% "scalatest" % "3.1.1" % Test
 
-  libraryDependencies += "org.scalatestplus" %%% "scalacheck-1-14" % "3.1.1.1" % "test"
-)
+ThisBuild / libraryDependencies += "org.scalatestplus" %%% "scalacheck-1-14" % "3.1.1.1" % Test
 
 lazy val root = project.in(file("."))
   .aggregate(yaidomJVM, yaidomJS)
-  .settings(commonSettings: _*)
   .settings(
     name                 := "yaidom",
     // Thanks, scala-java-time, for showing us how to prevent any publishing of root level artifacts:
@@ -59,7 +61,6 @@ lazy val root = project.in(file("."))
 lazy val yaidom = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Full)
   .in(file("."))
-  .settings(commonSettings: _*)
   .jvmSettings(
     // By all means, override this version of Saxon if needed, possibly with a Saxon-EE release!
 
@@ -74,32 +75,30 @@ lazy val yaidom = crossProject(JSPlatform, JVMPlatform)
 
     libraryDependencies += "com.github.ben-manes.caffeine" % "caffeine" % "2.8.0",
 
-    libraryDependencies += "com.google.code.findbugs" % "jsr305" % "3.0.2",
+    libraryDependencies += "junit" % "junit" % "4.12" % Test,
 
-    libraryDependencies += "junit" % "junit" % "4.12" % "test",
-
-    libraryDependencies += "org.scalacheck" %%% "scalacheck" % "1.14.3" % "test",
+    libraryDependencies += "org.scalacheck" %%% "scalacheck" % "1.14.3" % Test,
 
     // JUnit tests (the ones intentionally written in Java) should run as well
 
-    libraryDependencies += "com.novocode" % "junit-interface" % "0.11" % "test",
+    libraryDependencies += "com.novocode" % "junit-interface" % "0.11" % Test,
 
     libraryDependencies ++= {
       scalaBinaryVersion.value match {
         case "2.13" => Seq()
-        case _      => Seq("org.scalameta" %%% "scalameta" % "4.2.3" % "test")
+        case _      => Seq("org.scalameta" %%% "scalameta" % "4.2.3" % Test)
       }
     },
 
-    libraryDependencies += "org.ccil.cowan.tagsoup" % "tagsoup" % "1.2.1" % "test",
+    libraryDependencies += "org.ccil.cowan.tagsoup" % "tagsoup" % "1.2.1" % Test,
 
-    libraryDependencies += "org.jdom" % "jdom2" % "2.0.6" % "test",
+    libraryDependencies += "org.jdom" % "jdom2" % "2.0.6" % Test,
 
-    libraryDependencies += ("xom" % "xom" % "1.3.2" % "test").intransitive(),
+    libraryDependencies += ("xom" % "xom" % "1.3.2" % Test).intransitive(),
 
-    libraryDependencies += ("com.fasterxml.woodstox" % "woodstox-core" % "6.0.1" % "test").intransitive(),
+    libraryDependencies += ("com.fasterxml.woodstox" % "woodstox-core" % "6.0.1" % Test).intransitive(),
 
-    libraryDependencies += "org.codehaus.woodstox" % "stax2-api" % "4.2" % "test",
+    libraryDependencies += "org.codehaus.woodstox" % "stax2-api" % "4.2" % Test,
 
     Compile / unmanagedSourceDirectories += {
       val sourceDir = (Compile / sourceDirectory).value
@@ -141,7 +140,7 @@ lazy val yaidom = crossProject(JSPlatform, JVMPlatform)
 
     libraryDependencies += "org.scala-js" %%% "scalajs-dom" % "1.0.0",
 
-    libraryDependencies += "com.lihaoyi" %%% "scalatags" % "0.8.6" % "optional",
+    libraryDependencies += "com.lihaoyi" %%% "scalatags" % "0.8.6" % Optional,
 
     Test / parallelExecution := false,
 

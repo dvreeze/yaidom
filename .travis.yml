@@ -18,5 +18,5 @@ matrix:
     scala: 2.13.2
 
 script:
- - sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3G test
+ - sbt ++$TRAVIS_SCALA_VERSION -J-Xmx3G clean test checkDuplicates
 
