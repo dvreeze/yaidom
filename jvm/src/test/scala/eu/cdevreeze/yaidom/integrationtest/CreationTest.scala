@@ -344,10 +344,6 @@ class CreationTest extends AnyFunSuite {
       prefixBooks
     }
 
-    // Building an "independent" author ElemBuilder, which reuses the "books" prefix of the intended parent tree.
-    // "Independence" means: canBuild(Scope.Empty) && (findAllElemsOrSelf.forall(e => e.qname.prefixOption.isDefined))
-    // In other words, it does not care about the specific parent scope.
-
     val authorElmBuilder: simple.Elem =
       elem(
         qname = QName(prefixBooks, "Author"),

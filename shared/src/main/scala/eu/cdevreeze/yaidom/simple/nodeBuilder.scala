@@ -16,7 +16,6 @@
 
 package eu.cdevreeze.yaidom.simple
 
-import scala.Vector
 import scala.collection.immutable
 
 import eu.cdevreeze.yaidom.XmlStringUtils
