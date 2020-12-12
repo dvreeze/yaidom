@@ -16,8 +16,6 @@
 
 package eu.cdevreeze.yaidom.queryapitests
 
-import scala.collection.immutable
-
 import eu.cdevreeze.yaidom.convert.ScalaXmlConversions.convertToElem
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
@@ -25,8 +23,10 @@ import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi.withLocalName
 import eu.cdevreeze.yaidom.queryapi.ClarkNodes
-import eu.cdevreeze.yaidom.simple.NodeBuilder
+import eu.cdevreeze.yaidom.simple.Node
 import org.scalatest.funsuite.AnyFunSuite
+
+import scala.collection.immutable
 
 /**
  * Alternative query test, with yaidom queries ported from XQuery examples.
@@ -40,19 +40,27 @@ abstract class AbstractAlternativeQueryTest extends AnyFunSuite {
 
   type E <: ClarkNodes.Elem with ClarkElemApi.Aux[E]
 
+  protected val catalogElem: E
+
+  protected val pricesElem: E
+
+  protected val orderElem: E
+
+  protected final def toResolvedElem(elem: E): eu.cdevreeze.yaidom.resolved.Elem = {
+    eu.cdevreeze.yaidom.resolved.Elem.from(elem)
+  }
+
+  protected def fromScalaElem(elem: scala.xml.Elem): E
+
   test("testFindAllCatalogProducts") {
     // See example 1-4.
 
     require(catalogElem.localName == "catalog")
 
     val productElems =
-      catalogElem filterChildElems withLocalName("product")
+      catalogElem.filterChildElems(withLocalName("product"))
 
-    assertResult(List(
-      "557",
-      "563",
-      "443",
-      "784")) {
+    assertResult(List("557", "563", "443", "784")) {
       productElems.map(_.getChildElem(withLocalName("number"))).map(_.text)
     }
 
@@ -63,7 +71,8 @@ abstract class AbstractAlternativeQueryTest extends AnyFunSuite {
         <colorChoices>navy black</colorChoices>
       </product>
 
-    assertResult(eu.cdevreeze.yaidom.resolved.Elem.from(convertToElem(expectedFirstProd)).removeAllInterElementWhitespace) {
+    assertResult(
+      eu.cdevreeze.yaidom.resolved.Elem.from(convertToElem(expectedFirstProd)).removeAllInterElementWhitespace) {
       toResolvedElem(productElems.head).removeAllInterElementWhitespace
     }
 
@@ -75,7 +84,8 @@ abstract class AbstractAlternativeQueryTest extends AnyFunSuite {
         <desc>Our <i>favorite</i> shirt!</desc>
       </product>
 
-    assertResult(eu.cdevreeze.yaidom.resolved.Elem.from(convertToElem(expectedLastProd)).removeAllInterElementWhitespace) {
+    assertResult(
+      eu.cdevreeze.yaidom.resolved.Elem.from(convertToElem(expectedLastProd)).removeAllInterElementWhitespace) {
       toResolvedElem(productElems.last).removeAllInterElementWhitespace
     }
   }
@@ -103,13 +113,11 @@ abstract class AbstractAlternativeQueryTest extends AnyFunSuite {
     require(catalogElem.localName == "catalog")
 
     val productElems =
-      catalogElem filterChildElems { elem =>
+      catalogElem.filterChildElems { elem =>
         elem.localName == "product" && elem.attributeOption(EName("dept")).contains("ACC")
       }
 
-    assertResult(List(
-      "563",
-      "443")) {
+    assertResult(List("563", "443")) {
       productElems.map(_.getChildElem(withLocalName("number"))).map(_.text)
     }
 
@@ -119,7 +127,8 @@ abstract class AbstractAlternativeQueryTest extends AnyFunSuite {
         <name language="en">Floppy Sun Hat</name>
       </product>
 
-    assertResult(eu.cdevreeze.yaidom.resolved.Elem.from(convertToElem(expectedFirstProd)).removeAllInterElementWhitespace) {
+    assertResult(
+      eu.cdevreeze.yaidom.resolved.Elem.from(convertToElem(expectedFirstProd)).removeAllInterElementWhitespace) {
       toResolvedElem(productElems.head).removeAllInterElementWhitespace
     }
 
@@ -129,7 +138,8 @@ abstract class AbstractAlternativeQueryTest extends AnyFunSuite {
         <name language="en">Deluxe Travel Bag</name>
       </product>
 
-    assertResult(eu.cdevreeze.yaidom.resolved.Elem.from(convertToElem(expectedLastProd)).removeAllInterElementWhitespace) {
+    assertResult(
+      eu.cdevreeze.yaidom.resolved.Elem.from(convertToElem(expectedLastProd)).removeAllInterElementWhitespace) {
       toResolvedElem(productElems.last).removeAllInterElementWhitespace
     }
   }
@@ -165,11 +175,11 @@ abstract class AbstractAlternativeQueryTest extends AnyFunSuite {
         nameElem <- productElem \ withLocalName("name")
       } yield nameElem
 
-    val sortedProductNameElems = productNameElems sortBy (e => e.text)
+    val sortedProductNameElems = productNameElems.sortBy(e => e.text)
 
-    val expectedNameElems = List(
-      <name language="en">Deluxe Travel Bag</name>,
-      <name language="en">Floppy Sun Hat</name>).map(e => eu.cdevreeze.yaidom.resolved.Elem.from(convertToElem(e)))
+    val expectedNameElems =
+      List(<name language="en">Deluxe Travel Bag</name>, <name language="en">Floppy Sun Hat</name>).map(e =>
+        eu.cdevreeze.yaidom.resolved.Elem.from(convertToElem(e)))
 
     assertResult(expectedNameElems) {
       sortedProductNameElems.map(e => toResolvedElem(e))
@@ -183,14 +193,13 @@ abstract class AbstractAlternativeQueryTest extends AnyFunSuite {
 
     val productNameElems: immutable.IndexedSeq[scala.xml.Elem] =
       for {
-        productElem <- catalogElem \ withLocalName("product") sortBy (e => e.getChildElem(withLocalName("name")).text)
+        productElem <- (catalogElem \ withLocalName("product")).sortBy(e => e.getChildElem(withLocalName("name")).text)
         if (productElem \@ EName("dept")).contains("ACC")
         dept <- productElem \@ EName("dept")
         productName = productElem.getChildElem(withLocalName("name")).text
       } yield <li class={ dept }>{ productName }</li>
 
-    val resultElem: E = fromScalaElem(
-      <ul type="square">
+    val resultElem: E = fromScalaElem(<ul type="square">
         {
           productNameElems
         }
@@ -218,43 +227,35 @@ abstract class AbstractAlternativeQueryTest extends AnyFunSuite {
         itemElem <- orderElem \\ withLocalName("item")
         productElem <- catalogElem \\ { elem =>
           elem.localName == "product" &&
-            elem.getChildElem(withLocalName("number")).text == itemElem.attribute(EName("num"))
+          elem.getChildElem(withLocalName("number")).text == itemElem.attribute(EName("num"))
         }
         nameElem <- productElem \ withLocalName("name")
       } yield {
-        import NodeBuilder._
+        import Node._
 
         emptyElem(
           qname = QName("item"),
+          scope = Scope.Empty,
           attributes = Vector(
             QName("num") -> itemElem.attribute(EName("num")),
             QName("name") -> nameElem.text,
-            QName("quan") -> itemElem.attribute(EName("quantity")))).build(Scope.Empty)
+            QName("quan") -> itemElem.attribute(EName("quantity")))
+        )
       }
 
     val expectedResults =
       Vector(
-          <item num="557" name="Fleece Pullover" quan="1"/>,
-          <item num="563" name="Floppy Sun Hat" quan="1"/>,
-          <item num="443" name="Deluxe Travel Bag" quan="2"/>,
-          <item num="784" name="Cotton Dress Shirt" quan="1"/>,
-          <item num="784" name="Cotton Dress Shirt" quan="1"/>,
-          <item num="557" name="Fleece Pullover" quan="1"/>)
+        <item num="557" name="Fleece Pullover" quan="1"/>,
+        <item num="563" name="Floppy Sun Hat" quan="1"/>,
+        <item num="443" name="Deluxe Travel Bag" quan="2"/>,
+        <item num="784" name="Cotton Dress Shirt" quan="1"/>,
+        <item num="784" name="Cotton Dress Shirt" quan="1"/>,
+        <item num="557" name="Fleece Pullover" quan="1"/>
+      )
 
-    assertResult(expectedResults.map(e => eu.cdevreeze.yaidom.resolved.Elem.from(convertToElem(e)).removeAllInterElementWhitespace)) {
+    assertResult(expectedResults.map(e =>
+      eu.cdevreeze.yaidom.resolved.Elem.from(convertToElem(e)).removeAllInterElementWhitespace)) {
       itemElems.map(e => eu.cdevreeze.yaidom.resolved.Elem.from(e).removeAllInterElementWhitespace)
     }
   }
-
-  protected val catalogElem: E
-
-  protected val pricesElem: E
-
-  protected val orderElem: E
-
-  protected final def toResolvedElem(elem: E): eu.cdevreeze.yaidom.resolved.Elem = {
-    eu.cdevreeze.yaidom.resolved.Elem.from(elem)
-  }
-
-  protected def fromScalaElem(elem: scala.xml.Elem): E
 }

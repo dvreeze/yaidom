@@ -18,8 +18,6 @@ package eu.cdevreeze.yaidom.integrationtest
 
 import java.{util => jutil}
 
-import scala.collection.immutable
-
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
@@ -30,13 +28,12 @@ import eu.cdevreeze.yaidom.queryapi.ClarkElemApi._
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.simple.Document
 import eu.cdevreeze.yaidom.simple.Elem
-import eu.cdevreeze.yaidom.simple.ElemBuilder
-import eu.cdevreeze.yaidom.simple.NodeBuilder.elem
-import eu.cdevreeze.yaidom.simple.NodeBuilder.emptyElem
-import eu.cdevreeze.yaidom.simple.NodeBuilder.textElem
+import eu.cdevreeze.yaidom.simple.Node._
 import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.transform.TransformerFactory
 import org.scalatest.funsuite.AnyFunSuite
+
+import scala.collection.immutable
 
 /**
  * Test case using yaidom on the FriendFeed example, used in https://www.ibm.com/developerworks/library/x-scalaxml/.
@@ -92,7 +89,7 @@ class FriendFeedTest extends AnyFunSuite {
       feedElm.localName
     }
     assertResult(Set("entry")) {
-      val childNames = feedElm.findAllChildElems map {
+      val childNames = feedElm.findAllChildElems.map {
         _.localName
       }
       childNames.toSet
@@ -120,7 +117,10 @@ class FriendFeedTest extends AnyFunSuite {
             Vector(
               Elem(EName("nickname"), Map(), Vector(Text("karlerikson"))),
               Elem(EName("nickname"), Map(), Vector(Text("asfaq"))),
-              Elem(EName("nickname"), Map(), Vector(Text("chrisjlee")))))))
+              Elem(EName("nickname"), Map(), Vector(Text("chrisjlee")))
+            )
+          ))
+      )
     }
 
     assertResult(expectedTwitterSummaryElm) {
@@ -137,12 +137,8 @@ class FriendFeedTest extends AnyFunSuite {
       Elem(
         EName("Service"),
         Map(EName("id") -> "googlereader"),
-        Vector(
-          Elem(
-            EName("UserList"),
-            Map(),
-            Vector(
-              Elem(EName("nickname"), Map(), Vector(Text("misterjt")))))))
+        Vector(Elem(EName("UserList"), Map(), Vector(Elem(EName("nickname"), Map(), Vector(Text("misterjt"))))))
+      )
     }
 
     assertResult(expectedGoogleReaderSummaryElm) {
@@ -197,7 +193,9 @@ class FriendFeedTest extends AnyFunSuite {
           Elem(
             EName(NsFriendFeedStats, "Service"),
             Map(EName("cnt") -> 1.toString, EName("id") -> "googlereader"),
-            Vector())))
+            Vector())
+        )
+      )
     }
 
     assertResult(expectedStatsElm) {
@@ -223,24 +221,24 @@ class FriendFeedTest extends AnyFunSuite {
 
     val stats2Elm: Elem = {
       val serviceIds = {
-        val result = (feedElm \ (_.localName == "entry")) map { entryElm => getEntryServiceId(entryElm) }
+        val result = (feedElm \ (_.localName == "entry")).map { entryElm =>
+          getEntryServiceId(entryElm)
+        }
         result.distinct
       }
 
-      val serviceElms = serviceIds map { serviceId =>
-        val serviceCount = feedElm.findAllChildElems count { entryElm =>
+      val serviceElms = serviceIds.map { serviceId =>
+        val serviceCount = feedElm.findAllChildElems.count { entryElm =>
           getEntryServiceId(entryElm) == serviceId
         }
 
         emptyElem(
           qname = QName("Service"),
-          attributes = Vector(QName("cnt") -> serviceCount.toString, QName("id") -> serviceId)).build(StatsScope)
+          attributes = Vector(QName("cnt") -> serviceCount.toString, QName("id") -> serviceId),
+          scope = StatsScope)
       }
 
-      Elem(
-        qname = QName("Stats"),
-        scope = StatsScope,
-        children = serviceElms)
+      Elem(qname = QName("Stats"), scope = StatsScope, children = serviceElms)
     }
 
     assertResult(expectedStatsElm) {
@@ -258,14 +256,16 @@ class FriendFeedTest extends AnyFunSuite {
 
     val entryElms = feedElm \ (_.localName == "entry")
 
-    entryElms filter { entryElm =>
+    entryElms.filter { entryElm =>
       // Assuming precisely 1 "service" child elem with precisely 1 "id" child elem
       // Using method getChildElem (taking a predicate on elements) repeatedly
-      val serviceIdElm = entryElm getChildElem {
-        _.localName == "service"
-      } getChildElem {
-        _.localName == "id"
-      }
+      val serviceIdElm = entryElm
+        .getChildElem {
+          _.localName == "service"
+        }
+        .getChildElem {
+          _.localName == "id"
+        }
       serviceIdElm.text.trim == serviceName
     }
   }
@@ -282,31 +282,27 @@ class FriendFeedTest extends AnyFunSuite {
   private def createUserList(nickNames: immutable.IndexedSeq[String]): Elem = {
     // Creating ElemBuilders instead of Elems
 
-    val userElms: immutable.IndexedSeq[ElemBuilder] =
-      nickNames map { name =>
-        textElem(QName("nickname"), name)
+    val userElms: immutable.IndexedSeq[Elem] =
+      nickNames.map { name =>
+        textElem(QName("nickname"), Scope.Empty, name)
       }
 
-    val userListElm: ElemBuilder =
-      elem(
-        qname = QName("UserList"),
-        children = userElms)
+    val userListElm: Elem =
+      elem(qname = QName("UserList"), scope = Scope.Empty, children = userElms)
 
-    // Building an Elem from the ElemBuilder
-    userListElm.build()
+    userListElm
   }
 
   private def createServiceSummary(feedElm: Elem, serviceName: String): Elem = {
     require(feedElm.localName == "feed")
 
-    val nickNames = filterFeedEntriesOnServiceName(feedElm, serviceName) map { entryElm => getUserNickNameOfEntry(entryElm) }
+    val nickNames = filterFeedEntriesOnServiceName(feedElm, serviceName).map { entryElm =>
+      getUserNickNameOfEntry(entryElm)
+    }
     val userListElm = createUserList(nickNames)
 
     // Creating an Elem directly
-    Elem(
-      qname = QName("Service"),
-      attributes = Vector(QName("id") -> serviceName),
-      children = Vector(userListElm))
+    Elem(qname = QName("Service"), attributes = Vector(QName("id") -> serviceName), children = Vector(userListElm))
   }
 
   private def createStatisticsForService(feedElm: Elem, serviceName: String): Elem = {
@@ -314,22 +310,22 @@ class FriendFeedTest extends AnyFunSuite {
 
     val entryElms = filterFeedEntriesOnServiceName(feedElm, serviceName)
 
-    val serviceElm: ElemBuilder =
+    val serviceElm: Elem =
       emptyElem(
         qname = QName("Service"),
-        attributes = Vector(QName("cnt") -> entryElms.size.toString, QName("id") -> serviceName))
+        attributes = Vector(QName("cnt") -> entryElms.size.toString, QName("id") -> serviceName),
+        scope = StatsScope)
 
-    serviceElm.build(StatsScope)
+    serviceElm
   }
 
   private def createStatistics(feedElm: Elem, serviceNames: immutable.Seq[String]): Elem = {
     require(feedElm.localName == "feed")
 
-    val serviceStatisticsElms = serviceNames map { serviceName => createStatisticsForService(feedElm, serviceName) }
+    val serviceStatisticsElms = serviceNames.map { serviceName =>
+      createStatisticsForService(feedElm, serviceName)
+    }
 
-    Elem(
-      qname = QName("Stats"),
-      scope = StatsScope,
-      children = serviceStatisticsElms.toIndexedSeq)
+    Elem(qname = QName("Stats"), scope = StatsScope, children = serviceStatisticsElms.toIndexedSeq)
   }
 }

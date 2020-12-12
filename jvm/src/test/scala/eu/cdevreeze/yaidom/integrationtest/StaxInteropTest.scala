@@ -31,11 +31,10 @@ import eu.cdevreeze.yaidom.print.DocumentPrinterUsingStax
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi._
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.simple.Comment
-import eu.cdevreeze.yaidom.simple.DocBuilder
 import eu.cdevreeze.yaidom.simple.Document
 import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.simple.EntityRef
-import eu.cdevreeze.yaidom.simple.NodeBuilder
+import eu.cdevreeze.yaidom.simple.Node
 import javax.xml.stream.XMLInputFactory
 import javax.xml.stream.XMLResolver
 import org.scalatest.funsuite.AnyFunSuite
@@ -60,6 +59,8 @@ class StaxInteropTest extends AnyFunSuite {
   private val nsGoogle = "http://www.google.com"
   private val nsFooBar = "urn:foo:bar"
   private val nsXmlSchema = "http://www.w3.org/2001/XMLSchema"
+
+  private val testScope: Scope = Scope.from("test" -> "http://www.test.org/test")
 
   test("testParse") {
     // 1. Parse XML file into Elem
@@ -114,9 +115,9 @@ class StaxInteropTest extends AnyFunSuite {
       result.size
     }
 
-    // 5. Convert to NodeBuilder and back, and check again
+    // 5. Call method notUndeclaringPrefixes, and check again
 
-    val root3: Elem = NodeBuilder.fromElem(root2)(Scope.Empty).build()
+    val root3: Elem = root2.notUndeclaringPrefixes(testScope)
 
     assertResult((root.findAllElems map (e => e.localName)).toSet) {
       (root3.findAllElems map (e => e.localName)).toSet
@@ -222,9 +223,9 @@ class StaxInteropTest extends AnyFunSuite {
       result.toSet
     }
 
-    // 5. Convert to NodeBuilder and back, and check again
+    // 5. Call method notUndeclaringPrefixes, and check again
 
-    val root3: Elem = NodeBuilder.fromElem(root2)(Scope.Empty).build()
+    val root3: Elem = root2.notUndeclaringPrefixes(testScope)
 
     assertResult(Set(EName("bar"), EName(nsGoogle, "foo"))) {
       val result = root3.findAllElemsOrSelf map { e => e.resolvedName }
@@ -291,9 +292,9 @@ class StaxInteropTest extends AnyFunSuite {
       result.mkString
     }
 
-    // 5. Convert to NodeBuilder and back, and check again
+    // 5. Copy the document, and check again
 
-    val document3: Document = DocBuilder.fromDocument(document2).build()
+    val document3: Document = Document.document(document2.uriOption.map(_.toString), document2.children)
     val root3: Elem = document3.documentElement
 
     assertResult(Set(EName(nsFooBar, "root"), EName(nsFooBar, "child"))) {
@@ -534,9 +535,9 @@ class StaxInteropTest extends AnyFunSuite {
     checkComplexTypeElm(root2)
     checkFieldPattern(root2)
 
-    // 5. Convert to NodeBuilder and back, and check again
+    // 5. Call method notUndeclaringPrefixes, and check again
 
-    val root3: Elem = NodeBuilder.fromElem(root2)(Scope.Empty).build()
+    val root3: Elem = root2.notUndeclaringPrefixes(testScope)
 
     assertResult(xsElmENames) {
       val result = root3 \\ { e => e.resolvedName.namespaceUriOption.contains(nsXmlSchema) } map { e => e.resolvedName }
@@ -610,9 +611,9 @@ class StaxInteropTest extends AnyFunSuite {
 
     checkChildText(root2)
 
-    // 5. Convert to NodeBuilder and back, and check again
+    // 5. Call method notUndeclaringPrefixes, and check again
 
-    val root3: Elem = NodeBuilder.fromElem(root2)(Scope.Empty).build()
+    val root3: Elem = root2.notUndeclaringPrefixes(testScope)
 
     assertResult(Set(EName(ns, "root"), EName(ns, "child"))) {
       val result = root3.findAllElemsOrSelf map { e => e.resolvedName }
@@ -688,9 +689,9 @@ class StaxInteropTest extends AnyFunSuite {
 
     // No check on entity references, because they were lost in the conversion back to StAX events
 
-    // 5. Convert to NodeBuilder and back, and check again
+    // 5. Call method notUndeclaringPrefixes, and check again
 
-    val root3: Elem = NodeBuilder.fromElem(root2)(Scope.Empty).build()
+    val root3: Elem = root2.notUndeclaringPrefixes(testScope)
 
     assertResult(Set(EName(ns, "root"), EName(ns, "child"))) {
       val result = root3.findAllElemsOrSelf map { e => e.resolvedName }
@@ -735,9 +736,9 @@ class StaxInteropTest extends AnyFunSuite {
       result.toSet
     }
 
-    // 5. Convert to NodeBuilder and back, and check again
+    // 5. Call method notUndeclaringPrefixes, and check again
 
-    val root3: Elem = NodeBuilder.fromElem(root2)(Scope.Empty).build()
+    val root3: Elem = root2.notUndeclaringPrefixes(testScope)
 
     assertResult(Set(EName(ns, "root"), EName(ns, "a"), EName("b"), EName("c"), EName(ns, "d"))) {
       val result = root3.findAllElemsOrSelf map { e => e.resolvedName }
@@ -811,9 +812,9 @@ class StaxInteropTest extends AnyFunSuite {
 
     doChecks(root2)
 
-    // 5. Convert to NodeBuilder and back, and check again
+    // 5. Call method notUndeclaringPrefixes, and check again
 
-    val root3: Elem = NodeBuilder.fromElem(root2)(Scope.Empty).build()
+    val root3: Elem = root2.notUndeclaringPrefixes(testScope)
 
     assertResult(Set(EName(ns, "root"), EName(ns, "child"))) {
       val result = root3.findAllElemsOrSelf map { e => e.resolvedName }
@@ -855,9 +856,9 @@ class StaxInteropTest extends AnyFunSuite {
 
     doChecks(root)
 
-    // 2. Convert to NodeBuilder and back, and check again
+    // 2. Call method notUndeclaringPrefixes, and check again
 
-    val root2: Elem = NodeBuilder.fromElem(root)(Scope.Empty).build()
+    val root2: Elem = root.notUndeclaringPrefixes(testScope)
 
     assertResult(Set(EName(ns, "root"), EName(ns, "child"))) {
       val result = root2.findAllElemsOrSelf map { e => e.resolvedName }
@@ -1058,10 +1059,10 @@ class StaxInteropTest extends AnyFunSuite {
       result.toSet
     }
 
-    import NodeBuilder._
+    import Node._
 
     val countryPath = PathBuilder.from(QName("car") -> 0, QName("country") -> 0).build(Scope.Empty)
-    val updatedCountryElm = textElem(QName("country"), "New Zealand").build()
+    val updatedCountryElm = textElem(QName("country"), Scope.Empty, "New Zealand")
     val updatedDoc = doc.updateElemOrSelf(countryPath, updatedCountryElm)
 
     assertResult("New Zealand") {

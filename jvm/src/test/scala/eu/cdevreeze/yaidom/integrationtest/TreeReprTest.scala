@@ -17,10 +17,9 @@
 package eu.cdevreeze.yaidom.integrationtest
 
 import eu.cdevreeze.yaidom.convert.DomConversions
-import eu.cdevreeze.yaidom.core.Declarations
 import eu.cdevreeze.yaidom.core.QName
+import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
-import eu.cdevreeze.yaidom.simple.DocBuilder
 import eu.cdevreeze.yaidom.simple.Document
 import eu.cdevreeze.yaidom.simple.EntityRef
 import javax.xml.parsers.DocumentBuilderFactory
@@ -42,8 +41,8 @@ import org.xml.sax.InputSource
  */
 class TreeReprTest extends AnyFunSuite {
 
-  import eu.cdevreeze.yaidom.simple.DocBuilder._
-  import eu.cdevreeze.yaidom.simple.NodeBuilder._
+  import eu.cdevreeze.yaidom.simple.Document._
+  import eu.cdevreeze.yaidom.simple.Node._
 
   test("testCreateTreeForBooks") {
     val domParser = DocumentParserUsingDom.newInstance().withConverterToDocument(DomConversions)
@@ -51,188 +50,190 @@ class TreeReprTest extends AnyFunSuite {
 
     val doc: Document = domParser.parse(is)
 
-    val docBuilder: DocBuilder =
+    val startScope: Scope = Scope.from("" -> "http://bookstore", "books" -> "http://bookstore")
+
+    val docBuilder: Document =
       document(
         uriOption = None,
         children = Vector(
           elem(
             qname = QName("books:Bookstore"),
-            namespaces = Declarations.from("" -> "http://bookstore", "books" -> "http://bookstore"),
+            scope = startScope,
             children = Vector(
               elem(
                 qname = QName("Book"),
-                attributes = Vector(QName("Edition") -> "3rd", QName("ISBN") -> "ISBN-0-13-713526-2", QName("Price") -> "85"),
+                attributes =
+                  Vector(QName("Edition") -> "3rd", QName("ISBN") -> "ISBN-0-13-713526-2", QName("Price") -> "85"),
+                startScope,
                 children = Vector(
                   elem(
                     qname = QName("Title"),
-                    children = Vector(
-                      text("""A First Course in Database Systems"""))),
+                    scope = startScope,
+                    children = Vector(text("""A First Course in Database Systems"""))),
                   elem(
                     qname = QName("Authors"),
+                    scope = startScope,
                     children = Vector(
                       elem(
                         qname = QName("Author"),
+                        scope = startScope,
                         children = Vector(
-                          elem(
-                            qname = QName("First_Name"),
-                            children = Vector(
-                              text("Jeffrey"))),
-                          elem(
-                            qname = QName("Last_Name"),
-                            children = Vector(
-                              text("Ullman"))))),
+                          elem(qname = QName("First_Name"), scope = startScope, children = Vector(text("Jeffrey"))),
+                          elem(qname = QName("Last_Name"), scope = startScope, children = Vector(text("Ullman")))
+                        )
+                      ),
                       elem(
                         qname = QName("Author"),
+                        scope = startScope,
                         children = Vector(
-                          elem(
-                            qname = QName("First_Name"),
-                            children = Vector(
-                              text("Jennifer"))),
-                          elem(
-                            qname = QName("Last_Name"),
-                            children = Vector(
-                              text("Widom"))))))))),
+                          elem(qname = QName("First_Name"), scope = startScope, children = Vector(text("Jennifer"))),
+                          elem(qname = QName("Last_Name"), scope = startScope, children = Vector(text("Widom")))
+                        )
+                      )
+                    )
+                  )
+                )
+              ),
               elem(
                 qname = QName("Book"),
                 attributes = Vector(QName("ISBN") -> "ISBN-0-13-815504-6", QName("Price") -> "100"),
+                scope = startScope,
                 children = Vector(
                   elem(
                     qname = QName("Title"),
-                    children = Vector(
-                      text("""Database Systems: The Complete Book"""))),
+                    scope = startScope,
+                    children = Vector(text("""Database Systems: The Complete Book"""))),
                   elem(
                     qname = QName("Authors"),
+                    scope = startScope,
                     children = Vector(
                       elem(
                         qname = QName("Author"),
+                        scope = startScope,
                         children = Vector(
-                          elem(
-                            qname = QName("First_Name"),
-                            children = Vector(
-                              text("Hector"))),
-                          elem(
-                            qname = QName("Last_Name"),
-                            children = Vector(
-                              text("Garcia-Molina"))))),
+                          elem(qname = QName("First_Name"), scope = startScope, children = Vector(text("Hector"))),
+                          elem(qname = QName("Last_Name"), scope = startScope, children = Vector(text("Garcia-Molina")))
+                        )
+                      ),
                       elem(
                         qname = QName("Author"),
+                        scope = startScope,
                         children = Vector(
-                          elem(
-                            qname = QName("First_Name"),
-                            children = Vector(
-                              text("Jeffrey"))),
-                          elem(
-                            qname = QName("Last_Name"),
-                            children = Vector(
-                              text("Ullman"))))),
+                          elem(qname = QName("First_Name"), scope = startScope, children = Vector(text("Jeffrey"))),
+                          elem(qname = QName("Last_Name"), scope = startScope, children = Vector(text("Ullman")))
+                        )
+                      ),
                       elem(
                         qname = QName("Author"),
+                        scope = startScope,
                         children = Vector(
-                          elem(
-                            qname = QName("First_Name"),
-                            children = Vector(
-                              text("Jennifer"))),
-                          elem(
-                            qname = QName("Last_Name"),
-                            children = Vector(
-                              text("Widom"))))))),
+                          elem(qname = QName("First_Name"), scope = startScope, children = Vector(text("Jennifer"))),
+                          elem(qname = QName("Last_Name"), scope = startScope, children = Vector(text("Widom")))
+                        )
+                      )
+                    )
+                  ),
                   elem(
                     qname = QName("Remark"),
-                    children = Vector(
-                      text(
-                        """Buy this book bundled with "A First Course" - a great deal!
-                        """))))),
+                    scope = startScope,
+                    children = Vector(text("""Buy this book bundled with "A First Course" - a great deal!
+                        """))
+                  )
+                )
+              ),
               elem(
                 qname = QName("Book"),
                 attributes = Vector(QName("ISBN") -> "ISBN-0-11-222222-3", QName("Price") -> "50"),
+                scope = startScope,
                 children = Vector(
                   elem(
                     qname = QName("Title"),
-                    children = Vector(
-                      text("""Hector and Jeff's Database Hints"""))),
+                    scope = startScope,
+                    children = Vector(text("""Hector and Jeff's Database Hints"""))),
                   elem(
                     qname = QName("Authors"),
+                    scope = startScope,
                     children = Vector(
                       elem(
                         qname = QName("Author"),
+                        scope = startScope,
                         children = Vector(
-                          elem(
-                            qname = QName("First_Name"),
-                            children = Vector(
-                              text("Jeffrey"))),
-                          elem(
-                            qname = QName("Last_Name"),
-                            children = Vector(
-                              text("Ullman"))))),
+                          elem(qname = QName("First_Name"), scope = startScope, children = Vector(text("Jeffrey"))),
+                          elem(qname = QName("Last_Name"), scope = startScope, children = Vector(text("Ullman")))
+                        )
+                      ),
                       elem(
                         qname = QName("Author"),
+                        scope = startScope,
                         children = Vector(
-                          elem(
-                            qname = QName("First_Name"),
-                            children = Vector(
-                              text("Hector"))),
-                          elem(
-                            qname = QName("Last_Name"),
-                            children = Vector(
-                              text("Garcia-Molina"))))))),
+                          elem(qname = QName("First_Name"), scope = startScope, children = Vector(text("Hector"))),
+                          elem(qname = QName("Last_Name"), scope = startScope, children = Vector(text("Garcia-Molina")))
+                        )
+                      )
+                    )
+                  ),
                   elem(
                     qname = QName("Remark"),
-                    children = Vector(
-                      text("""An indispensable companion to your textbook"""))))),
+                    scope = startScope,
+                    children = Vector(text("""An indispensable companion to your textbook""")))
+                )
+              ),
               elem(
                 qname = QName("Book"),
                 attributes = Vector(QName("ISBN") -> "ISBN-9-88-777777-6", QName("Price") -> "25"),
+                scope = startScope,
                 children = Vector(
                   elem(
                     qname = QName("Title"),
-                    children = Vector(
-                      text("""Jennifer's Economical Database Hints"""))),
+                    scope = startScope,
+                    children = Vector(text("""Jennifer's Economical Database Hints"""))),
                   elem(
                     qname = QName("Authors"),
-                    children = Vector(
-                      elem(
-                        qname = QName("Author"),
-                        children = Vector(
-                          elem(
-                            qname = QName("First_Name"),
-                            children = Vector(
-                              text("Jennifer"))),
-                          elem(
-                            qname = QName("Last_Name"),
-                            children = Vector(
-                              text("Widom"))))))))),
+                    scope = startScope,
+                    children = Vector(elem(
+                      qname = QName("Author"),
+                      scope = startScope,
+                      children = Vector(
+                        elem(qname = QName("First_Name"), scope = startScope, children = Vector(text("Jennifer"))),
+                        elem(qname = QName("Last_Name"), scope = startScope, children = Vector(text("Widom")))
+                      )
+                    ))
+                  )
+                )
+              ),
               elem(
                 qname = QName("Magazine"),
                 attributes = Vector(QName("Month") -> "January", QName("Year") -> "2009"),
+                scope = startScope,
                 children = Vector(
-                  elem(
-                    qname = QName("Title"),
-                    children = Vector(
-                      text("""National Geographic"""))))),
+                  elem(qname = QName("Title"), scope = startScope, children = Vector(text("""National Geographic"""))))
+              ),
               elem(
                 qname = QName("Magazine"),
                 attributes = Vector(QName("Month") -> "February", QName("Year") -> "2009"),
+                scope = startScope,
                 children = Vector(
-                  elem(
-                    qname = QName("Title"),
-                    children = Vector(
-                      text("""National Geographic"""))))),
+                  elem(qname = QName("Title"), scope = startScope, children = Vector(text("""National Geographic"""))))
+              ),
               elem(
                 qname = QName("Magazine"),
                 attributes = Vector(QName("Month") -> "February", QName("Year") -> "2009"),
-                children = Vector(
-                  elem(
-                    qname = QName("Title"),
-                    children = Vector(
-                      text("Newsweek"))))),
+                scope = startScope,
+                children = Vector(elem(qname = QName("Title"), scope = startScope, children = Vector(text("Newsweek"))))
+              ),
               elem(
                 qname = QName("Magazine"),
                 attributes = Vector(QName("Month") -> "March", QName("Year") -> "2009"),
+                scope = startScope,
                 children = Vector(
                   elem(
                     qname = QName("Title"),
-                    children = Vector(
-                      text("""Hector and Jeff's Database Hints""")))))))))
+                    scope = startScope,
+                    children = Vector(text("""Hector and Jeff's Database Hints"""))))
+              )
+            )
+          ))
+      )
 
     doTest(doc, docBuilder)
   }
@@ -244,17 +245,18 @@ class TreeReprTest extends AnyFunSuite {
 
     val doc: Document = domParser.parse(is)
 
-    val docBuilder: DocBuilder =
+    val startScope: Scope = Scope.from("ns" -> "http://www.yahoo.com")
+
+    val docBuilder: Document =
       document(
         uriOption = None,
         children = Vector(
           elem(
             qname = QName("bar"),
-            namespaces = Declarations.from("ns" -> "http://www.yahoo.com"),
-            children = Vector(
-              emptyElem(
-                qname = QName("ns:foo"),
-                namespaces = Declarations.from("ns" -> "http://www.google.com"))))))
+            scope = startScope,
+            children =
+              Vector(emptyElem(qname = QName("ns:foo"), scope = startScope.append("ns", "http://www.google.com")))))
+      )
 
     doTest(doc, docBuilder)
   }
@@ -266,18 +268,20 @@ class TreeReprTest extends AnyFunSuite {
 
     val doc: Document = domParser.parse(is)
 
-    val docBuilder: DocBuilder =
+    val docBuilder: Document =
       document(
         uriOption = None,
         children = Vector(
           comment(""" This is trivial XML """),
           elem(
             qname = QName("root"),
-            namespaces = Declarations.from("" -> "urn:foo:bar"),
+            scope = Scope.from("" -> "urn:foo:bar"),
             children = Vector(
               comment(""" Trivial XML """),
-              emptyElem(
-                qname = QName("child"))))))
+              emptyElem(qname = QName("child"), scope = Scope.from("" -> "urn:foo:bar")))
+          )
+        )
+      )
 
     doTest(doc, docBuilder)
   }
@@ -288,21 +292,22 @@ class TreeReprTest extends AnyFunSuite {
 
     val doc: Document = domParser.parse(is)
 
-    val docBuilder: DocBuilder =
+    val docBuilder: Document =
       document(
         uriOption = None,
         children = Vector(
           elem(
             qname = QName("root"),
-            namespaces = Declarations.from("" -> "urn:foo:bar"),
-            children = Vector(
-              elem(
-                qname = QName("child"),
-                children = Vector(
-                  text(
-                    """This text contains an entity reference, viz. hi.
+            scope = Scope.from("" -> "urn:foo:bar"),
+            children = Vector(elem(
+              qname = QName("child"),
+              scope = Scope.from("" -> "urn:foo:bar"),
+              children = Vector(text("""This text contains an entity reference, viz. hi.
   The entity is defined in the included DTD.
-  """)))))))
+  """))
+            ))
+          ))
+      )
 
     doTest(doc, docBuilder)
   }
@@ -315,23 +320,25 @@ class TreeReprTest extends AnyFunSuite {
 
     val doc: Document = domParser.parse(is)
 
-    val docBuilder: DocBuilder =
+    val docBuilder: Document =
       document(
         uriOption = None,
         children = Vector(
           elem(
             qname = QName("root"),
-            namespaces = Declarations.from("" -> "urn:foo:bar"),
-            children = Vector(
-              elem(
-                qname = QName("child"),
-                children = Vector(
-                  text("""This text contains an entity reference, viz. """),
-                  entityRef("hello"),
-                  text(
-                    """hi.
+            scope = Scope.from("" -> "urn:foo:bar"),
+            children = Vector(elem(
+              qname = QName("child"),
+              scope = Scope.from("" -> "urn:foo:bar"),
+              children = Vector(
+                text("""This text contains an entity reference, viz. """),
+                entityRef("hello"),
+                text("""hi.
   The entity is defined in the included DTD.
-  """)))))))
+  """))
+            ))
+          ))
+      )
 
     // We only check the entity reference, for consistent results between Oracle and IBM J9.
     // Note that above the string "hi" should not be there in the first place in the second text node.
@@ -339,15 +346,13 @@ class TreeReprTest extends AnyFunSuite {
     def transform(d: Document): Document = {
       d.transformElemsOrSelf {
         case e if e.localName == "child" =>
-          e.withChildren(e.children collect { case er: EntityRef => er })
+          e.withChildren(e.children.collect { case er: EntityRef                          => er })
             .ensuring(_.findAllElemsOrSelf.flatMap(_.children.collect { case er: EntityRef => er }).nonEmpty)
         case e => e
       }
     }
 
-    doTest(
-      transform(doc),
-      DocBuilder.fromDocument(transform(docBuilder.build())))
+    doTest(transform(doc), transform(docBuilder))
   }
 
   test("testCreateTreeForXmlWithNamespaceUndeclarations") {
@@ -356,29 +361,31 @@ class TreeReprTest extends AnyFunSuite {
 
     val doc: Document = domParser.parse(is)
 
-    val docBuilder: DocBuilder =
+    val docBuilder: Document =
       document(
         uriOption = None,
         children = Vector(
           elem(
             qname = QName("root"),
-            namespaces = Declarations.from("" -> "urn:foo:bar"),
-            children = Vector(
-              elem(
-                qname = QName("a"),
+            scope = Scope.from("" -> "urn:foo:bar"),
+            children = Vector(elem(
+              qname = QName("a"),
+              scope = Scope.from("" -> "urn:foo:bar"),
+              children = Vector(elem(
+                qname = QName("b"),
+                scope = Scope.Empty,
                 children = Vector(
                   elem(
-                    qname = QName("b"),
-                    namespaces = Declarations.from("" -> ""),
-                    children = Vector(
-                      elem(
-                        qname = QName("c"),
-                        children = Vector(
-                          elem(
-                            qname = QName("d"),
-                            namespaces = Declarations.from("" -> "urn:foo:bar"),
-                            children = Vector(
-                              text("text")))))))))))))
+                    qname = QName("c"),
+                    scope = Scope.Empty,
+                    children = Vector(elem(
+                      qname = QName("d"),
+                      scope = Scope.from("" -> "urn:foo:bar"),
+                      children = Vector(text("text"))))))
+              ))
+            ))
+          ))
+      )
 
     doTest(doc, docBuilder)
   }
@@ -391,31 +398,34 @@ class TreeReprTest extends AnyFunSuite {
 
     val doc: Document = domParser.parse(is)
 
-    val docBuilder: DocBuilder =
+    val docBuilder: Document =
       document(
         uriOption = None,
         children = Vector(
           elem(
             qname = QName("root"),
-            namespaces = Declarations.from("" -> "urn:foo:bar"),
+            scope = Scope.from("" -> "urn:foo:bar"),
             children = Vector(
               comment(""" Jansen & co """),
               elem(
                 qname = QName("child"),
                 attributes = Vector(QName("about") -> """Jansen & co"""),
-                children = Vector(
-                  text(
-                    """
+                scope = Scope.from("" -> "urn:foo:bar"),
+                children = Vector(text("""
     Jansen & co
-  """))),
+  """))
+              ),
               elem(
                 qname = QName("child"),
                 attributes = Vector(QName("about") -> """Jansen & co"""),
-                children = Vector(
-                  text(
-                    """
+                scope = Scope.from("" -> "urn:foo:bar"),
+                children = Vector(text("""
   Jansen & co
-  """)))))))
+  """))
+              )
+            )
+          ))
+      )
 
     doTest(doc, docBuilder)
   }
@@ -433,16 +443,19 @@ class TreeReprTest extends AnyFunSuite {
         children = Vector(
           elem(
             qname = QName("root"),
-            namespaces = Declarations.from("" -> "urn:foo:bar"),
+            scope = Scope.from("" -> "urn:foo:bar"),
             children = Vector(
               elem(
                 qname = QName("child"),
-                children = Vector(
-                  text("""€ 200"""))),
+                scope = Scope.from("" -> "urn:foo:bar"),
+                children = Vector(text("""€ 200"""))),
               elem(
                 qname = QName("child"),
-                children = Vector(
-                  text("""€ 200""")))))))
+                scope = Scope.from("" -> "urn:foo:bar"),
+                children = Vector(text("""€ 200""")))
+            )
+          ))
+      )
 
     doTest(doc, docBuilder)
   }
@@ -456,57 +469,63 @@ class TreeReprTest extends AnyFunSuite {
 
     val doc = parser.parse(classOf[TreeReprTest].getResourceAsStream("cars.xml"))
 
-    val docBuilder: DocBuilder =
+    val docBuilder: Document =
       document(
         uriOption = None,
         children = Vector(
           comment(""" Copied from http://groovy.codehaus.org/Reading+XML+using+Groovy%27s+XmlParser """),
           elem(
             qname = QName("records"),
+            scope = Scope.Empty,
             children = Vector(
               elem(
                 qname = QName("car"),
-                attributes = Vector(QName("make") -> "Holden", QName("name") -> """HSV Maloo""", QName("year") -> "2006"),
+                attributes =
+                  Vector(QName("make") -> "Holden", QName("name") -> """HSV Maloo""", QName("year") -> "2006"),
+                scope = Scope.Empty,
                 children = Vector(
-                  elem(
-                    qname = QName("country"),
-                    children = Vector(
-                      text("Australia"))),
+                  elem(qname = QName("country"), scope = Scope.Empty, children = Vector(text("Australia"))),
                   elem(
                     qname = QName("record"),
                     attributes = Vector(QName("type") -> "speed"),
-                    children = Vector(
-                      text(
-                        """Production Pickup Truck with speed of 271kph
-                        """))))),
+                    scope = Scope.Empty,
+                    children = Vector(text("""Production Pickup Truck with speed of 271kph
+                        """))
+                  )
+                )
+              ),
               elem(
                 qname = QName("car"),
                 attributes = Vector(QName("make") -> "Peel", QName("name") -> "P50", QName("year") -> "1962"),
+                scope = Scope.Empty,
                 children = Vector(
-                  elem(
-                    qname = QName("country"),
-                    children = Vector(
-                      text("""Isle of Man"""))),
+                  elem(qname = QName("country"), scope = Scope.Empty, children = Vector(text("""Isle of Man"""))),
                   elem(
                     qname = QName("record"),
                     attributes = Vector(QName("type") -> "size"),
-                    children = Vector(
-                      text(
-                        """Smallest Street-Legal Car at 99cm wide and 59 kg
-      in weight"""))))),
+                    scope = Scope.Empty,
+                    children = Vector(text("""Smallest Street-Legal Car at 99cm wide and 59 kg
+      in weight"""))
+                  )
+                )
+              ),
               elem(
                 qname = QName("car"),
                 attributes = Vector(QName("make") -> "Bugatti", QName("name") -> "Royale", QName("year") -> "1931"),
+                scope = Scope.Empty,
                 children = Vector(
-                  elem(
-                    qname = QName("country"),
-                    children = Vector(
-                      text("France"))),
+                  elem(qname = QName("country"), scope = Scope.Empty, children = Vector(text("France"))),
                   elem(
                     qname = QName("record"),
                     attributes = Vector(QName("type") -> "price"),
-                    children = Vector(
-                      text("""Most Valuable Car at $15 million""")))))))))
+                    scope = Scope.Empty,
+                    children = Vector(text("""Most Valuable Car at $15 million""")))
+                )
+              )
+            )
+          )
+        )
+      )
 
     doTest(doc, docBuilder)
   }
@@ -522,188 +541,190 @@ class TreeReprTest extends AnyFunSuite {
 
     val doc: Document = domParser.parse(new java.io.ByteArrayInputStream(baWithBom))
 
-    val docBuilder: DocBuilder =
+    val startScope: Scope = Scope.from("" -> "http://bookstore", "books" -> "http://bookstore")
+
+    val docBuilder: Document =
       document(
         uriOption = None,
         children = Vector(
           elem(
             qname = QName("books:Bookstore"),
-            namespaces = Declarations.from("" -> "http://bookstore", "books" -> "http://bookstore"),
+            scope = startScope,
             children = Vector(
               elem(
                 qname = QName("Book"),
-                attributes = Vector(QName("Edition") -> "3rd", QName("ISBN") -> "ISBN-0-13-713526-2", QName("Price") -> "85"),
+                attributes =
+                  Vector(QName("Edition") -> "3rd", QName("ISBN") -> "ISBN-0-13-713526-2", QName("Price") -> "85"),
+                scope = startScope,
                 children = Vector(
                   elem(
                     qname = QName("Title"),
-                    children = Vector(
-                      text("""A First Course in Database Systems"""))),
+                    scope = startScope,
+                    children = Vector(text("""A First Course in Database Systems"""))),
                   elem(
                     qname = QName("Authors"),
+                    scope = startScope,
                     children = Vector(
                       elem(
                         qname = QName("Author"),
+                        scope = startScope,
                         children = Vector(
-                          elem(
-                            qname = QName("First_Name"),
-                            children = Vector(
-                              text("Jeffrey"))),
-                          elem(
-                            qname = QName("Last_Name"),
-                            children = Vector(
-                              text("Ullman"))))),
+                          elem(qname = QName("First_Name"), scope = startScope, children = Vector(text("Jeffrey"))),
+                          elem(qname = QName("Last_Name"), scope = startScope, children = Vector(text("Ullman")))
+                        )
+                      ),
                       elem(
                         qname = QName("Author"),
+                        scope = startScope,
                         children = Vector(
-                          elem(
-                            qname = QName("First_Name"),
-                            children = Vector(
-                              text("Jennifer"))),
-                          elem(
-                            qname = QName("Last_Name"),
-                            children = Vector(
-                              text("Widom"))))))))),
+                          elem(qname = QName("First_Name"), scope = startScope, children = Vector(text("Jennifer"))),
+                          elem(qname = QName("Last_Name"), scope = startScope, children = Vector(text("Widom")))
+                        )
+                      )
+                    )
+                  )
+                )
+              ),
               elem(
                 qname = QName("Book"),
                 attributes = Vector(QName("ISBN") -> "ISBN-0-13-815504-6", QName("Price") -> "100"),
+                scope = startScope,
                 children = Vector(
                   elem(
                     qname = QName("Title"),
-                    children = Vector(
-                      text("""Database Systems: The Complete Book"""))),
+                    scope = startScope,
+                    children = Vector(text("""Database Systems: The Complete Book"""))),
                   elem(
                     qname = QName("Authors"),
+                    scope = startScope,
                     children = Vector(
                       elem(
                         qname = QName("Author"),
+                        scope = startScope,
                         children = Vector(
-                          elem(
-                            qname = QName("First_Name"),
-                            children = Vector(
-                              text("Hector"))),
-                          elem(
-                            qname = QName("Last_Name"),
-                            children = Vector(
-                              text("Garcia-Molina"))))),
+                          elem(qname = QName("First_Name"), scope = startScope, children = Vector(text("Hector"))),
+                          elem(qname = QName("Last_Name"), scope = startScope, children = Vector(text("Garcia-Molina")))
+                        )
+                      ),
                       elem(
                         qname = QName("Author"),
+                        scope = startScope,
                         children = Vector(
-                          elem(
-                            qname = QName("First_Name"),
-                            children = Vector(
-                              text("Jeffrey"))),
-                          elem(
-                            qname = QName("Last_Name"),
-                            children = Vector(
-                              text("Ullman"))))),
+                          elem(qname = QName("First_Name"), scope = startScope, children = Vector(text("Jeffrey"))),
+                          elem(qname = QName("Last_Name"), scope = startScope, children = Vector(text("Ullman")))
+                        )
+                      ),
                       elem(
                         qname = QName("Author"),
+                        scope = startScope,
                         children = Vector(
-                          elem(
-                            qname = QName("First_Name"),
-                            children = Vector(
-                              text("Jennifer"))),
-                          elem(
-                            qname = QName("Last_Name"),
-                            children = Vector(
-                              text("Widom"))))))),
+                          elem(qname = QName("First_Name"), scope = startScope, children = Vector(text("Jennifer"))),
+                          elem(qname = QName("Last_Name"), scope = startScope, children = Vector(text("Widom")))
+                        )
+                      )
+                    )
+                  ),
                   elem(
                     qname = QName("Remark"),
-                    children = Vector(
-                      text(
-                        """Buy this book bundled with "A First Course" - a great deal!
-                        """))))),
+                    scope = startScope,
+                    children = Vector(text("""Buy this book bundled with "A First Course" - a great deal!
+                        """))
+                  )
+                )
+              ),
               elem(
                 qname = QName("Book"),
                 attributes = Vector(QName("ISBN") -> "ISBN-0-11-222222-3", QName("Price") -> "50"),
+                scope = startScope,
                 children = Vector(
                   elem(
                     qname = QName("Title"),
-                    children = Vector(
-                      text("""Hector and Jeff's Database Hints"""))),
+                    scope = startScope,
+                    children = Vector(text("""Hector and Jeff's Database Hints"""))),
                   elem(
                     qname = QName("Authors"),
+                    scope = startScope,
                     children = Vector(
                       elem(
                         qname = QName("Author"),
+                        scope = startScope,
                         children = Vector(
-                          elem(
-                            qname = QName("First_Name"),
-                            children = Vector(
-                              text("Jeffrey"))),
-                          elem(
-                            qname = QName("Last_Name"),
-                            children = Vector(
-                              text("Ullman"))))),
+                          elem(qname = QName("First_Name"), scope = startScope, children = Vector(text("Jeffrey"))),
+                          elem(qname = QName("Last_Name"), scope = startScope, children = Vector(text("Ullman")))
+                        )
+                      ),
                       elem(
                         qname = QName("Author"),
+                        scope = startScope,
                         children = Vector(
-                          elem(
-                            qname = QName("First_Name"),
-                            children = Vector(
-                              text("Hector"))),
-                          elem(
-                            qname = QName("Last_Name"),
-                            children = Vector(
-                              text("Garcia-Molina"))))))),
+                          elem(qname = QName("First_Name"), scope = startScope, children = Vector(text("Hector"))),
+                          elem(qname = QName("Last_Name"), scope = startScope, children = Vector(text("Garcia-Molina")))
+                        )
+                      )
+                    )
+                  ),
                   elem(
                     qname = QName("Remark"),
-                    children = Vector(
-                      text("""An indispensable companion to your textbook"""))))),
+                    scope = startScope,
+                    children = Vector(text("""An indispensable companion to your textbook""")))
+                )
+              ),
               elem(
                 qname = QName("Book"),
                 attributes = Vector(QName("ISBN") -> "ISBN-9-88-777777-6", QName("Price") -> "25"),
+                scope = startScope,
                 children = Vector(
                   elem(
                     qname = QName("Title"),
-                    children = Vector(
-                      text("""Jennifer's Economical Database Hints"""))),
+                    scope = startScope,
+                    children = Vector(text("""Jennifer's Economical Database Hints"""))),
                   elem(
                     qname = QName("Authors"),
-                    children = Vector(
-                      elem(
-                        qname = QName("Author"),
-                        children = Vector(
-                          elem(
-                            qname = QName("First_Name"),
-                            children = Vector(
-                              text("Jennifer"))),
-                          elem(
-                            qname = QName("Last_Name"),
-                            children = Vector(
-                              text("Widom"))))))))),
+                    scope = startScope,
+                    children = Vector(elem(
+                      qname = QName("Author"),
+                      scope = startScope,
+                      children = Vector(
+                        elem(qname = QName("First_Name"), scope = startScope, children = Vector(text("Jennifer"))),
+                        elem(qname = QName("Last_Name"), scope = startScope, children = Vector(text("Widom")))
+                      )
+                    ))
+                  )
+                )
+              ),
               elem(
                 qname = QName("Magazine"),
                 attributes = Vector(QName("Month") -> "January", QName("Year") -> "2009"),
+                scope = startScope,
                 children = Vector(
-                  elem(
-                    qname = QName("Title"),
-                    children = Vector(
-                      text("""National Geographic"""))))),
+                  elem(qname = QName("Title"), scope = startScope, children = Vector(text("""National Geographic"""))))
+              ),
               elem(
                 qname = QName("Magazine"),
                 attributes = Vector(QName("Month") -> "February", QName("Year") -> "2009"),
+                scope = startScope,
                 children = Vector(
-                  elem(
-                    qname = QName("Title"),
-                    children = Vector(
-                      text("""National Geographic"""))))),
+                  elem(qname = QName("Title"), scope = startScope, children = Vector(text("""National Geographic"""))))
+              ),
               elem(
                 qname = QName("Magazine"),
                 attributes = Vector(QName("Month") -> "February", QName("Year") -> "2009"),
-                children = Vector(
-                  elem(
-                    qname = QName("Title"),
-                    children = Vector(
-                      text("Newsweek"))))),
+                scope = startScope,
+                children = Vector(elem(qname = QName("Title"), scope = startScope, children = Vector(text("Newsweek"))))
+              ),
               elem(
                 qname = QName("Magazine"),
                 attributes = Vector(QName("Month") -> "March", QName("Year") -> "2009"),
+                scope = startScope,
                 children = Vector(
                   elem(
                     qname = QName("Title"),
-                    children = Vector(
-                      text("""Hector and Jeff's Database Hints""")))))))))
+                    scope = startScope,
+                    children = Vector(text("""Hector and Jeff's Database Hints"""))))
+              )
+            )
+          ))
+      )
 
     doTest(doc, docBuilder)
   }
@@ -727,31 +748,35 @@ class TreeReprTest extends AnyFunSuite {
 
     val doc = parser.parse(new InputSource(new java.io.StringReader(xmlString)))
 
-    val docBuilder: DocBuilder =
+    val docBuilder: Document =
       document(
         uriOption = None,
         children = Vector(
           elem(
             qname = QName("rootElem"),
-            children = Vector(
-              elem(
-                qname = QName("listing"),
-                children = Vector(
-                  emptyElem(
-                    qname = QName("item")),
-                  emptyElem(
-                    qname = QName("item")),
-                  comment(""" some comment """)))))))
+            scope = Scope.Empty,
+            children = Vector(elem(
+              qname = QName("listing"),
+              scope = Scope.Empty,
+              children = Vector(
+                emptyElem(qname = QName("item"), scope = Scope.Empty),
+                emptyElem(qname = QName("item"), scope = Scope.Empty),
+                comment(""" some comment """))
+            ))
+          ))
+      )
 
     doTest(doc, docBuilder)
   }
 
-  private def doTest(doc: Document, docBuilder: DocBuilder): Unit = {
-    val doc2 = docBuilder.build().transformingDocumentElement(e => e.removeAllInterElementWhitespace.coalesceAndNormalizeAllText)
+  private def doTest(doc: Document, docBuilder: Document): Unit = {
+    val doc2 =
+      docBuilder.transformingDocumentElement(e => e.removeAllInterElementWhitespace.coalesceAndNormalizeAllText)
 
     // Call printTreeReprs to compare the toString result pairs!
 
-    assertResult(doc.transformingDocumentElement(e => e.removeAllInterElementWhitespace.coalesceAndNormalizeAllText).toString) {
+    assertResult(
+      doc.transformingDocumentElement(e => e.removeAllInterElementWhitespace.coalesceAndNormalizeAllText).toString) {
       doc2.toString
     }
   }

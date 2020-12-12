@@ -23,7 +23,7 @@ import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi._
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.simple.Document
-import eu.cdevreeze.yaidom.simple.NodeBuilder
+import eu.cdevreeze.yaidom.simple.Node
 import org.scalatest.funsuite.AnyFunSuite
 
 /**
@@ -46,7 +46,7 @@ class OtherNamespaceTestUsingXmlLiterals extends AnyFunSuite {
     val doc = Document(convertToElem(xml))
 
     assertResult(List(QName("prod", "product"), QName("prod", "number"), QName("prod", "size"))) {
-      doc.documentElement.findAllElemsOrSelf map {
+      doc.documentElement.findAllElemsOrSelf.map {
         _.qname
       }
     }
@@ -54,7 +54,7 @@ class OtherNamespaceTestUsingXmlLiterals extends AnyFunSuite {
     val ns = "http://datypic.com/prod"
 
     assertResult(List(EName(ns, "product"), EName(ns, "number"), EName(ns, "size"))) {
-      doc.documentElement.findAllElemsOrSelf map {
+      doc.documentElement.findAllElemsOrSelf.map {
         _.resolvedName
       }
     }
@@ -105,7 +105,7 @@ class OtherNamespaceTestUsingXmlLiterals extends AnyFunSuite {
         QName("prod", "product"),
         QName("prod", "number"),
         QName("prod", "size"))) {
-      doc.documentElement.findAllElemsOrSelf map {
+      doc.documentElement.findAllElemsOrSelf.map {
         _.qname
       }
     }
@@ -121,7 +121,7 @@ class OtherNamespaceTestUsingXmlLiterals extends AnyFunSuite {
         EName(nsProd, "product"),
         EName(nsProd, "number"),
         EName(nsProd, "size"))) {
-      doc.documentElement.findAllElemsOrSelf map {
+      doc.documentElement.findAllElemsOrSelf.map {
         _.resolvedName
       }
     }
@@ -177,7 +177,7 @@ class OtherNamespaceTestUsingXmlLiterals extends AnyFunSuite {
         QName("prod", "product"),
         QName("prod", "number"),
         QName("prod", "size"))) {
-      doc.documentElement.findAllElemsOrSelf map {
+      doc.documentElement.findAllElemsOrSelf.map {
         _.qname
       }
     }
@@ -193,7 +193,7 @@ class OtherNamespaceTestUsingXmlLiterals extends AnyFunSuite {
         EName(nsProd, "product"),
         EName(nsProd, "number"),
         EName(nsProd, "size"))) {
-      doc.documentElement.findAllElemsOrSelf map {
+      doc.documentElement.findAllElemsOrSelf.map {
         _.resolvedName
       }
     }
@@ -253,13 +253,13 @@ class OtherNamespaceTestUsingXmlLiterals extends AnyFunSuite {
         EName(nsProd, "product"),
         EName(nsProd, "number"),
         EName(nsProd, "size"))) {
-      resolvedEquivalentElem.findAllElemsOrSelf map {
+      resolvedEquivalentElem.findAllElemsOrSelf.map {
         _.resolvedName
       }
     }
 
-    assertResult(resolvedEquivalentElem.findAllElemsOrSelf map (_.resolvedName)) {
-      resolvedElem.findAllElemsOrSelf map {
+    assertResult(resolvedEquivalentElem.findAllElemsOrSelf.map(_.resolvedName)) {
+      resolvedElem.findAllElemsOrSelf.map {
         _.resolvedName
       }
     }
@@ -291,7 +291,7 @@ class OtherNamespaceTestUsingXmlLiterals extends AnyFunSuite {
         QName("prod", "product"),
         QName("prod", "number"),
         QName("prod", "size"))) {
-      doc.documentElement.findAllElemsOrSelf map {
+      doc.documentElement.findAllElemsOrSelf.map {
         _.qname
       }
     }
@@ -307,7 +307,7 @@ class OtherNamespaceTestUsingXmlLiterals extends AnyFunSuite {
         EName(nsProd, "product"),
         EName(nsProd, "number"),
         EName(nsProd, "size"))) {
-      doc.documentElement.findAllElemsOrSelf map {
+      doc.documentElement.findAllElemsOrSelf.map {
         _.resolvedName
       }
     }
@@ -367,13 +367,13 @@ class OtherNamespaceTestUsingXmlLiterals extends AnyFunSuite {
         EName(nsProd, "product"),
         EName(nsProd, "number"),
         EName(nsProd, "size"))) {
-      resolvedEquivalentElem.findAllElemsOrSelf map {
+      resolvedEquivalentElem.findAllElemsOrSelf.map {
         _.resolvedName
       }
     }
 
-    assertResult(resolvedEquivalentElem.findAllElemsOrSelf map (_.resolvedName)) {
-      resolvedElem.findAllElemsOrSelf map {
+    assertResult(resolvedEquivalentElem.findAllElemsOrSelf.map(_.resolvedName)) {
+      resolvedElem.findAllElemsOrSelf.map {
         _.resolvedName
       }
     }
@@ -432,7 +432,7 @@ class OtherNamespaceTestUsingXmlLiterals extends AnyFunSuite {
         QName("prod", "product"),
         QName("prod", "number"),
         QName("prod", "size"))) {
-      doc.documentElement.findAllElemsOrSelf map {
+      doc.documentElement.findAllElemsOrSelf.map {
         _.qname
       }
     }
@@ -449,7 +449,7 @@ class OtherNamespaceTestUsingXmlLiterals extends AnyFunSuite {
         EName(nsProd, "product"),
         EName(nsProd2, "number"),
         EName(nsProd, "size"))) {
-      doc.documentElement.findAllElemsOrSelf map {
+      doc.documentElement.findAllElemsOrSelf.map {
         _.resolvedName
       }
     }
@@ -503,7 +503,7 @@ class OtherNamespaceTestUsingXmlLiterals extends AnyFunSuite {
       case e: resolved.Elem if e.resolvedName == EName(nsProd, "number") =>
         val scope = doc.documentElement.scope ++ Scope.from("prod" -> nsProd2)
         val v = (doc.documentElement \\ EName(nsProd2, "number")).map(_.text).mkString
-        val result = NodeBuilder.textElem(QName("prod", "number"), v).build(scope)
+        val result = Node.textElem(QName("prod", "number"), scope, v)
         resolved.Elem.from(result)
       case e => e
     }
@@ -519,13 +519,13 @@ class OtherNamespaceTestUsingXmlLiterals extends AnyFunSuite {
         EName(nsProd, "product"),
         EName(nsProd2, "number"),
         EName(nsProd, "size"))) {
-      resolvedEquivalentElem.findAllElemsOrSelf map {
+      resolvedEquivalentElem.findAllElemsOrSelf.map {
         _.resolvedName
       }
     }
 
-    assertResult(resolvedEquivalentElem.findAllElemsOrSelf map (_.resolvedName)) {
-      resolvedElem.findAllElemsOrSelf map {
+    assertResult(resolvedEquivalentElem.findAllElemsOrSelf.map(_.resolvedName)) {
+      resolvedElem.findAllElemsOrSelf.map {
         _.resolvedName
       }
     }
@@ -550,14 +550,8 @@ class OtherNamespaceTestUsingXmlLiterals extends AnyFunSuite {
     val doc = Document(convertToElem(xml))
 
     assertResult(
-      List(
-        QName("order"),
-        QName("number"),
-        QName("items"),
-        QName("product"),
-        QName("number"),
-        QName("size"))) {
-      doc.documentElement.findAllElemsOrSelf map {
+      List(QName("order"), QName("number"), QName("items"), QName("product"), QName("number"), QName("size"))) {
+      doc.documentElement.findAllElemsOrSelf.map {
         _.qname
       }
     }
@@ -573,7 +567,7 @@ class OtherNamespaceTestUsingXmlLiterals extends AnyFunSuite {
         EName(nsProd, "product"),
         EName(nsProd, "number"),
         EName(nsProd, "size"))) {
-      doc.documentElement.findAllElemsOrSelf map {
+      doc.documentElement.findAllElemsOrSelf.map {
         _.resolvedName
       }
     }
@@ -633,13 +627,13 @@ class OtherNamespaceTestUsingXmlLiterals extends AnyFunSuite {
         EName(nsProd, "product"),
         EName(nsProd, "number"),
         EName(nsProd, "size"))) {
-      resolvedEquivalentElem.findAllElemsOrSelf map {
+      resolvedEquivalentElem.findAllElemsOrSelf.map {
         _.resolvedName
       }
     }
 
-    assertResult(resolvedEquivalentElem.findAllElemsOrSelf map (_.resolvedName)) {
-      resolvedElem.findAllElemsOrSelf map {
+    assertResult(resolvedEquivalentElem.findAllElemsOrSelf.map(_.resolvedName)) {
+      resolvedElem.findAllElemsOrSelf.map {
         _.resolvedName
       }
     }
@@ -664,14 +658,8 @@ class OtherNamespaceTestUsingXmlLiterals extends AnyFunSuite {
     val doc = Document(convertToElem(xml))
 
     assertResult(
-      List(
-        QName("order"),
-        QName("number"),
-        QName("items"),
-        QName("product"),
-        QName("number"),
-        QName("size"))) {
-      doc.documentElement.findAllElemsOrSelf map {
+      List(QName("order"), QName("number"), QName("items"), QName("product"), QName("number"), QName("size"))) {
+      doc.documentElement.findAllElemsOrSelf.map {
         _.qname
       }
     }
@@ -686,7 +674,7 @@ class OtherNamespaceTestUsingXmlLiterals extends AnyFunSuite {
         EName("product"),
         EName("number"),
         EName("size"))) {
-      doc.documentElement.findAllElemsOrSelf map {
+      doc.documentElement.findAllElemsOrSelf.map {
         _.resolvedName
       }
     }
@@ -745,7 +733,7 @@ class OtherNamespaceTestUsingXmlLiterals extends AnyFunSuite {
         QName("prod", "product"),
         QName("prod", "number"),
         QName("prod", "size"))) {
-      doc.documentElement.findAllElemsOrSelf map {
+      doc.documentElement.findAllElemsOrSelf.map {
         _.qname
       }
     }
@@ -761,7 +749,7 @@ class OtherNamespaceTestUsingXmlLiterals extends AnyFunSuite {
         EName(nsProd, "product"),
         EName(nsProd, "number"),
         EName(nsProd, "size"))) {
-      doc.documentElement.findAllElemsOrSelf map {
+      doc.documentElement.findAllElemsOrSelf.map {
         _.resolvedName
       }
     }
@@ -821,13 +809,13 @@ class OtherNamespaceTestUsingXmlLiterals extends AnyFunSuite {
         EName(nsProd, "product"),
         EName(nsProd, "number"),
         EName(nsProd, "size"))) {
-      resolvedEquivalentElem.findAllElemsOrSelf map {
+      resolvedEquivalentElem.findAllElemsOrSelf.map {
         _.resolvedName
       }
     }
 
-    assertResult(resolvedEquivalentElem.findAllElemsOrSelf map (_.resolvedName)) {
-      resolvedElem.findAllElemsOrSelf map {
+    assertResult(resolvedEquivalentElem.findAllElemsOrSelf.map(_.resolvedName)) {
+      resolvedElem.findAllElemsOrSelf.map {
         _.resolvedName
       }
     }
@@ -847,7 +835,7 @@ class OtherNamespaceTestUsingXmlLiterals extends AnyFunSuite {
     val doc = Document(convertToElem(xml))
 
     assertResult(List(QName("product"), QName("number"), QName("size"))) {
-      doc.documentElement.findAllElemsOrSelf map {
+      doc.documentElement.findAllElemsOrSelf.map {
         _.qname
       }
     }
@@ -856,7 +844,7 @@ class OtherNamespaceTestUsingXmlLiterals extends AnyFunSuite {
     val nsApp = "http://datypic.com/app"
 
     assertResult(List(EName(ns, "product"), EName(ns, "number"), EName(ns, "size"))) {
-      doc.documentElement.findAllElemsOrSelf map {
+      doc.documentElement.findAllElemsOrSelf.map {
         _.resolvedName
       }
     }
@@ -895,7 +883,7 @@ class OtherNamespaceTestUsingXmlLiterals extends AnyFunSuite {
     val doc = Document(convertToElem(xml))
 
     assertResult(List(QName("product"), QName("number"), QName("size"))) {
-      doc.documentElement.findAllElemsOrSelf map {
+      doc.documentElement.findAllElemsOrSelf.map {
         _.qname
       }
     }
@@ -903,7 +891,7 @@ class OtherNamespaceTestUsingXmlLiterals extends AnyFunSuite {
     val ns = "http://datypic.com/prod"
 
     assertResult(List(EName(ns, "product"), EName(ns, "number"), EName(ns, "size"))) {
-      doc.documentElement.findAllElemsOrSelf map {
+      doc.documentElement.findAllElemsOrSelf.map {
         _.resolvedName
       }
     }
@@ -973,8 +961,9 @@ class OtherNamespaceTestUsingXmlLiterals extends AnyFunSuite {
         QName("number"),
         QName("name"),
         QName("prod", "size"),
-        QName("prod", "color"))) {
-      doc.documentElement.findAllElemsOrSelf map {
+        QName("prod", "color")
+      )) {
+      doc.documentElement.findAllElemsOrSelf.map {
         _.qname
       }
     }
@@ -993,8 +982,9 @@ class OtherNamespaceTestUsingXmlLiterals extends AnyFunSuite {
         EName(nsProd, "number"),
         EName("name"),
         EName(nsProd, "size"),
-        EName(nsProd2, "color"))) {
-      doc.documentElement.findAllElemsOrSelf map {
+        EName(nsProd2, "color")
+      )) {
+      doc.documentElement.findAllElemsOrSelf.map {
         _.resolvedName
       }
     }
@@ -1075,14 +1065,15 @@ class OtherNamespaceTestUsingXmlLiterals extends AnyFunSuite {
         EName(nsProd, "number"),
         EName("name"),
         EName(nsProd, "size"),
-        EName(nsProd2, "color"))) {
-      resolvedEquivalentElem.findAllElemsOrSelf map {
+        EName(nsProd2, "color")
+      )) {
+      resolvedEquivalentElem.findAllElemsOrSelf.map {
         _.resolvedName
       }
     }
 
-    assertResult(resolvedEquivalentElem.findAllElemsOrSelf map (_.resolvedName)) {
-      resolvedElem.findAllElemsOrSelf map {
+    assertResult(resolvedEquivalentElem.findAllElemsOrSelf.map(_.resolvedName)) {
+      resolvedElem.findAllElemsOrSelf.map {
         _.resolvedName
       }
     }

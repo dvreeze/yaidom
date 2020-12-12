@@ -16,8 +16,6 @@
 
 package eu.cdevreeze.yaidom.integrationtest
 
-import scala.collection.immutable
-
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
@@ -26,9 +24,10 @@ import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingStax
 import eu.cdevreeze.yaidom.simple.Document
 import eu.cdevreeze.yaidom.simple.Elem
-import eu.cdevreeze.yaidom.simple.ElemBuilder
-import eu.cdevreeze.yaidom.simple.NodeBuilder
+import eu.cdevreeze.yaidom.simple.Node._
 import org.scalatest.funsuite.AnyFunSuite
+
+import scala.collection.immutable
 
 /**
  * Test case using yaidom on files of airports.
@@ -48,7 +47,7 @@ class AirportExampleTest extends AnyFunSuite {
   test("testDocumentStructure") {
     // 1. Parse XML files into Documents
 
-    val saxParser = DocumentParserUsingSax.newInstance
+    val saxParser = DocumentParserUsingSax.newInstance()
 
     val deAirportsDoc: Document = {
       val is = classOf[AirportExampleTest].getResourceAsStream("airportsGermany.xml")
@@ -67,15 +66,19 @@ class AirportExampleTest extends AnyFunSuite {
 
     // 2. Check document structure
 
-    val rootElms = List(deAirportsDoc, beAirportsDoc, nlAirportsDoc) map { doc => doc.documentElement }
+    val rootElms = List(deAirportsDoc, beAirportsDoc, nlAirportsDoc).map { doc =>
+      doc.documentElement
+    }
 
-    rootElms foreach { root => validateDocumentStructure(root) }
+    rootElms.foreach { root =>
+      validateDocumentStructure(root)
+    }
   }
 
   test("testShortDocumentQueries") {
     // 1. Parse XML files into Documents
 
-    val domParser = DocumentParserUsingDom.newInstance
+    val domParser = DocumentParserUsingDom.newInstance()
 
     val deAirportsDoc: Document = {
       val is = classOf[AirportExampleTest].getResourceAsStream("airportsGermany.xml")
@@ -95,7 +98,9 @@ class AirportExampleTest extends AnyFunSuite {
     // 2. Sanity checks on the documents
 
     val beAirportCountries = {
-      val result = beAirportsDoc.documentElement.findAllElems collect { case e if e.localName == "Country" => e.trimmedText }
+      val result = beAirportsDoc.documentElement.findAllElems.collect {
+        case e if e.localName == "Country" => e.trimmedText
+      }
       result.toSet
     }
     assertResult(Set("Belgium")) {
@@ -103,7 +108,9 @@ class AirportExampleTest extends AnyFunSuite {
     }
 
     val nlAirportCountryCodes = {
-      val result = nlAirportsDoc.documentElement.findAllElems collect { case e if e.localName == "CountryCode" => e.trimmedText }
+      val result = nlAirportsDoc.documentElement.findAllElems.collect {
+        case e if e.localName == "CountryCode" => e.trimmedText
+      }
       result.toSet
     }
     assertResult(Set("461")) {
@@ -111,7 +118,9 @@ class AirportExampleTest extends AnyFunSuite {
     }
 
     val deAirportCountryAbbrevs = {
-      val result = deAirportsDoc.documentElement.findAllElems collect { case e if e.localName == "CountryAbbrviation" => e.trimmedText }
+      val result = deAirportsDoc.documentElement.findAllElems.collect {
+        case e if e.localName == "CountryAbbrviation" => e.trimmedText
+      }
       result.toSet
     }
     assertResult(Set("DE")) {
@@ -122,10 +131,14 @@ class AirportExampleTest extends AnyFunSuite {
 
     def highestAirport(root: Elem): Elem = {
       val tableElms = root \\ (_.localName == "Table")
-      val sorted = tableElms sortBy { (e: Elem) =>
-        e findChildElem {
-          _.localName == "RunwayElevationFeet"
-        } map { e => e.trimmedText.toInt } getOrElse (0)
+      val sorted = tableElms.sortBy { (e: Elem) =>
+        e.findChildElem {
+            _.localName == "RunwayElevationFeet"
+          }
+          .map { e =>
+            e.trimmedText.toInt
+          }
+          .getOrElse(0)
       }
       sorted.last
     }
@@ -177,7 +190,7 @@ class AirportExampleTest extends AnyFunSuite {
     val nlAirportsCloseToArnhem = {
       val airportElms = nlAirportsDoc.documentElement.findAllChildElems
 
-      airportElms filter { e =>
+      airportElms.filter { e =>
         val latLon = LatLon(airportLatitude(e), airportLongitude(e))
         latLon.distance(latLonArnhem) <= maxDistance
       }
@@ -186,18 +199,22 @@ class AirportExampleTest extends AnyFunSuite {
     val deAirportsCloseToArnhem = {
       val airportElms = deAirportsDoc.documentElement.findAllChildElems
 
-      airportElms filter { e =>
+      airportElms.filter { e =>
         val latLon = LatLon(airportLatitude(e), airportLongitude(e))
         latLon.distance(latLonArnhem) <= maxDistance
       }
     }
 
     val nlAirportCodesCloseToArnhem = {
-      val result = nlAirportsCloseToArnhem map { e => airportCode(e) }
+      val result = nlAirportsCloseToArnhem.map { e =>
+        airportCode(e)
+      }
       result.toSet
     }
     val deAirportCodesCloseToArnhem = {
-      val result = deAirportsCloseToArnhem map { e => airportCode(e) }
+      val result = deAirportsCloseToArnhem.map { e =>
+        airportCode(e)
+      }
       result.toSet
     }
 
@@ -213,7 +230,7 @@ class AirportExampleTest extends AnyFunSuite {
   test("testDocumentTransformations") {
     // 1. Parse XML files into Documents
 
-    val staxParser = DocumentParserUsingStax.newInstance
+    val staxParser = DocumentParserUsingStax.newInstance()
 
     val deAirportsDoc: Document = {
       val is = classOf[AirportExampleTest].getResourceAsStream("airportsGermany.xml")
@@ -238,9 +255,11 @@ class AirportExampleTest extends AnyFunSuite {
       Elem(
         qname = QName("NewDataSet"),
         scope = scope,
-        children = deAirportsDoc.documentElement.findAllChildElems ++ beAirportsDoc.documentElement.findAllChildElems ++ nlAirportsDoc.documentElement.findAllChildElems)
+        children = deAirportsDoc.documentElement.findAllChildElems ++ beAirportsDoc.documentElement.findAllChildElems ++ nlAirportsDoc.documentElement.findAllChildElems
+      )
 
-    assertResult(deAirportsDoc.documentElement.findAllChildElems.size + beAirportsDoc.documentElement.findAllChildElems.size + nlAirportsDoc.documentElement.findAllChildElems.size) {
+    assertResult(
+      deAirportsDoc.documentElement.findAllChildElems.size + beAirportsDoc.documentElement.findAllChildElems.size + nlAirportsDoc.documentElement.findAllChildElems.size) {
       airportRootElm.findAllChildElems.size
     }
 
@@ -249,84 +268,100 @@ class AirportExampleTest extends AnyFunSuite {
 
     val airportElms: immutable.Seq[Elem] = {
       // Contains duplicates
-      val elms = airportRootElm \ { e => airportCodes.contains(airportCode(e)) }
-      val groups = elms groupBy { e => airportCode(e) }
+      val elms = airportRootElm \ { e =>
+        airportCodes.contains(airportCode(e))
+      }
+      val groups = elms.groupBy { e =>
+        airportCode(e)
+      }
       // No more duplicates
-      val result = groups.values map { grp => grp.head }
-      result.toList sortBy { e => airportCodes.indexOf(airportCode(e)) }
+      val result = groups.values.map { grp =>
+        grp.head
+      }
+      result.toList.sortBy { e =>
+        airportCodes.indexOf(airportCode(e))
+      }
     }
 
     val airportLatLons: Map[String, LatLon] = {
-      val result = airportCodes map { airport =>
+      val result = airportCodes.map { airport =>
         val airportElm: Elem = {
-          val result: Option[Elem] = airportElms find { e => airportCode(e) == airport }
+          val result: Option[Elem] = airportElms.find { e =>
+            airportCode(e) == airport
+          }
           result.getOrElse(sys.error(s"Airport $airport must exist"))
         }
 
         val lat = airportLatitude(airportElm)
         val lon = airportLongitude(airportElm)
 
-        (airport -> LatLon(lat, lon))
+        airport -> LatLon(lat, lon)
       }
       result.toMap
     }
 
-    import NodeBuilder._
-
-    def distancesElemBuilder(airportElm: Elem): ElemBuilder = {
+    def distancesElemBuilder(airportElm: Elem): Elem = {
       val lat = airportLatitude(airportElm)
       val lon = airportLongitude(airportElm)
       val latLon = LatLon(lat, lon)
 
       val distances: immutable.IndexedSeq[(String, Double)] =
-        airportCodes.toIndexedSeq map { (airportCode: String) =>
+        airportCodes.toIndexedSeq.map { (airportCode: String) =>
           val otherLatLon = airportLatLons(airportCode)
           val dist = latLon.distance(otherLatLon)
 
-          (airportCode -> dist)
+          airportCode -> dist
         }
 
       elem(
         qname = QName("Distances"),
-        children = distances map {
+        scope = scope,
+        children = distances.map {
           case (airportCode, dist) =>
             elem(
               qname = QName("Distance"),
+              scope = scope,
               children = Vector(
                 textElem(
                   qname = QName("Airport"),
                   attributes = Vector(QName("code") -> airportCode),
-                  txt = dist.toString)))
-        })
+                  scope = scope,
+                  txt = dist.toString))
+            )
+        }
+      )
     }
 
     val airportSummaryElms: immutable.Seq[Elem] =
       for {
         airportElm <- airportElms
       } yield {
-        val airportOrCityName = (airportElm getChildElem (_.localName == "CityOrAirportName")).trimmedText
-        val country = (airportElm getChildElem (_.localName == "Country")).trimmedText
-        val countryAbbreviation = (airportElm getChildElem (_.localName == "CountryAbbrviation")).trimmedText
+        val airportOrCityName = airportElm.getChildElem(_.localName == "CityOrAirportName").trimmedText
+        val country = airportElm.getChildElem(_.localName == "Country").trimmedText
+        val countryAbbreviation = airportElm.getChildElem(_.localName == "CountryAbbrviation").trimmedText
 
         val lat = airportLatitude(airportElm)
         val lon = airportLongitude(airportElm)
 
-        val elmBuilder: ElemBuilder =
+        val elmBuilder: Elem =
           elem(
             qname = QName("Airport"),
+            scope = scope,
             children = Vector(
-              textElem(QName("AirportCode"), airportCode(airportElm)),
-              textElem(QName("AirportOrCityName"), airportOrCityName),
-              textElem(QName("Country"), country),
-              textElem(QName("CountryAbbreviation"), countryAbbreviation),
+              textElem(QName("AirportCode"), scope, airportCode(airportElm)),
+              textElem(QName("AirportOrCityName"), scope, airportOrCityName),
+              textElem(QName("Country"), scope, country),
+              textElem(QName("CountryAbbreviation"), scope, countryAbbreviation),
               elem(
                 qname = QName("Position"),
-                children = Vector(
-                  textElem(QName("Lat"), lat.toString),
-                  textElem(QName("Lon"), lon.toString))),
-              distancesElemBuilder(airportElm)))
+                scope = scope,
+                children =
+                  Vector(textElem(QName("Lat"), scope, lat.toString), textElem(QName("Lon"), scope, lon.toString))),
+              distancesElemBuilder(airportElm)
+            )
+          )
 
-        elmBuilder.build(scope)
+        elmBuilder
       }
 
     val airportSummaryRoot = Elem(qname = QName("Airports"), scope = scope, children = airportSummaryElms.toIndexedSeq)
@@ -335,7 +370,7 @@ class AirportExampleTest extends AnyFunSuite {
       val airportElms =
         for {
           airportElm <- airportSummaryRoot.findAllChildElems
-          airportCodeElm = airportElm getChildElem (_.localName == "AirportCode")
+          airportCodeElm = airportElm.getChildElem(_.localName == "AirportCode")
           if airportCodeElm.trimmedText == "FRA"
         } yield airportElm
       val airportElm = airportElms.headOption.getOrElse(sys.error("Expected airport FRA"))
@@ -366,13 +401,15 @@ class AirportExampleTest extends AnyFunSuite {
 
     // The root child elements must all be named Table
     assertResult(Set(enameTable)) {
-      val elmNames = tableElms map {
+      val elmNames = tableElms.map {
         _.resolvedName
       }
       elmNames.toSet
     }
 
-    val tablePropertyElms = tableElms flatMap { e => e.findAllChildElems }
+    val tablePropertyElms = tableElms.flatMap { e =>
+      e.findAllChildElems
+    }
 
     val propertyENames = Set(
       EName(nsWebServiceX, "AirportCode"),
@@ -390,11 +427,12 @@ class AirportExampleTest extends AnyFunSuite {
       EName(nsWebServiceX, "LongitudeDegree"),
       EName(nsWebServiceX, "LongitudeMinute"),
       EName(nsWebServiceX, "LongitudeSeconds"),
-      EName(nsWebServiceX, "LongitudeEperW"))
+      EName(nsWebServiceX, "LongitudeEperW")
+    )
 
     // The root grandchild elements must all have names mentioned above (in Set propertyENames)
     assertResult(propertyENames) {
-      val elmNames = tablePropertyElms map {
+      val elmNames = tablePropertyElms.map {
         _.resolvedName
       }
       elmNames.toSet
@@ -402,7 +440,7 @@ class AirportExampleTest extends AnyFunSuite {
 
     // The root grandchild elements must have no child elements themselves
     assertResult(0) {
-      val elms = tablePropertyElms flatMap {
+      val elms = tablePropertyElms.flatMap {
         _.findAllChildElems
       }
       elms.size
@@ -418,7 +456,7 @@ class AirportExampleTest extends AnyFunSuite {
 
     val north = {
       val result = e.getChildElem(EName(nsWebServiceX, "LatitudeNpeerS")).trimmedText
-      (result != "S")
+      result != "S"
     }
 
     val absoluteValue = degree + (minute / 60) + (second / 3600)
@@ -434,7 +472,7 @@ class AirportExampleTest extends AnyFunSuite {
 
     val east = {
       val result = e.getChildElem(EName(nsWebServiceX, "LongitudeEperW")).trimmedText
-      (result != "W")
+      result != "W"
     }
 
     val absoluteValue = degree + (minute / 60) + (second / 3600)
@@ -451,7 +489,7 @@ class AirportExampleTest extends AnyFunSuite {
 
 object AirportExampleTest {
 
-  final case class LatLon(val lat: Double, val lon: Double) {
+  final case class LatLon(lat: Double, lon: Double) {
 
     import scala.math._
 
@@ -468,7 +506,7 @@ object AirportExampleTest {
       val lat1 = toRadians(lat)
       val lat2 = toRadians(other.lat)
 
-      val a = pow((dLat / 2), 2) + (cos(lat1) * cos(lat2) * pow(sin(dLon / 2), 2))
+      val a = pow(dLat / 2, 2) + (cos(lat1) * cos(lat2) * pow(sin(dLon / 2), 2))
 
       val c = 2 * atan2(sqrt(a), sqrt(1 - a))
 

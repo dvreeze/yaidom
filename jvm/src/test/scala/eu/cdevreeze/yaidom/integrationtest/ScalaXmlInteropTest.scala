@@ -25,11 +25,10 @@ import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi._
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.simple.Comment
-import eu.cdevreeze.yaidom.simple.DocBuilder
 import eu.cdevreeze.yaidom.simple.Document
 import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.simple.EntityRef
-import eu.cdevreeze.yaidom.simple.NodeBuilder
+import eu.cdevreeze.yaidom.simple.Node
 import org.scalatest.funsuite.AnyFunSuite
 
 /**
@@ -46,6 +45,8 @@ class ScalaXmlInteropTest extends AnyFunSuite {
   private val nsBookstore = "http://bookstore"
   private val nsGoogle = "http://www.google.com"
   private val nsFooBar = "urn:foo:bar"
+
+  private val testScope: Scope = Scope.from("test" -> "http://www.test.org/test")
 
   test("testConvert") {
     // 1. Convert XML to Elem
@@ -66,9 +67,9 @@ class ScalaXmlInteropTest extends AnyFunSuite {
       result.size
     }
 
-    // 2. Convert to NodeBuilder and back, and check again
+    // 2. Call method notUndeclaringPrefixes, and check again
 
-    val root3: Elem = NodeBuilder.fromElem(root)(Scope.Empty).build()
+    val root3: Elem = root.notUndeclaringPrefixes(testScope)
 
     assertResult((root.findAllElems map (e => e.localName)).toSet) {
       (root3.findAllElems map (e => e.localName)).toSet
@@ -131,9 +132,9 @@ class ScalaXmlInteropTest extends AnyFunSuite {
       result.toSet
     }
 
-    // 2. Convert to NodeBuilder and back, and check again
+    // 2. Call method notUndeclaringPrefixes, and check again
 
-    val root3: Elem = NodeBuilder.fromElem(root)(Scope.Empty).build()
+    val root3: Elem = root.notUndeclaringPrefixes(testScope)
 
     assertResult(Set(EName("bar"), EName(nsGoogle, "foo"))) {
       val result = root3.findAllElemsOrSelf map { e => e.resolvedName }
@@ -168,9 +169,9 @@ class ScalaXmlInteropTest extends AnyFunSuite {
       result.mkString
     }
 
-    // 2. Convert to NodeBuilder and back, and check again
+    // 2. Call method notUndeclaringPrefixes, and check again
 
-    val document3: eu.cdevreeze.yaidom.simple.Document = DocBuilder.fromDocument(Document(root)).build()
+    val document3: eu.cdevreeze.yaidom.simple.Document = Document(root.notUndeclaringPrefixes(testScope))
     val root3: Elem = document3.documentElement
 
     assertResult(Set(EName(nsFooBar, "root"), EName(nsFooBar, "child"))) {
@@ -232,9 +233,9 @@ class ScalaXmlInteropTest extends AnyFunSuite {
 
     checkChildTextAndEntityRef(root)
 
-    // 2. Convert to NodeBuilder and back, and check again
+    // 2. Call method notUndeclaringPrefixes, and check again
 
-    val root3: Elem = NodeBuilder.fromElem(root)(Scope.Empty).build()
+    val root3: Elem = root.notUndeclaringPrefixes(testScope)
 
     assertResult(Set(EName(ns, "root"), EName(ns, "child"))) {
       val result = root3.findAllElemsOrSelf map { e => e.resolvedName }
@@ -264,9 +265,9 @@ class ScalaXmlInteropTest extends AnyFunSuite {
       result.toSet
     }
 
-    // 2. Convert to NodeBuilder and back, and check again
+    // 2. Call method notUndeclaringPrefixes, and check again
 
-    val root3: Elem = NodeBuilder.fromElem(root)(Scope.Empty).build()
+    val root3: Elem = root.notUndeclaringPrefixes(testScope)
 
     assertResult(Set(EName(ns, "root"), EName(ns, "a"), EName("b"), EName("c"), EName(ns, "d"))) {
       val result = root3.findAllElemsOrSelf map { e => e.resolvedName }
@@ -325,9 +326,9 @@ class ScalaXmlInteropTest extends AnyFunSuite {
 
     doChecks(root)
 
-    // 2. Convert to NodeBuilder and back, and check again
+    // 2. Call method notUndeclaringPrefixes, and check again
 
-    val root3: Elem = NodeBuilder.fromElem(root)(Scope.Empty).build()
+    val root3: Elem = root.notUndeclaringPrefixes(testScope)
 
     assertResult(Set(EName(ns, "root"), EName(ns, "child"))) {
       val result = root3.findAllElemsOrSelf map { e => e.resolvedName }
@@ -365,9 +366,9 @@ class ScalaXmlInteropTest extends AnyFunSuite {
 
     doChecks(root)
 
-    // 2. Convert to NodeBuilder and back, and check again
+    // 2. Call method notUndeclaringPrefixes, and check again
 
-    val root2: Elem = NodeBuilder.fromElem(root)(Scope.Empty).build()
+    val root2: Elem = root.notUndeclaringPrefixes(testScope)
 
     assertResult(Set(EName(ns, "root"), EName(ns, "child"))) {
       val result = root2.findAllElemsOrSelf map { e => e.resolvedName }
@@ -443,10 +444,10 @@ class ScalaXmlInteropTest extends AnyFunSuite {
       result.toSet
     }
 
-    import NodeBuilder._
+    import Node._
 
     val countryPath = PathBuilder.from(QName("car") -> 0, QName("country") -> 0).build(Scope.Empty)
-    val updatedCountryElm = textElem(QName("country"), "New Zealand").build()
+    val updatedCountryElm = textElem(QName("country"), Scope.Empty, "New Zealand")
     val updatedDoc = doc.updateElemOrSelf(countryPath, updatedCountryElm)
 
     assertResult("New Zealand") {

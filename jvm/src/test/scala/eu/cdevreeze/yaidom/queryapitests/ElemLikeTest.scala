@@ -16,9 +16,6 @@
 
 package eu.cdevreeze.yaidom.queryapitests
 
-import scala.collection.immutable
-
-import eu.cdevreeze.yaidom.core.Declarations
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.core.PathBuilder
@@ -27,9 +24,10 @@ import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.indexed.{Elem => IElem}
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi._
 import eu.cdevreeze.yaidom.simple.Elem
-import eu.cdevreeze.yaidom.simple.ElemBuilder
-import eu.cdevreeze.yaidom.simple.NodeBuilder
+import eu.cdevreeze.yaidom.simple.Node
 import org.scalatest.funsuite.AnyFunSuite
+
+import scala.collection.immutable
 
 /**
  * ElemLike test case.
@@ -44,6 +42,208 @@ class ElemLikeTest extends AnyFunSuite {
 
   private val ns = "http://bookstore"
 
+  private val startScope: Scope = Scope.from("" -> ns, "books" -> ns)
+
+  private val book1: Elem = {
+    import Node._
+
+    elem(
+      qname = QName("Book"),
+      attributes = Vector(QName("ISBN") -> "ISBN-0-13-713526-2", QName("Price") -> "85", QName("Edition") -> "3rd"),
+      scope = startScope,
+      children = Vector(
+        textElem(QName("Title"), startScope, "A First Course in Database Systems"),
+        elem(
+          qname = QName("Authors"),
+          scope = startScope,
+          children = Vector(
+            elem(
+              qname = QName("Author"),
+              scope = startScope,
+              children = Vector(
+                textElem(QName("First_Name"), startScope, "Jeffrey"),
+                textElem(QName("Last_Name"), startScope, "Ullman"))
+            ),
+            elem(
+              qname = QName("Author"),
+              scope = startScope,
+              children = Vector(
+                textElem(QName("First_Name"), startScope, "Jennifer"),
+                textElem(QName("Last_Name"), startScope, "Widom"))
+            )
+          )
+        )
+      )
+    )
+  }
+
+  private val book2: Elem = {
+    import Node._
+
+    elem(
+      qname = QName("Book"),
+      attributes = Vector(QName("ISBN") -> "ISBN-0-13-815504-6", QName("Price") -> "100"),
+      scope = startScope,
+      children = Vector(
+        textElem(QName("Title"), startScope, "Database Systems: The Complete Book"),
+        elem(
+          qname = QName("Authors"),
+          scope = startScope,
+          children = Vector(
+            elem(
+              qname = QName("Author"),
+              scope = startScope,
+              children = Vector(
+                textElem(QName("First_Name"), startScope, "Hector"),
+                textElem(QName("Last_Name"), startScope, "Garcia-Molina"))
+            ),
+            elem(
+              qname = QName("Author"),
+              scope = startScope,
+              children = Vector(
+                textElem(QName("First_Name"), startScope, "Jeffrey"),
+                textElem(QName("Last_Name"), startScope, "Ullman"))
+            ),
+            elem(
+              qname = QName("Author"),
+              scope = startScope,
+              children = Vector(
+                textElem(QName("First_Name"), startScope, "Jennifer"),
+                textElem(QName("Last_Name"), startScope, "Widom"))
+            )
+          )
+        ),
+        textElem(QName("Remark"), startScope, "Buy this book bundled with \"A First Course\" - a great deal!")
+      )
+    )
+  }
+
+  private val book3: Elem = {
+    import Node._
+
+    elem(
+      qname = QName("Book"),
+      attributes = Vector(QName("ISBN") -> "ISBN-0-11-222222-3", QName("Price") -> "50"),
+      scope = startScope,
+      children = Vector(
+        textElem(QName("Title"), startScope, "Hector and Jeff's Database Hints"),
+        elem(
+          qname = QName("Authors"),
+          scope = startScope,
+          children = Vector(
+            elem(
+              qname = QName("Author"),
+              scope = startScope,
+              children = Vector(
+                textElem(QName("First_Name"), startScope, "Jeffrey"),
+                textElem(QName("Last_Name"), startScope, "Ullman"))
+            ),
+            elem(
+              qname = QName("Author"),
+              scope = startScope,
+              children = Vector(
+                textElem(QName("First_Name"), startScope, "Hector"),
+                textElem(QName("Last_Name"), startScope, "Garcia-Molina"))
+            )
+          )
+        ),
+        textElem(QName("Remark"), startScope, "An indispensable companion to your textbook")
+      )
+    )
+  }
+
+  private val book4: Elem = {
+    import Node._
+
+    elem(
+      qname = QName("Book"),
+      attributes = Vector(QName("ISBN") -> "ISBN-9-88-777777-6", QName("Price") -> "25"),
+      scope = startScope,
+      children = Vector(
+        textElem(QName("Title"), startScope, "Jennifer's Economical Database Hints"),
+        elem(
+          qname = QName("Authors"),
+          scope = startScope,
+          children = Vector(
+            elem(
+              qname = QName("Author"),
+              scope = startScope,
+              children = Vector(
+                textElem(QName("First_Name"), startScope, "Jennifer"),
+                textElem(QName("Last_Name"), startScope, "Widom"))
+            ))
+        )
+      )
+    )
+  }
+
+  private val magazine1: Elem = {
+    import Node._
+
+    elem(
+      qname = QName("Magazine"),
+      attributes = Vector(QName("Month") -> "January", QName("Year") -> "2009"),
+      scope = startScope,
+      children = Vector(textElem(QName("Title"), startScope, "National Geographic"))
+    )
+  }
+
+  private val magazine2: Elem = {
+    import Node._
+
+    elem(
+      qname = QName("Magazine"),
+      attributes = Vector(QName("Month") -> "February", QName("Year") -> "2009"),
+      scope = startScope,
+      children = Vector(textElem(QName("Title"), startScope, "National Geographic"))
+    )
+  }
+
+  private val magazine3: Elem = {
+    import Node._
+
+    elem(
+      qname = QName("Magazine"),
+      attributes = Vector(QName("Month") -> "February", QName("Year") -> "2009"),
+      scope = startScope,
+      children = Vector(textElem(QName("Title"), startScope, "Newsweek"))
+    )
+  }
+
+  private val magazine4: Elem = {
+    import Node._
+
+    elem(
+      qname = QName("Magazine"),
+      attributes = Vector(QName("Month") -> "March", QName("Year") -> "2009"),
+      scope = startScope,
+      children = Vector(textElem(QName("Title"), startScope, "Hector and Jeff's Database Hints"))
+    )
+  }
+
+  private val bookstore: Elem = {
+    import Node._
+
+    val result: Elem =
+      elem(
+        qname = QName("books:Bookstore"),
+        scope = startScope,
+        children = Vector(book1, book2, book3, book4, magazine1, magazine2, magazine3, magazine4))
+
+    require {
+      result.findAllElemsOrSelf.forall { e =>
+        e.resolvedName.namespaceUriOption == Option(ns)
+      }
+    }
+    require(result.qname.prefixOption.contains("books"))
+    require {
+      result.findAllElems.forall { e =>
+        e.qname.prefixOption.isEmpty
+      }
+    }
+    result
+  }
+
   test("testChildElems") {
     require(bookstore.localName == "Bookstore")
 
@@ -51,7 +251,9 @@ class ElemLikeTest extends AnyFunSuite {
     val magazineElms = bookstore \ (_.localName == "Magazine")
     val bookElms = bookstore \ (_.localName == "Book")
     val cheapBookElms =
-      bookstore filterChildElems { e => e.localName == "Book" && e.attribute(EName("Price")).toInt <= 50 }
+      bookstore.filterChildElems { e =>
+        e.localName == "Book" && e.attribute(EName("Price")).toInt <= 50
+      }
 
     assertResult(8) {
       bookstoreChildElms.size
@@ -66,7 +268,7 @@ class ElemLikeTest extends AnyFunSuite {
       cheapBookElms.size
     }
     assertResult(Set(EName(ns, "Book"), EName(ns, "Magazine"))) {
-      val result = bookstoreChildElms map {
+      val result = bookstoreChildElms.map {
         _.resolvedName
       }
       result.toSet
@@ -75,7 +277,7 @@ class ElemLikeTest extends AnyFunSuite {
     assert(bookElms.toSet.subsetOf(bookstoreChildElms.toSet))
     assert(cheapBookElms.toSet.subsetOf(bookElms.toSet))
 
-    assertResult(bookstore.findAllChildElems filter (_.localName == "Magazine")) {
+    assertResult(bookstore.findAllChildElems.filter(_.localName == "Magazine")) {
       bookstore \ (_.localName == "Magazine")
     }
 
@@ -88,21 +290,29 @@ class ElemLikeTest extends AnyFunSuite {
       cheapBookElm.getChildElem(EName(ns, "Title")).trimmedText
     }
     assertResult("An indispensable companion to your textbook") {
-      (cheapBookElm getChildElem (_.localName == "Remark")).trimmedText
+      cheapBookElm.getChildElem(_.localName == "Remark").trimmedText
     }
 
     assertResult(Set("Ullman", "Garcia-Molina")) {
-      val authorsElm = cheapBookElm getChildElem (_.localName == "Authors")
+      val authorsElm = cheapBookElm.getChildElem(_.localName == "Authors")
       val authorElms = authorsElm \ (_.localName == "Author")
-      val authorLastNameElms = authorElms map { e => e getChildElem (_.localName == "Last_Name") }
-      val result = authorLastNameElms map { e => e.trimmedText }
+      val authorLastNameElms = authorElms.map { e =>
+        e.getChildElem(_.localName == "Last_Name")
+      }
+      val result = authorLastNameElms.map { e =>
+        e.trimmedText
+      }
       result.toSet
     }
     assertResult(Set("Ullman", "Garcia-Molina")) {
-      val authorsElm = cheapBookElm getChildElem (_.localName == "Authors")
+      val authorsElm = cheapBookElm.getChildElem(_.localName == "Authors")
       val authorElms = authorsElm \ (_.localName == "Author")
-      val authorLastNameElms = authorElms flatMap { e => e findChildElem (_.localName == "Last_Name") }
-      val result = authorLastNameElms map { e => e.trimmedText }
+      val authorLastNameElms = authorElms.flatMap { e =>
+        e.findChildElem(_.localName == "Last_Name")
+      }
+      val result = authorLastNameElms.map { e =>
+        e.trimmedText
+      }
       result.toSet
     }
   }
@@ -111,18 +321,18 @@ class ElemLikeTest extends AnyFunSuite {
     require(bookstore.localName == "Bookstore")
 
     val bookstoreChildElms = bookstore.findAllChildElems
-    val magazineElms = bookstore.findAllChildElems collect {
+    val magazineElms = bookstore.findAllChildElems.collect {
       case e if e.localName == "Magazine" => e
     }
-    val bookElms = bookstore.findAllChildElems collect {
+    val bookElms = bookstore.findAllChildElems.collect {
       case e if e.localName == "Book" => e
     }
     val cheapBookElms =
-      bookstore.findAllChildElems collect {
+      bookstore.findAllChildElems.collect {
         case e if e.localName == "Book" && e.attribute(EName("Price")).toInt <= 50 => e
       }
     val cheapBookPrices =
-      bookstore.findAllChildElems collect {
+      bookstore.findAllChildElems.collect {
         case e if e.localName == "Book" && e.attribute(EName("Price")).toInt <= 50 =>
           e.attribute(EName("Price")).toInt
       }
@@ -143,7 +353,7 @@ class ElemLikeTest extends AnyFunSuite {
       cheapBookPrices.toSet
     }
     assertResult(Set(EName(ns, "Book"), EName(ns, "Magazine"))) {
-      val result = bookstoreChildElms map {
+      val result = bookstoreChildElms.map {
         _.resolvedName
       }
       result.toSet
@@ -160,7 +370,9 @@ class ElemLikeTest extends AnyFunSuite {
     val magazineElms = bookstore \\ (_.localName == "Magazine")
     val bookElms = bookstore.filterElems(EName(ns, "Book"))
     val cheapBookElms =
-      bookstore filterElems { e => e.localName == "Book" && e.attribute(EName("Price")).toInt <= 50 }
+      bookstore.filterElems { e =>
+        e.localName == "Book" && e.attribute(EName("Price")).toInt <= 50
+      }
 
     assertResult(46) {
       elms.size
@@ -174,10 +386,18 @@ class ElemLikeTest extends AnyFunSuite {
     assertResult(2) {
       cheapBookElms.size
     }
-    assertResult(Set(EName(ns, "Book"), EName(ns, "Magazine"), EName(ns, "Title"),
-      EName(ns, "Authors"), EName(ns, "Author"), EName(ns, "First_Name"), EName(ns, "Last_Name"),
-      EName(ns, "Remark"))) {
-      val result = elms map {
+    assertResult(
+      Set(
+        EName(ns, "Book"),
+        EName(ns, "Magazine"),
+        EName(ns, "Title"),
+        EName(ns, "Authors"),
+        EName(ns, "Author"),
+        EName(ns, "First_Name"),
+        EName(ns, "Last_Name"),
+        EName(ns, "Remark")
+      )) {
+      val result = elms.map {
         _.resolvedName
       }
       result.toSet
@@ -186,10 +406,10 @@ class ElemLikeTest extends AnyFunSuite {
     assert(bookElms.toSet.subsetOf(elms.toSet))
     assert(cheapBookElms.toSet.subsetOf(bookElms.toSet))
 
-    assertResult(bookstore.findAllElems filter {
+    assertResult(bookstore.findAllElems.filter {
       _.localName != "Magazine"
     }) {
-      bookstore filterElems {
+      bookstore.filterElems {
         _.localName != "Magazine"
       }
     }
@@ -200,15 +420,17 @@ class ElemLikeTest extends AnyFunSuite {
       cheapBookElm.attribute(EName("ISBN"))
     }
     assertResult("Hector and Jeff's Database Hints") {
-      val result = cheapBookElm filterElems {
-        _.localName == "Title"
-      } map {
-        _.trimmedText
-      }
+      val result = cheapBookElm
+        .filterElems {
+          _.localName == "Title"
+        }
+        .map {
+          _.trimmedText
+        }
       result.headOption.getOrElse(sys.error("Missing Title"))
     }
     assertResult("An indispensable companion to your textbook") {
-      val result = (cheapBookElm \\ (_.localName == "Remark")) map {
+      val result = (cheapBookElm \\ (_.localName == "Remark")).map {
         _.trimmedText
       }
       result.headOption.getOrElse(sys.error("Missing Remark"))
@@ -216,12 +438,16 @@ class ElemLikeTest extends AnyFunSuite {
 
     assertResult(Set("Ullman", "Garcia-Molina")) {
       val authorElms = cheapBookElm \\ (_.localName == "Author")
-      val authorLastNameElms = authorElms flatMap { e => e \\ (_.localName == "Last_Name") }
-      val result = authorLastNameElms map { e => e.trimmedText }
+      val authorLastNameElms = authorElms.flatMap { e =>
+        e \\ (_.localName == "Last_Name")
+      }
+      val result = authorLastNameElms.map { e =>
+        e.trimmedText
+      }
       result.toSet
     }
 
-    assertResult(bookstore.findAllChildElems flatMap (_.findAllElemsOrSelf)) {
+    assertResult(bookstore.findAllChildElems.flatMap(_.findAllElemsOrSelf)) {
       bookstore.findAllElems
     }
   }
@@ -230,14 +456,14 @@ class ElemLikeTest extends AnyFunSuite {
     require(bookstore.localName == "Bookstore")
 
     val elms = bookstore.findAllElems
-    val magazineElms = bookstore.findAllElems collect {
+    val magazineElms = bookstore.findAllElems.collect {
       case e if e.localName == "Magazine" => e
     }
-    val bookElms = bookstore.findAllElems collect {
+    val bookElms = bookstore.findAllElems.collect {
       case e if e.localName == "Book" => e
     }
     val cheapBookElms =
-      bookstore.findAllElems collect {
+      bookstore.findAllElems.collect {
         case e if e.localName == "Book" && e.attribute(EName("Price")).toInt <= 50 => e
       }
 
@@ -253,10 +479,18 @@ class ElemLikeTest extends AnyFunSuite {
     assertResult(2) {
       cheapBookElms.size
     }
-    assertResult(Set(EName(ns, "Book"), EName(ns, "Magazine"), EName(ns, "Title"),
-      EName(ns, "Authors"), EName(ns, "Author"), EName(ns, "First_Name"), EName(ns, "Last_Name"),
-      EName(ns, "Remark"))) {
-      val result = elms map {
+    assertResult(
+      Set(
+        EName(ns, "Book"),
+        EName(ns, "Magazine"),
+        EName(ns, "Title"),
+        EName(ns, "Authors"),
+        EName(ns, "Author"),
+        EName(ns, "First_Name"),
+        EName(ns, "Last_Name"),
+        EName(ns, "Remark")
+      )) {
+      val result = elms.map {
         _.resolvedName
       }
       result.toSet
@@ -273,13 +507,17 @@ class ElemLikeTest extends AnyFunSuite {
     val magazineElms = bookstore \\ (_.localName == "Magazine")
     val bookElms = bookstore \\ EName(ns, "Book")
     val cheapBookElms =
-      bookstore \\ { e => e.localName == "Book" && e.attribute(EName("Price")).toInt <= 50 }
+      bookstore \\ { e =>
+        e.localName == "Book" && e.attribute(EName("Price")).toInt <= 50
+      }
 
     assertResult(47) {
       elms.size
     }
     assertResult(47) {
-      val elms = bookstore \\ { e => e.resolvedName.namespaceUriOption.contains(ns.toString) }
+      val elms = bookstore \\ { e =>
+        e.resolvedName.namespaceUriOption.contains(ns)
+      }
       elms.size
     }
     assertResult(4) {
@@ -291,10 +529,19 @@ class ElemLikeTest extends AnyFunSuite {
     assertResult(2) {
       cheapBookElms.size
     }
-    assertResult(Set(EName(ns, "Bookstore"), EName(ns, "Book"), EName(ns, "Magazine"), EName(ns, "Title"),
-      EName(ns, "Authors"), EName(ns, "Author"), EName(ns, "First_Name"), EName(ns, "Last_Name"),
-      EName(ns, "Remark"))) {
-      val result = elms map {
+    assertResult(
+      Set(
+        EName(ns, "Bookstore"),
+        EName(ns, "Book"),
+        EName(ns, "Magazine"),
+        EName(ns, "Title"),
+        EName(ns, "Authors"),
+        EName(ns, "Author"),
+        EName(ns, "First_Name"),
+        EName(ns, "Last_Name"),
+        EName(ns, "Remark")
+      )) {
+      val result = elms.map {
         _.resolvedName
       }
       result.toSet
@@ -303,7 +550,7 @@ class ElemLikeTest extends AnyFunSuite {
     assert(bookElms.toSet.subsetOf(elms.toSet))
     assert(cheapBookElms.toSet.subsetOf(bookElms.toSet))
 
-    assertResult(bookstore.findAllElemsOrSelf filter {
+    assertResult(bookstore.findAllElemsOrSelf.filter {
       _.localName != "Magazine"
     }) {
       bookstore \\ {
@@ -317,13 +564,13 @@ class ElemLikeTest extends AnyFunSuite {
       cheapBookElm.attribute(EName("ISBN"))
     }
     assertResult("Hector and Jeff's Database Hints") {
-      val result = (cheapBookElm \\ EName(ns, "Title")) map {
+      val result = (cheapBookElm \\ EName(ns, "Title")).map {
         _.trimmedText
       }
       result.headOption.getOrElse(sys.error("Missing Title"))
     }
     assertResult("An indispensable companion to your textbook") {
-      val result = (cheapBookElm \\ (_.localName == "Remark")) map {
+      val result = (cheapBookElm \\ (_.localName == "Remark")).map {
         _.trimmedText
       }
       result.headOption.getOrElse(sys.error("Missing Remark"))
@@ -331,12 +578,16 @@ class ElemLikeTest extends AnyFunSuite {
 
     assertResult(Set("Ullman", "Garcia-Molina")) {
       val authorElms = cheapBookElm.getChildElem(EName(ns, "Authors")).filterElems(EName(ns, "Author"))
-      val authorLastNameElms = authorElms flatMap { e => e \\ (_.localName == "Last_Name") }
-      val result = authorLastNameElms map { e => e.trimmedText }
+      val authorLastNameElms = authorElms.flatMap { e =>
+        e \\ (_.localName == "Last_Name")
+      }
+      val result = authorLastNameElms.map { e =>
+        e.trimmedText
+      }
       result.toSet
     }
 
-    assertResult(immutable.IndexedSeq(bookstore) ++ (bookstore.findAllChildElems flatMap (_.findAllElemsOrSelf))) {
+    assertResult(immutable.IndexedSeq(bookstore) ++ bookstore.findAllChildElems.flatMap(_.findAllElemsOrSelf)) {
       bookstore.findAllElemsOrSelf
     }
   }
@@ -345,14 +596,14 @@ class ElemLikeTest extends AnyFunSuite {
     require(bookstore.localName == "Bookstore")
 
     val elms = bookstore.findAllElemsOrSelf
-    val magazineElms = bookstore.findAllElemsOrSelf collect {
+    val magazineElms = bookstore.findAllElemsOrSelf.collect {
       case e if e.localName == "Magazine" => e
     }
-    val bookElms = bookstore.findAllElemsOrSelf collect {
+    val bookElms = bookstore.findAllElemsOrSelf.collect {
       case e if e.localName == "Book" => e
     }
     val cheapBookElms =
-      bookstore.findAllElemsOrSelf collect {
+      bookstore.findAllElemsOrSelf.collect {
         case e if e.localName == "Book" && e.attribute(EName("Price")).toInt <= 50 => e
       }
 
@@ -360,7 +611,9 @@ class ElemLikeTest extends AnyFunSuite {
       elms.size
     }
     assertResult(47) {
-      val elms = bookstore \\ { e => e.resolvedName.namespaceUriOption.contains(ns.toString) }
+      val elms = bookstore \\ { e =>
+        e.resolvedName.namespaceUriOption.contains(ns)
+      }
       elms.size
     }
     assertResult(4) {
@@ -372,10 +625,19 @@ class ElemLikeTest extends AnyFunSuite {
     assertResult(2) {
       cheapBookElms.size
     }
-    assertResult(Set(EName(ns, "Bookstore"), EName(ns, "Book"), EName(ns, "Magazine"), EName(ns, "Title"),
-      EName(ns, "Authors"), EName(ns, "Author"), EName(ns, "First_Name"), EName(ns, "Last_Name"),
-      EName(ns, "Remark"))) {
-      val result = elms map {
+    assertResult(
+      Set(
+        EName(ns, "Bookstore"),
+        EName(ns, "Book"),
+        EName(ns, "Magazine"),
+        EName(ns, "Title"),
+        EName(ns, "Authors"),
+        EName(ns, "Author"),
+        EName(ns, "First_Name"),
+        EName(ns, "Last_Name"),
+        EName(ns, "Remark")
+      )) {
+      val result = elms.map {
         _.resolvedName
       }
       result.toSet
@@ -392,7 +654,9 @@ class ElemLikeTest extends AnyFunSuite {
     val magazineElms = bookstore \\! EName(ns, "Magazine")
     val bookElms = bookstore.findTopmostElems(EName(ns, "Book"))
     val cheapBookElms =
-      bookstore findTopmostElems { e => e.localName == "Book" && e.attribute(EName("Price")).toInt <= 50 }
+      bookstore.findTopmostElems { e =>
+        e.localName == "Book" && e.attribute(EName("Price")).toInt <= 50
+      }
 
     assertResult(46) {
       elms.size
@@ -416,45 +680,75 @@ class ElemLikeTest extends AnyFunSuite {
       cheapBookElm.attribute(EName("ISBN"))
     }
     assertResult("Hector and Jeff's Database Hints") {
-      cheapBookElm.findElem(EName(ns, "Title")) map {
-        _.trimmedText
-      } getOrElse (sys.error("Missing Title"))
+      cheapBookElm
+        .findElem(EName(ns, "Title"))
+        .map {
+          _.trimmedText
+        }
+        .getOrElse(sys.error("Missing Title"))
     }
     assertResult("An indispensable companion to your textbook") {
-      cheapBookElm.findElem(EName(ns, "Remark")) map {
-        _.trimmedText
-      } getOrElse (sys.error("Missing Remark"))
+      cheapBookElm
+        .findElem(EName(ns, "Remark"))
+        .map {
+          _.trimmedText
+        }
+        .getOrElse(sys.error("Missing Remark"))
     }
     assertResult("An indispensable companion to your textbook") {
-      cheapBookElm findElem {
-        _.localName == "Remark"
-      } map {
-        _.trimmedText
-      } getOrElse (sys.error("Missing Remark"))
+      cheapBookElm
+        .findElem {
+          _.localName == "Remark"
+        }
+        .map {
+          _.trimmedText
+        }
+        .getOrElse(sys.error("Missing Remark"))
     }
     assertResult("An indispensable companion to your textbook") {
-      cheapBookElm findElem { e => e.localName == "Remark" && e.findAllChildElems.isEmpty } map {
-        _.trimmedText
-      } getOrElse (sys.error("Missing Remark"))
+      cheapBookElm
+        .findElem { e =>
+          e.localName == "Remark" && e.findAllChildElems.isEmpty
+        }
+        .map {
+          _.trimmedText
+        }
+        .getOrElse(sys.error("Missing Remark"))
     }
 
     assertResult(Set("Ullman", "Garcia-Molina")) {
       val authorElms = cheapBookElm.getChildElem(EName(ns, "Authors")).findTopmostElems(EName(ns, "Author"))
-      val authorLastNameElms = authorElms flatMap { e => e findElem (_.localName == "Last_Name") }
-      val result = authorLastNameElms map { e => e.trimmedText }
+      val authorLastNameElms = authorElms.flatMap { e =>
+        e.findElem(_.localName == "Last_Name")
+      }
+      val result = authorLastNameElms.map { e =>
+        e.trimmedText
+      }
       result.toSet
     }
     assertResult(Set("Ullman", "Garcia-Molina")) {
       val authorElms = cheapBookElm.getChildElem(EName(ns, "Authors")).findTopmostElems(EName(ns, "Author"))
-      val authorLastNameElms = authorElms flatMap { e => e.findTopmostElems(EName(ns, "Last_Name")) }
-      val result = authorLastNameElms map { e => e.trimmedText }
+      val authorLastNameElms = authorElms.flatMap { e =>
+        e.findTopmostElems(EName(ns, "Last_Name"))
+      }
+      val result = authorLastNameElms.map { e =>
+        e.trimmedText
+      }
       result.toSet
     }
 
     val ullmanAncestors =
-      cheapBookElm filterElems { e => e.findAllElemsOrSelf exists { e2 => e2.trimmedText == "Ullman" } }
+      cheapBookElm.filterElems { e =>
+        e.findAllElemsOrSelf.exists { e2 =>
+          e2.trimmedText == "Ullman"
+        }
+      }
     val firstUllmanAncestors =
-      cheapBookElm findTopmostElems { e => e.findAllElemsOrSelf exists { e2 => e2.trimmedText == "Ullman" } }
+      cheapBookElm.findTopmostElems { e =>
+        e.findAllElemsOrSelf.exists { e2 =>
+          e2.trimmedText == "Ullman"
+        }
+      }
 
     assertResult(3) {
       ullmanAncestors.size
@@ -466,7 +760,7 @@ class ElemLikeTest extends AnyFunSuite {
       ullmanAncestors.map(_.resolvedName).toSet
     }
     assertResult(Set(EName(ns, "Authors"))) {
-      val result = firstUllmanAncestors map {
+      val result = firstUllmanAncestors.map {
         _.resolvedName
       }
       result.toSet
@@ -477,7 +771,7 @@ class ElemLikeTest extends AnyFunSuite {
   test("testFindParentInTree") {
     require(bookstore.localName == "Bookstore")
 
-    val bookElms = bookstore filterElems {
+    val bookElms = bookstore.filterElems {
       _.localName == "Book"
     }
 
@@ -489,15 +783,21 @@ class ElemLikeTest extends AnyFunSuite {
 
       val indexedBookstoreElem = IElem(bookstore)
       val paths =
-        indexedBookstoreElem filterElemsOrSelf { e => bookElms.contains(bookstore.getElemOrSelfByPath(e.path)) } map (_.path)
-      val parentPaths = paths flatMap {
+        indexedBookstoreElem
+          .filterElemsOrSelf { e =>
+            bookElms.contains(bookstore.getElemOrSelfByPath(e.path))
+          }
+          .map(_.path)
+      val parentPaths = paths.flatMap {
         _.parentPathOption
       }
-      val result: Set[Elem] = parentPaths.toSet map { (path: Path) => bookstore.getElemOrSelfByPath(path) }
+      val result: Set[Elem] = parentPaths.toSet.map { (path: Path) =>
+        bookstore.getElemOrSelfByPath(path)
+      }
       result
     }
 
-    val lastNameElms = bookstore filterElems {
+    val lastNameElms = bookstore.filterElems {
       _.localName == "Last_Name"
     }
 
@@ -509,18 +809,28 @@ class ElemLikeTest extends AnyFunSuite {
 
       val indexedBookstoreElem = IElem(bookstore)
       val paths =
-        indexedBookstoreElem filterElemsOrSelf { e => lastNameElms.contains(bookstore.getElemOrSelfByPath(e.path)) } map (_.path)
-      val parentPaths = paths flatMap {
+        indexedBookstoreElem
+          .filterElemsOrSelf { e =>
+            lastNameElms.contains(bookstore.getElemOrSelfByPath(e.path))
+          }
+          .map(_.path)
+      val parentPaths = paths.flatMap {
         _.parentPathOption
       }
-      val result: Set[Elem] = parentPaths.toSet map { (path: Path) => bookstore.getElemOrSelfByPath(path) }
-      result map { e => e.resolvedName }
+      val result: Set[Elem] = parentPaths.toSet.map { (path: Path) =>
+        bookstore.getElemOrSelfByPath(path)
+      }
+      result.map { e =>
+        e.resolvedName
+      }
     }
 
     val cheapBookElms =
-      bookstore findTopmostElems { e => e.localName == "Book" && e.attribute(EName("Price")).toInt <= 50 }
+      bookstore.findTopmostElems { e =>
+        e.localName == "Book" && e.attribute(EName("Price")).toInt <= 50
+      }
     val cheapBookElm: Elem = cheapBookElms(0)
-    val cheapBookAuthorElms = cheapBookElm filterElems {
+    val cheapBookAuthorElms = cheapBookElm.filterElems {
       _.localName == "Author"
     }
 
@@ -534,11 +844,17 @@ class ElemLikeTest extends AnyFunSuite {
 
       val indexedCheapBookElm = IElem(cheapBookElm)
       val paths =
-        indexedCheapBookElm filterElemsOrSelf { e => lastNameElms.contains(cheapBookElm.getElemOrSelfByPath(e.path)) } map (_.path)
-      val parentPaths = paths flatMap {
+        indexedCheapBookElm
+          .filterElemsOrSelf { e =>
+            lastNameElms.contains(cheapBookElm.getElemOrSelfByPath(e.path))
+          }
+          .map(_.path)
+      val parentPaths = paths.flatMap {
         _.parentPathOption
       }
-      val result: Set[Elem] = parentPaths.toSet map { (path: Path) => cheapBookElm.getElemOrSelfByPath(path) }
+      val result: Set[Elem] = parentPaths.toSet.map { (path: Path) =>
+        cheapBookElm.getElemOrSelfByPath(path)
+      }
       result
     }
   }
@@ -546,12 +862,12 @@ class ElemLikeTest extends AnyFunSuite {
   test("testGetIndex") {
     require(bookstore.localName == "Bookstore")
 
-    val index: Map[EName, immutable.IndexedSeq[Elem]] = bookstore.findAllElemsOrSelf groupBy {
+    val index: Map[EName, immutable.IndexedSeq[Elem]] = bookstore.findAllElemsOrSelf.groupBy {
       _.resolvedName
     }
 
     assertResult {
-      val result = bookstore.findAllElemsOrSelf map {
+      val result = bookstore.findAllElemsOrSelf.map {
         _.resolvedName
       }
       result.toSet.size
@@ -560,10 +876,10 @@ class ElemLikeTest extends AnyFunSuite {
     }
 
     assert {
-      index forall { kv =>
+      index.forall { kv =>
         val ename: EName = kv._1
         val elms: immutable.IndexedSeq[Elem] = kv._2
-        elms forall {
+        elms.forall {
           _.resolvedName == ename
         }
       }
@@ -577,17 +893,21 @@ class ElemLikeTest extends AnyFunSuite {
       bookstore.findElemOrSelfByPath(Path.Empty)
     }
 
-    val scope = Scope.from(Map("b" -> ns.toString))
+    val scope = Scope.from(Map("b" -> ns))
 
     assertResult(Some(QName("Last_Name"))) {
-      val path = PathBuilder.from(QName("b:Book") -> 0, QName("b:Authors") -> 0, QName("b:Author") -> 0, QName("b:Last_Name") -> 0).build(scope)
-      bookstore.findElemOrSelfByPath(path) map {
+      val path = PathBuilder
+        .from(QName("b:Book") -> 0, QName("b:Authors") -> 0, QName("b:Author") -> 0, QName("b:Last_Name") -> 0)
+        .build(scope)
+      bookstore.findElemOrSelfByPath(path).map {
         _.qname
       }
     }
     assertResult(Some("Ullman")) {
-      val path = PathBuilder.from(QName("b:Book") -> 0, QName("b:Authors") -> 0, QName("b:Author") -> 0, QName("b:Last_Name") -> 0).build(scope)
-      bookstore.findElemOrSelfByPath(path) map {
+      val path = PathBuilder
+        .from(QName("b:Book") -> 0, QName("b:Authors") -> 0, QName("b:Author") -> 0, QName("b:Last_Name") -> 0)
+        .build(scope)
+      bookstore.findElemOrSelfByPath(path).map {
         _.trimmedText
       }
     }
@@ -599,11 +919,15 @@ class ElemLikeTest extends AnyFunSuite {
       bookstoreChildIndexes.size
     }
     assertResult(Set(EName(ns, "Book"), EName(ns, "Magazine"))) {
-      val result = bookstoreChildIndexes map { idx => idx.elementName }
+      val result = bookstoreChildIndexes.map { idx =>
+        idx.elementName
+      }
       result.toSet
     }
     assertResult((0 to 3).toSet) {
-      val result = bookstoreChildIndexes map { idx => idx.index }
+      val result = bookstoreChildIndexes.map { idx =>
+        idx.index
+      }
       result.toSet
     }
 
@@ -643,11 +967,11 @@ class ElemLikeTest extends AnyFunSuite {
     }
 
     for (elm <- allElms) {
-      assertResult((elm.findAllChildElems flatMap (_.findAllElemsOrSelf))) {
+      assertResult(elm.findAllChildElems.flatMap(_.findAllElemsOrSelf)) {
         elm.findAllElems
       }
 
-      assertResult((immutable.IndexedSeq(elm) ++ (elm.findAllChildElems flatMap (_.findAllElemsOrSelf)))) {
+      assertResult(immutable.IndexedSeq(elm) ++ elm.findAllChildElems.flatMap(_.findAllElemsOrSelf)) {
         elm.findAllElemsOrSelf
       }
 
@@ -675,17 +999,17 @@ class ElemLikeTest extends AnyFunSuite {
         elm.findAllElemsOrSelf.collect(pf)
       }
 
-      assertResult(elm.findAllChildElems flatMap (_ \\! p)) {
+      assertResult(elm.findAllChildElems.flatMap(_ \\! p)) {
         elm.findTopmostElems(p)
       }
 
-      assertResult(if (p(elm)) immutable.IndexedSeq(elm) else (elm.findAllChildElems flatMap (_ \\! p))) {
+      assertResult(if (p(elm)) immutable.IndexedSeq(elm) else elm.findAllChildElems.flatMap(_ \\! p)) {
         elm \\! p
       }
 
       val expectedTopmostElems = {
-        elm.filterElems(p) filter { e =>
-          val hasNoMatchingAncestor = elm.filterElems(p) forall {
+        elm.filterElems(p).filter { e =>
+          val hasNoMatchingAncestor = elm.filterElems(p).forall {
             _.findElem(_ == e).isEmpty
           }
           hasNoMatchingAncestor
@@ -697,8 +1021,8 @@ class ElemLikeTest extends AnyFunSuite {
       }
 
       val expectedTopmostElemsOrSelf = {
-        elm \\ p filter { e =>
-          val hasNoMatchingAncestor = elm \\ p forall {
+        (elm \\ p).filter { e =>
+          val hasNoMatchingAncestor = (elm \\ p).forall {
             _.findElem(_ == e).isEmpty
           }
           hasNoMatchingAncestor
@@ -710,18 +1034,18 @@ class ElemLikeTest extends AnyFunSuite {
       }
 
       assertResult(elm.filterElems(p)) {
-        (elm.findTopmostElems(p) flatMap (_ \\ p))
+        elm.findTopmostElems(p).flatMap(_ \\ p)
       }
 
       assertResult(elm \\ p) {
-        (elm \\! p flatMap (_ \\ p))
+        (elm \\! p).flatMap(_ \\ p)
       }
 
-      assertResult(elm.findAllChildElems flatMap (_ \\ p)) {
+      assertResult(elm.findAllChildElems.flatMap(_ \\ p)) {
         elm.filterElems(p)
       }
 
-      assertResult((immutable.IndexedSeq(elm).filter(p)) ++ (elm.findAllChildElems flatMap (_ \\ p))) {
+      assertResult(immutable.IndexedSeq(elm).filter(p) ++ elm.findAllChildElems.flatMap(_ \\ p)) {
         elm \\ p
       }
 
@@ -738,159 +1062,5 @@ class ElemLikeTest extends AnyFunSuite {
         elm.findElemOrSelf(p)
       }
     }
-  }
-
-  private val book1: ElemBuilder = {
-    import NodeBuilder._
-
-    elem(
-      qname = QName("Book"),
-      attributes = Vector(QName("ISBN") -> "ISBN-0-13-713526-2", QName("Price") -> "85", QName("Edition") -> "3rd"),
-      children = Vector(
-        textElem(QName("Title"), "A First Course in Database Systems"),
-        elem(
-          qname = QName("Authors"),
-          children = Vector(
-            elem(
-              qname = QName("Author"),
-              children = Vector(
-                textElem(QName("First_Name"), "Jeffrey"),
-                textElem(QName("Last_Name"), "Ullman"))),
-            elem(
-              qname = QName("Author"),
-              children = Vector(
-                textElem(QName("First_Name"), "Jennifer"),
-                textElem(QName("Last_Name"), "Widom")))))))
-  }
-
-  private val book2: ElemBuilder = {
-    import NodeBuilder._
-
-    elem(
-      qname = QName("Book"),
-      attributes = Vector(QName("ISBN") -> "ISBN-0-13-815504-6", QName("Price") -> "100"),
-      children = Vector(
-        textElem(QName("Title"), "Database Systems: The Complete Book"),
-        elem(
-          qname = QName("Authors"),
-          children = Vector(
-            elem(
-              qname = QName("Author"),
-              children = Vector(
-                textElem(QName("First_Name"), "Hector"),
-                textElem(QName("Last_Name"), "Garcia-Molina"))),
-            elem(
-              qname = QName("Author"),
-              children = Vector(
-                textElem(QName("First_Name"), "Jeffrey"),
-                textElem(QName("Last_Name"), "Ullman"))),
-            elem(
-              qname = QName("Author"),
-              children = Vector(
-                textElem(QName("First_Name"), "Jennifer"),
-                textElem(QName("Last_Name"), "Widom"))))),
-        textElem(QName("Remark"), "Buy this book bundled with \"A First Course\" - a great deal!")))
-  }
-
-  private val book3: ElemBuilder = {
-    import NodeBuilder._
-
-    elem(
-      qname = QName("Book"),
-      attributes = Vector(QName("ISBN") -> "ISBN-0-11-222222-3", QName("Price") -> "50"),
-      children = Vector(
-        textElem(QName("Title"), "Hector and Jeff's Database Hints"),
-        elem(
-          qname = QName("Authors"),
-          children = Vector(
-            elem(
-              qname = QName("Author"),
-              children = Vector(
-                textElem(QName("First_Name"), "Jeffrey"),
-                textElem(QName("Last_Name"), "Ullman"))),
-            elem(
-              qname = QName("Author"),
-              children = Vector(
-                textElem(QName("First_Name"), "Hector"),
-                textElem(QName("Last_Name"), "Garcia-Molina"))))),
-        textElem(QName("Remark"), "An indispensable companion to your textbook")))
-  }
-
-  private val book4: ElemBuilder = {
-    import NodeBuilder._
-
-    elem(
-      qname = QName("Book"),
-      attributes = Vector(QName("ISBN") -> "ISBN-9-88-777777-6", QName("Price") -> "25"),
-      children = Vector(
-        textElem(QName("Title"), "Jennifer's Economical Database Hints"),
-        elem(
-          qname = QName("Authors"),
-          children = Vector(
-            elem(
-              qname = QName("Author"),
-              children = Vector(
-                textElem(QName("First_Name"), "Jennifer"),
-                textElem(QName("Last_Name"), "Widom")))))))
-  }
-
-  private val magazine1: ElemBuilder = {
-    import NodeBuilder._
-
-    elem(
-      qname = QName("Magazine"),
-      attributes = Vector(QName("Month") -> "January", QName("Year") -> "2009"),
-      children = Vector(
-        textElem(QName("Title"), "National Geographic")))
-  }
-
-  private val magazine2: ElemBuilder = {
-    import NodeBuilder._
-
-    elem(
-      qname = QName("Magazine"),
-      attributes = Vector(QName("Month") -> "February", QName("Year") -> "2009"),
-      children = Vector(
-        textElem(QName("Title"), "National Geographic")))
-  }
-
-  private val magazine3: ElemBuilder = {
-    import NodeBuilder._
-
-    elem(
-      qname = QName("Magazine"),
-      attributes = Vector(QName("Month") -> "February", QName("Year") -> "2009"),
-      children = Vector(
-        textElem(QName("Title"), "Newsweek")))
-  }
-
-  private val magazine4: ElemBuilder = {
-    import NodeBuilder._
-
-    elem(
-      qname = QName("Magazine"),
-      attributes = Vector(QName("Month") -> "March", QName("Year") -> "2009"),
-      children = Vector(
-        textElem(QName("Title"), "Hector and Jeff's Database Hints")))
-  }
-
-  private val bookstore: Elem = {
-    import NodeBuilder._
-
-    val result: Elem =
-      elem(
-        qname = QName("books:Bookstore"),
-        namespaces = Declarations.from("" -> ns.toString, "books" -> ns.toString),
-        children = Vector(
-          book1, book2, book3, book4, magazine1, magazine2, magazine3, magazine4)).build(Scope.Empty)
-
-    require {
-      result.findAllElemsOrSelf forall { e => e.resolvedName.namespaceUriOption == Option(ns.toString) }
-    }
-    require(result.qname.prefixOption.contains("books"))
-    require {
-      result.findAllElems forall { e => e.qname.prefixOption.isEmpty }
-    }
-    result
   }
 }

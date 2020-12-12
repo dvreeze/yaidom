@@ -73,6 +73,7 @@ import eu.cdevreeze.yaidom.queryapi.TransformableElemLike
  *
  * @author Chris de Vreeze
  */
+@deprecated(message = "Deprecated, without replacement", since = "1.12.0")
 sealed trait NodeBuilder extends Serializable {
 
   type NodeType <: Node
@@ -100,6 +101,7 @@ sealed trait NodeBuilder extends Serializable {
   }
 }
 
+@deprecated(message = "Deprecated, without replacement", since = "1.12.0")
 sealed trait CanBeDocBuilderChild extends NodeBuilder {
 
   override type NodeType <: CanBeDocumentChild
@@ -111,6 +113,7 @@ sealed trait CanBeDocBuilderChild extends NodeBuilder {
  * '''See the documentation of the mixed-in query API trait(s) for more details on the uniform query API offered by this class.'''
  */
 @SerialVersionUID(1L)
+@deprecated(message = "Deprecated, without replacement", since = "1.12.0")
 final class ElemBuilder(
     val qname: QName,
     val attributes: immutable.IndexedSeq[(QName, String)],
@@ -265,6 +268,7 @@ final class ElemBuilder(
 }
 
 @SerialVersionUID(1L)
+@deprecated(message = "Deprecated, without replacement", since = "1.12.0")
 final case class TextBuilder(text: String, isCData: Boolean) extends NodeBuilder {
   require(text ne null) // scalastyle:off null
   if (isCData) require(!text.containsSlice("]]>"))
@@ -275,6 +279,7 @@ final case class TextBuilder(text: String, isCData: Boolean) extends NodeBuilder
 }
 
 @SerialVersionUID(1L)
+@deprecated(message = "Deprecated, without replacement", since = "1.12.0")
 final case class ProcessingInstructionBuilder(target: String, data: String) extends CanBeDocBuilderChild {
   require(target ne null) // scalastyle:off null
   require(data ne null) // scalastyle:off null
@@ -286,6 +291,7 @@ final case class ProcessingInstructionBuilder(target: String, data: String) exte
 }
 
 @SerialVersionUID(1L)
+@deprecated(message = "Deprecated, without replacement", since = "1.12.0")
 final case class EntityRefBuilder(entity: String) extends NodeBuilder {
   require(entity ne null) // scalastyle:off null
 
@@ -295,6 +301,7 @@ final case class EntityRefBuilder(entity: String) extends NodeBuilder {
 }
 
 @SerialVersionUID(1L)
+@deprecated(message = "Deprecated, without replacement", since = "1.12.0")
 final case class CommentBuilder(text: String) extends CanBeDocBuilderChild {
   require(text ne null) // scalastyle:off null
 
@@ -303,6 +310,7 @@ final case class CommentBuilder(text: String) extends CanBeDocBuilderChild {
   def build(parentScope: Scope): Comment = Comment(text)
 }
 
+@deprecated(message = "Deprecated, without replacement", since = "1.12.0")
 object NodeBuilder {
 
   def elem(

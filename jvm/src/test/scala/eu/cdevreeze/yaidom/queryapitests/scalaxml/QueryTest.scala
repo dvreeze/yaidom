@@ -16,8 +16,6 @@
 
 package eu.cdevreeze.yaidom.queryapitests.scalaxml
 
-import scala.collection.immutable
-
 import eu.cdevreeze.yaidom.convert
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
@@ -25,7 +23,9 @@ import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi._
 import eu.cdevreeze.yaidom.queryapitests.AbstractElemLikeQueryTest
 import eu.cdevreeze.yaidom.scalaxml.ScalaXmlElem
-import eu.cdevreeze.yaidom.simple.NodeBuilder
+import eu.cdevreeze.yaidom.simple.Node
+
+import scala.collection.immutable
 
 /**
  * Query test case for Scala XML wrapper elements.
@@ -35,169 +35,6 @@ import eu.cdevreeze.yaidom.simple.NodeBuilder
 class QueryTest extends AbstractElemLikeQueryTest {
 
   final type E = ScalaXmlElem
-
-  test("testQueryAll") {
-    require(bookstore.localName == "Bookstore")
-
-    val elems = bookstore.findAllElemsOrSelf
-
-    assertResult(true) {
-      elems.nonEmpty
-    }
-  }
-
-  /**
-   * The equivalent of XQuery:
-   * {{{
-   * for $b in doc("bookstore.xml")/Bookstore/Book
-   * where some $fm in $b/Authors/Author/First_Name satisfies contains($b/Title, $fn)
-   * return &lt;Book&gt;
-   *          { $b/Title }
-   *          { for $fm in $b/Authors/Author/First_Name where contains($b/Title, $fn) return $fn }
-   *        &lt;/Book&gt;
-   * }}}
-   */
-  test("testQueryBooksWithAuthorInTitle") {
-    require(bookstore.localName == "Bookstore")
-
-    import NodeBuilder._
-
-    val titleAndFirstNames =
-      for {
-        book <- bookstore \ (_.localName == "Book")
-        title = book.getChildElem(EName("Title"))
-        authorFirstNames = {
-          val result = book.filterElems(EName("Author")) map { _.getChildElem(EName("First_Name")).trimmedText }
-          result.toSet
-        }
-        searchedForFirstNames = authorFirstNames filter { firstName => title.trimmedText.indexOf(firstName) >= 0 }
-        if searchedForFirstNames.nonEmpty
-      } yield {
-        val titleElem = convert.ScalaXmlConversions.convertToElem(title.wrappedNode)
-
-        elem(
-          qname = QName("Book"),
-          children = Vector(
-            fromElem(titleElem)(Scope.Empty),
-            textElem(QName("First_Name"), searchedForFirstNames.head))).build()
-      }
-
-    assertResult(2) {
-      titleAndFirstNames.size
-    }
-    assertResult(Set("Hector and Jeff's Database Hints", "Jennifer's Economical Database Hints")) {
-      val titleElms = titleAndFirstNames map { e => e.filterElems(EName("Title")) }
-      val result = titleElms.flatten map { e => e.trimmedText }
-      result.toSet
-    }
-  }
-
-  /**
-   * The equivalent of XQuery:
-   * {{{
-   * let $a := avg(doc("bookstore.xml")/Bookstore/Book/@Price)
-   * for $b in doc("bookstore.xml")/Bookstore/Book
-   * where $b/@Price < $a
-   * return &lt;Book&gt;
-   *          { $b/Title }
-   *          &lt;Price&gt; { $b/data(@Price) } &lt;/Price&gt;
-   *        &lt;/Book&gt;
-   * }}}
-   */
-  test("testQueryBooksPricedBelowAverage") {
-    require(bookstore.localName == "Bookstore")
-
-    import NodeBuilder._
-
-    val prices: immutable.IndexedSeq[Double] =
-      for {
-        book <- bookstore \ (_.localName == "Book")
-        price = book.attribute(EName("Price")).toDouble
-      } yield price
-
-    val avg: Double = prices.sum.toDouble / prices.size
-
-    val cheapBooks =
-      for {
-        book <- bookstore \ (_.localName == "Book")
-        price = book.attribute(EName("Price")).toDouble
-        if price < avg
-      } yield {
-        val title = book.getChildElem(EName("Title"))
-        val titleElem = convert.ScalaXmlConversions.convertToElem(title.wrappedNode)
-
-        elem(
-          qname = QName("Book"),
-          children = Vector(
-            fromElem(titleElem)(Scope.Empty),
-            textElem(QName("Price"), price.toString))).build()
-      }
-
-    assertResult(2) {
-      cheapBooks.size
-    }
-    assertResult(Set(50, 25)) {
-      val result = cheapBooks flatMap { e => e.filterElems(EName("Price")) } map { e => e.trimmedText.toDouble.intValue }
-      result.toSet
-    }
-    assertResult(Set("Hector and Jeff's Database Hints", "Jennifer's Economical Database Hints")) {
-      val result = cheapBooks flatMap { e => e.filterElems(EName("Title")) } map { e => e.trimmedText }
-      result.toSet
-    }
-  }
-
-  /**
-   * The equivalent of XQuery:
-   * {{{
-   * for $b in doc("bookstore.xml")/Bookstore/Book
-   * order by $b/@Price
-   * return &lt;Book&gt;
-   *          { $b/Title }
-   *          &lt;Price&gt; { $b/data(@Price) } &lt;/Price&gt;
-   *        &lt;/Book&gt;
-   * }}}
-   */
-  test("testQueryBooksOrderedByPrice") {
-    require(bookstore.localName == "Bookstore")
-
-    import NodeBuilder._
-
-    def cheaper(book1: ScalaXmlElem, book2: ScalaXmlElem): Boolean = {
-      val price1 = book1.attribute(EName("Price")).toInt
-      val price2 = book2.attribute(EName("Price")).toInt
-      price1 < price2
-    }
-
-    val books = {
-      for {
-        book <- bookstore \ (_.localName == "Book") sortWith { cheaper _ }
-        price = book.attribute(EName("Price")).toDouble
-      } yield {
-        val title = book.getChildElem(EName("Title"))
-        val titleElem = convert.ScalaXmlConversions.convertToElem(title.wrappedNode)
-
-        elem(
-          qname = QName("Book"),
-          children = Vector(
-            fromElem(titleElem)(Scope.Empty),
-            textElem(QName("Price"), price.toString))).build()
-      }
-    }
-
-    assertResult(4) {
-      books.size
-    }
-    assertResult(List(25, 50, 85, 100)) {
-      books flatMap { e => e.filterElems(EName("Price")) } map { e => e.trimmedText.toDouble.intValue }
-    }
-    assertResult(List(
-      "Jennifer's Economical Database Hints",
-      "Hector and Jeff's Database Hints",
-      "A First Course in Database Systems",
-      "Database Systems: The Complete Book")) {
-      books flatMap { e => e.filterElems(EName("Title")) } map { e => e.trimmedText }
-    }
-  }
 
   protected final val bookstore: ScalaXmlElem = {
     val scalaElem =
@@ -273,5 +110,196 @@ class QueryTest extends AbstractElemLikeQueryTest {
       </Bookstore>
 
     new ScalaXmlElem(scalaElem)
+  }
+
+  test("testQueryAll") {
+    require(bookstore.localName == "Bookstore")
+
+    val elems = bookstore.findAllElemsOrSelf
+
+    assertResult(true) {
+      elems.nonEmpty
+    }
+  }
+
+  /**
+   * The equivalent of XQuery:
+   * {{{
+   * for $b in doc("bookstore.xml")/Bookstore/Book
+   * where some $fm in $b/Authors/Author/First_Name satisfies contains($b/Title, $fn)
+   * return &lt;Book&gt;
+   *          { $b/Title }
+   *          { for $fm in $b/Authors/Author/First_Name where contains($b/Title, $fn) return $fn }
+   *        &lt;/Book&gt;
+   * }}}
+   */
+  test("testQueryBooksWithAuthorInTitle") {
+    require(bookstore.localName == "Bookstore")
+
+    import Node._
+
+    val titleAndFirstNames =
+      for {
+        book <- bookstore \ (_.localName == "Book")
+        title = book.getChildElem(EName("Title"))
+        authorFirstNames = {
+          val result = book.filterElems(EName("Author")).map { _.getChildElem(EName("First_Name")).trimmedText }
+          result.toSet
+        }
+        searchedForFirstNames = authorFirstNames.filter { firstName =>
+          title.trimmedText.indexOf(firstName) >= 0
+        }
+        if searchedForFirstNames.nonEmpty
+      } yield {
+        val titleElem = convert.ScalaXmlConversions.convertToElem(title.wrappedNode)
+
+        elem(
+          qname = QName("Book"),
+          scope = Scope.Empty,
+          children = Vector(titleElem, textElem(QName("First_Name"), Scope.Empty, searchedForFirstNames.head)))
+      }
+
+    assertResult(2) {
+      titleAndFirstNames.size
+    }
+    assertResult(Set("Hector and Jeff's Database Hints", "Jennifer's Economical Database Hints")) {
+      val titleElms = titleAndFirstNames.map { e =>
+        e.filterElems(EName("Title"))
+      }
+      val result = titleElms.flatten.map { e =>
+        e.trimmedText
+      }
+      result.toSet
+    }
+  }
+
+  /**
+   * The equivalent of XQuery:
+   * {{{
+   * let $a := avg(doc("bookstore.xml")/Bookstore/Book/@Price)
+   * for $b in doc("bookstore.xml")/Bookstore/Book
+   * where $b/@Price < $a
+   * return &lt;Book&gt;
+   *          { $b/Title }
+   *          &lt;Price&gt; { $b/data(@Price) } &lt;/Price&gt;
+   *        &lt;/Book&gt;
+   * }}}
+   */
+  test("testQueryBooksPricedBelowAverage") {
+    require(bookstore.localName == "Bookstore")
+
+    import Node._
+
+    val prices: immutable.IndexedSeq[Double] =
+      for {
+        book <- bookstore \ (_.localName == "Book")
+        price = book.attribute(EName("Price")).toDouble
+      } yield price
+
+    val avg: Double = prices.sum / prices.size
+
+    val cheapBooks =
+      for {
+        book <- bookstore \ (_.localName == "Book")
+        price = book.attribute(EName("Price")).toDouble
+        if price < avg
+      } yield {
+        val title = book.getChildElem(EName("Title"))
+        val titleElem = convert.ScalaXmlConversions.convertToElem(title.wrappedNode)
+
+        elem(
+          qname = QName("Book"),
+          scope = Scope.Empty,
+          children = Vector(titleElem, textElem(QName("Price"), Scope.Empty, price.toString)))
+      }
+
+    assertResult(2) {
+      cheapBooks.size
+    }
+    assertResult(Set(50, 25)) {
+      val result = cheapBooks
+        .flatMap { e =>
+          e.filterElems(EName("Price"))
+        }
+        .map { e =>
+          e.trimmedText.toDouble.intValue
+        }
+      result.toSet
+    }
+    assertResult(Set("Hector and Jeff's Database Hints", "Jennifer's Economical Database Hints")) {
+      val result = cheapBooks
+        .flatMap { e =>
+          e.filterElems(EName("Title"))
+        }
+        .map { e =>
+          e.trimmedText
+        }
+      result.toSet
+    }
+  }
+
+  /**
+   * The equivalent of XQuery:
+   * {{{
+   * for $b in doc("bookstore.xml")/Bookstore/Book
+   * order by $b/@Price
+   * return &lt;Book&gt;
+   *          { $b/Title }
+   *          &lt;Price&gt; { $b/data(@Price) } &lt;/Price&gt;
+   *        &lt;/Book&gt;
+   * }}}
+   */
+  test("testQueryBooksOrderedByPrice") {
+    require(bookstore.localName == "Bookstore")
+
+    import Node._
+
+    def cheaper(book1: ScalaXmlElem, book2: ScalaXmlElem): Boolean = {
+      val price1 = book1.attribute(EName("Price")).toInt
+      val price2 = book2.attribute(EName("Price")).toInt
+      price1 < price2
+    }
+
+    val books = {
+      for {
+        book <- (bookstore \ (_.localName == "Book")).sortWith { cheaper }
+        price = book.attribute(EName("Price")).toDouble
+      } yield {
+        val title = book.getChildElem(EName("Title"))
+        val titleElem = convert.ScalaXmlConversions.convertToElem(title.wrappedNode)
+
+        elem(
+          qname = QName("Book"),
+          scope = Scope.Empty,
+          children = Vector(titleElem, textElem(QName("Price"), Scope.Empty, price.toString)))
+      }
+    }
+
+    assertResult(4) {
+      books.size
+    }
+    assertResult(List(25, 50, 85, 100)) {
+      books
+        .flatMap { e =>
+          e.filterElems(EName("Price"))
+        }
+        .map { e =>
+          e.trimmedText.toDouble.intValue
+        }
+    }
+    assertResult(
+      List(
+        "Jennifer's Economical Database Hints",
+        "Hector and Jeff's Database Hints",
+        "A First Course in Database Systems",
+        "Database Systems: The Complete Book")) {
+      books
+        .flatMap { e =>
+          e.filterElems(EName("Title"))
+        }
+        .map { e =>
+          e.trimmedText
+        }
+    }
   }
 }

@@ -19,8 +19,6 @@ package eu.cdevreeze.yaidom.integrationtest
 import java.io.ByteArrayInputStream
 import java.nio.charset.Charset
 
-import scala.io.Codec
-
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.dom.DomDocument
 import eu.cdevreeze.yaidom.parse.DocumentParser
@@ -29,10 +27,12 @@ import eu.cdevreeze.yaidom.parse.DocumentParserUsingDomLS
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingStax
 import eu.cdevreeze.yaidom.scalaxml.ScalaXmlDocument
-import eu.cdevreeze.yaidom.simple.DocBuilder
+import eu.cdevreeze.yaidom.simple.Document
 import javax.xml.parsers.DocumentBuilderFactory
 import org.scalatest.funsuite.AnyFunSuite
 import org.xml.sax.InputSource
+
+import scala.io.Codec
 
 /**
  * DocumentParser test.
@@ -42,49 +42,49 @@ import org.xml.sax.InputSource
 class DocumentParserTest extends AnyFunSuite {
 
   test("testParseWithEndingCommentsUsingSax") {
-    val parser = DocumentParserUsingSax.newInstance
+    val parser = DocumentParserUsingSax.newInstance()
 
     doTestParseWithEndingComments(parser)
   }
 
   test("testParseWithEndingCommentsUsingStax") {
-    val parser = DocumentParserUsingStax.newInstance
+    val parser = DocumentParserUsingStax.newInstance()
 
     doTestParseWithEndingComments(parser)
   }
 
   test("testParseWithEndingCommentsUsingDom") {
-    val parser = DocumentParserUsingDom.newInstance
+    val parser = DocumentParserUsingDom.newInstance()
 
     doTestParseWithEndingComments(parser)
   }
 
   test("testParseWithEndingCommentsUsingDomLS") {
-    val parser = DocumentParserUsingDomLS.newInstance
+    val parser = DocumentParserUsingDomLS.newInstance()
 
     doTestParseWithEndingComments(parser)
   }
 
   test("testParseXml11UsingSax") {
-    val parser = DocumentParserUsingSax.newInstance
+    val parser = DocumentParserUsingSax.newInstance()
 
     doTestParseXml11(parser)
   }
 
   test("testParseXml11UsingStax") {
-    val parser = DocumentParserUsingStax.newInstance
+    val parser = DocumentParserUsingStax.newInstance()
 
     doTestParseXml11(parser)
   }
 
   test("testParseXml11UsingDom") {
-    val parser = DocumentParserUsingDom.newInstance
+    val parser = DocumentParserUsingDom.newInstance()
 
     doTestParseXml11(parser)
   }
 
   test("testParseXml11UsingDomLS") {
-    val parser = DocumentParserUsingDomLS.newInstance
+    val parser = DocumentParserUsingDomLS.newInstance()
 
     doTestParseXml11(parser)
   }
@@ -100,7 +100,7 @@ class DocumentParserTest extends AnyFunSuite {
          |""".stripMargin.trim
 
     val doc = ScalaXmlDocument(
-      scala.xml.parsing.ConstructingParser.fromSource(scala.io.Source.fromString(xml), true).document)
+      scala.xml.parsing.ConstructingParser.fromSource(scala.io.Source.fromString(xml), preserveWS = true).document)
 
     assertResult(List(QName("prod:product"), QName("prod:number"), QName("prod:size"))) {
       doc.documentElement.findAllElemsOrSelf.map(_.qname)
@@ -137,7 +137,7 @@ class DocumentParserTest extends AnyFunSuite {
          |""".stripMargin.trim
 
     val doc = ScalaXmlDocument(
-      scala.xml.parsing.ConstructingParser.fromSource(scala.io.Source.fromString(xml), true).document)
+      scala.xml.parsing.ConstructingParser.fromSource(scala.io.Source.fromString(xml), preserveWS = true).document)
 
     assertResult(List(QName("prod:product"), QName("prod:number"), QName("prod:size"))) {
       doc.documentElement.findAllElemsOrSelf.map(_.qname)
@@ -174,8 +174,7 @@ class DocumentParserTest extends AnyFunSuite {
          |""".stripMargin.trim
 
     val db = DocumentBuilderFactory.newInstance().newDocumentBuilder()
-    val doc = DomDocument(
-      db.parse(new InputSource(new ByteArrayInputStream(xml.getBytes("UTF-8")))))
+    val doc = DomDocument(db.parse(new InputSource(new ByteArrayInputStream(xml.getBytes("UTF-8")))))
 
     assertResult(List(QName("prod:product"), QName("prod:number"), QName("prod:size"))) {
       doc.documentElement.findAllElemsOrSelf.map(_.qname)
@@ -212,8 +211,7 @@ class DocumentParserTest extends AnyFunSuite {
          |""".stripMargin.trim
 
     val db = DocumentBuilderFactory.newInstance().newDocumentBuilder()
-    val doc = DomDocument(
-      db.parse(new InputSource(new ByteArrayInputStream(xml.getBytes("iso-8859-1")))))
+    val doc = DomDocument(db.parse(new InputSource(new ByteArrayInputStream(xml.getBytes("iso-8859-1")))))
 
     assertResult(List(QName("prod:product"), QName("prod:number"), QName("prod:size"))) {
       doc.documentElement.findAllElemsOrSelf.map(_.qname)
@@ -274,7 +272,7 @@ class DocumentParserTest extends AnyFunSuite {
       xmlDeclOption.flatMap(_.standaloneOption)
     }
 
-    val doc2 = DocBuilder.fromDocument(doc).build()
+    val doc2 = Document.document(doc.uriOption.map(_.toString), doc.xmlDeclarationOption, doc.children)
 
     val xmlDeclOption2 = doc2.xmlDeclarationOption
 
@@ -322,7 +320,7 @@ class DocumentParserTest extends AnyFunSuite {
       xmlDeclOption.flatMap(_.standaloneOption)
     }
 
-    val doc2 = DocBuilder.fromDocument(doc).build()
+    val doc2 = Document.document(doc.uriOption.map(_.toString), doc.xmlDeclarationOption, doc.children)
 
     val xmlDeclOption2 = doc2.xmlDeclarationOption
 

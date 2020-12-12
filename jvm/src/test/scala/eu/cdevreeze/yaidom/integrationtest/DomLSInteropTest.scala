@@ -32,11 +32,10 @@ import eu.cdevreeze.yaidom.print.DocumentPrinterUsingDomLS
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi._
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.simple.Comment
-import eu.cdevreeze.yaidom.simple.DocBuilder
 import eu.cdevreeze.yaidom.simple.Document
 import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.simple.EntityRef
-import eu.cdevreeze.yaidom.simple.NodeBuilder
+import eu.cdevreeze.yaidom.simple.Node
 import javax.xml.parsers.DocumentBuilderFactory
 import org.scalatest.funsuite.AnyFunSuite
 import org.w3c.dom.DOMError
@@ -68,6 +67,8 @@ class DomLSInteropTest extends AnyFunSuite {
   private val nsFooBar = "urn:foo:bar"
   private val nsXmlSchema = "http://www.w3.org/2001/XMLSchema"
 
+  private val testScope: Scope = Scope.from("test" -> "http://www.test.org/test")
+
   test("testParse") {
     // 1. Parse XML file into Elem
 
@@ -77,16 +78,19 @@ class DomLSInteropTest extends AnyFunSuite {
     val root: Elem = domParser.parse(is).documentElement
 
     assertResult(Set("Book", "Title", "Authors", "Author", "First_Name", "Last_Name", "Remark", "Magazine")) {
-      (root.findAllElems map (e => e.localName)).toSet
+      root.findAllElems.map(e => e.localName).toSet
     }
-    assertResult(Set("Bookstore", "Book", "Title", "Authors", "Author", "First_Name", "Last_Name", "Remark", "Magazine")) {
-      (root.findAllElemsOrSelf map (e => e.localName)).toSet
+    assertResult(
+      Set("Bookstore", "Book", "Title", "Authors", "Author", "First_Name", "Last_Name", "Remark", "Magazine")) {
+      root.findAllElemsOrSelf.map(e => e.localName).toSet
     }
     assertResult(8) {
       root.filterElemsOrSelf(EName(nsBookstore, "Title")).size
     }
     assertResult(3) {
-      val result = root \\ { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
+      val result = root \\ { e =>
+        e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman"
+      }
       result.size
     }
 
@@ -105,41 +109,49 @@ class DomLSInteropTest extends AnyFunSuite {
 
     // 4. Perform the checks of the converted DOM tree as Elem against the originally parsed XML file as Elem
 
-    assertResult((root.findAllElems map (e => e.localName)).toSet) {
-      (root2.findAllElems map (e => e.localName)).toSet
+    assertResult(root.findAllElems.map(e => e.localName).toSet) {
+      root2.findAllElems.map(e => e.localName).toSet
     }
-    assertResult((root.findAllElemsOrSelf map (e => e.localName)).toSet) {
-      (root2.findAllElemsOrSelf map (e => e.localName)).toSet
+    assertResult(root.findAllElemsOrSelf.map(e => e.localName).toSet) {
+      root2.findAllElemsOrSelf.map(e => e.localName).toSet
     }
     assertResult(root.filterElemsOrSelf(EName(nsBookstore, "Title")).size) {
       root2.filterElemsOrSelf(EName(nsBookstore, "Title")).size
     }
     assertResult {
-      val result = root \\ { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
+      val result = root \\ { e =>
+        e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman"
+      }
       result.size
     } {
-      val result = root2 \\ { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
+      val result = root2 \\ { e =>
+        e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman"
+      }
       result.size
     }
 
-    // 5. Convert to NodeBuilder and back, and check again
+    // 5. Call method notUndeclaringPrefixes, and check again
 
-    val root3: Elem = NodeBuilder.fromElem(root2)(Scope.Empty).build()
+    val root3: Elem = root2.notUndeclaringPrefixes(testScope)
 
-    assertResult((root.findAllElems map (e => e.localName)).toSet) {
-      (root3.findAllElems map (e => e.localName)).toSet
+    assertResult(root.findAllElems.map(e => e.localName).toSet) {
+      root3.findAllElems.map(e => e.localName).toSet
     }
-    assertResult((root.findAllElemsOrSelf map (e => e.localName)).toSet) {
-      (root3.findAllElemsOrSelf map (e => e.localName)).toSet
+    assertResult(root.findAllElemsOrSelf.map(e => e.localName).toSet) {
+      root3.findAllElemsOrSelf.map(e => e.localName).toSet
     }
     assertResult(root.filterElemsOrSelf(EName(nsBookstore, "Title")).size) {
       root3.filterElemsOrSelf(EName(nsBookstore, "Title")).size
     }
     assertResult {
-      val result = root \\ { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
+      val result = root \\ { e =>
+        e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman"
+      }
       result.size
     } {
-      val result = root3 \\ { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
+      val result = root3 \\ { e =>
+        e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman"
+      }
       result.size
     }
 
@@ -151,27 +163,31 @@ class DomLSInteropTest extends AnyFunSuite {
     val xmlString3 = printer.print(doc.documentElement)
     assert(xmlString2.startsWith("<?xml "))
     assert(!xmlString3.startsWith("<?xml "))
-    assert(xmlString2.size >= xmlString3.size + "<?xml ".size)
+    assert(xmlString2.length >= xmlString3.length + "<?xml ".length)
 
     val bis = new InputSource(new jio.StringReader(xmlString2))
     val doc2 = domParser.parse(bis)
 
     val root4 = doc2.documentElement
 
-    assertResult((root.findAllElems map (e => e.localName)).toSet) {
-      (root4.findAllElems map (e => e.localName)).toSet
+    assertResult(root.findAllElems.map(e => e.localName).toSet) {
+      root4.findAllElems.map(e => e.localName).toSet
     }
-    assertResult((root.findAllElemsOrSelf map (e => e.localName)).toSet) {
-      (root4.findAllElemsOrSelf map (e => e.localName)).toSet
+    assertResult(root.findAllElemsOrSelf.map(e => e.localName).toSet) {
+      root4.findAllElemsOrSelf.map(e => e.localName).toSet
     }
     assertResult(root.filterElemsOrSelf(EName(nsBookstore, "Title")).size) {
       root4.filterElemsOrSelf(EName(nsBookstore, "Title")).size
     }
     assertResult {
-      val result = root \\ { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
+      val result = root \\ { e =>
+        e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman"
+      }
       result.size
     } {
-      val result = root4 \\ { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
+      val result = root4 \\ { e =>
+        e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman"
+      }
       result.size
     }
 
@@ -179,26 +195,30 @@ class DomLSInteropTest extends AnyFunSuite {
 
     val root5: resolved.Elem = resolved.Elem.from(doc.documentElement)
 
-    assertResult((root.findAllElems map (e => e.localName)).toSet) {
-      (root5.findAllElems map (e => e.localName)).toSet
+    assertResult(root.findAllElems.map(e => e.localName).toSet) {
+      root5.findAllElems.map(e => e.localName).toSet
     }
-    assertResult((root.findAllElemsOrSelf map (e => e.localName)).toSet) {
-      (root5.findAllElemsOrSelf map (e => e.localName)).toSet
+    assertResult(root.findAllElemsOrSelf.map(e => e.localName).toSet) {
+      root5.findAllElemsOrSelf.map(e => e.localName).toSet
     }
     assertResult(root.filterElemsOrSelf(EName(nsBookstore, "Title")).size) {
       root5.filterElemsOrSelf(EName(nsBookstore, "Title")).size
     }
     assertResult {
-      val result = root \\ { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
+      val result = root \\ { e =>
+        e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman"
+      }
       result.size
     } {
-      val result = root5 \\ { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
+      val result = root5 \\ { e =>
+        e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman"
+      }
       result.size
     }
 
-    // 8. Serialize the corresponding NodeBuilder, deserialize it, and check again.
+    // 8. Serialize, deserialize it, and check again.
 
-    val rootDocBuilder = DocBuilder.fromDocument(Document(root))
+    val rootDocBuilder = Document(root)
     val bos = new jio.ByteArrayOutputStream
     val oos = new jio.ObjectOutputStream(bos)
 
@@ -206,29 +226,34 @@ class DomLSInteropTest extends AnyFunSuite {
 
     val objectBytes = bos.toByteArray
 
-    assert(objectBytes.size >= 1000 && objectBytes.size <= 50000, "Expected the serialized document to be >= 1000 and <= 50000 bytes")
+    assert(
+      objectBytes.size >= 1000 && objectBytes.size <= 50000,
+      "Expected the serialized document to be >= 1000 and <= 50000 bytes")
 
     val bis2 = new jio.ByteArrayInputStream(objectBytes)
     val ois = new jio.ObjectInputStream(bis2)
 
-    val rootDocBuilder2 = ois.readObject().asInstanceOf[DocBuilder]
-    val doc7 = rootDocBuilder2.build()
+    val doc7 = ois.readObject().asInstanceOf[Document]
     val root7 = doc7.documentElement
 
-    assertResult((root.findAllElems map (e => e.localName)).toSet) {
-      (root7.findAllElems map (e => e.localName)).toSet
+    assertResult(root.findAllElems.map(e => e.localName).toSet) {
+      root7.findAllElems.map(e => e.localName).toSet
     }
-    assertResult((root.findAllElemsOrSelf map (e => e.localName)).toSet) {
-      (root7.findAllElemsOrSelf map (e => e.localName)).toSet
+    assertResult(root.findAllElemsOrSelf.map(e => e.localName).toSet) {
+      root7.findAllElemsOrSelf.map(e => e.localName).toSet
     }
     assertResult(root.filterElemsOrSelf(EName(nsBookstore, "Title")).size) {
       root7.filterElemsOrSelf(EName(nsBookstore, "Title")).size
     }
     assertResult {
-      val result = root \\ { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
+      val result = root \\ { e =>
+        e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman"
+      }
       result.size
     } {
-      val result = root7 \\ { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
+      val result = root7 \\ { e =>
+        e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman"
+      }
       result.size
     }
 
@@ -242,7 +267,9 @@ class DomLSInteropTest extends AnyFunSuite {
 
     val objectBytes3 = bos3.toByteArray
 
-    assert(objectBytes3.size >= 1000 && objectBytes3.size <= 50000, "Expected the serialized document to be >= 1000 and <= 50000 bytes")
+    assert(
+      objectBytes3.size >= 1000 && objectBytes3.size <= 50000,
+      "Expected the serialized document to be >= 1000 and <= 50000 bytes")
 
     val bis3 = new jio.ByteArrayInputStream(objectBytes3)
     val ois3 = new jio.ObjectInputStream(bis3)
@@ -250,20 +277,24 @@ class DomLSInteropTest extends AnyFunSuite {
     val doc8 = ois3.readObject().asInstanceOf[Document]
     val root8 = doc8.documentElement
 
-    assertResult((root.findAllElems map (e => e.localName)).toSet) {
-      (root8.findAllElems map (e => e.localName)).toSet
+    assertResult(root.findAllElems.map(e => e.localName).toSet) {
+      root8.findAllElems.map(e => e.localName).toSet
     }
-    assertResult((root.findAllElemsOrSelf map (e => e.localName)).toSet) {
-      (root8.findAllElemsOrSelf map (e => e.localName)).toSet
+    assertResult(root.findAllElemsOrSelf.map(e => e.localName).toSet) {
+      root8.findAllElemsOrSelf.map(e => e.localName).toSet
     }
     assertResult(root.filterElemsOrSelf(EName(nsBookstore, "Title")).size) {
       root8.filterElemsOrSelf(EName(nsBookstore, "Title")).size
     }
     assertResult {
-      val result = root \\ { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
+      val result = root \\ { e =>
+        e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman"
+      }
       result.size
     } {
-      val result = root8 \\ { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
+      val result = root8 \\ { e =>
+        e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman"
+      }
       result.size
     }
   }
@@ -278,13 +309,15 @@ class DomLSInteropTest extends AnyFunSuite {
     val root: Elem = domParser.parse(is).documentElement
 
     assertResult(Set(EName("bar"), EName(nsGoogle, "foo"))) {
-      val result = root.findAllElemsOrSelf map { e => e.resolvedName }
+      val result = root.findAllElemsOrSelf.map { e =>
+        e.resolvedName
+      }
       result.toSet
     }
 
     // 2. Convert Elem to a DOM element
 
-    val dbf = DocumentBuilderFactory.newInstance
+    val dbf = DocumentBuilderFactory.newInstance()
     val db2 = dbf.newDocumentBuilder
     val doc2 = db2.newDocument
     val element = convertElem(root)(doc2)
@@ -297,16 +330,20 @@ class DomLSInteropTest extends AnyFunSuite {
     // 4. Perform the checks of the converted DOM tree as Elem against the originally parsed XML file as Elem
 
     assertResult(Set(EName("bar"), EName(nsGoogle, "foo"))) {
-      val result = root2.findAllElemsOrSelf map { e => e.resolvedName }
+      val result = root2.findAllElemsOrSelf.map { e =>
+        e.resolvedName
+      }
       result.toSet
     }
 
-    // 5. Convert to NodeBuilder and back, and check again
+    // 5. Call method notUndeclaringPrefixes, and check again
 
-    val root3: Elem = NodeBuilder.fromElem(root2)(Scope.Empty).build()
+    val root3: Elem = root2.notUndeclaringPrefixes(testScope)
 
     assertResult(Set(EName("bar"), EName(nsGoogle, "foo"))) {
-      val result = root3.findAllElemsOrSelf map { e => e.resolvedName }
+      val result = root3.findAllElemsOrSelf.map { e =>
+        e.resolvedName
+      }
       result.toSet
     }
   }
@@ -322,25 +359,35 @@ class DomLSInteropTest extends AnyFunSuite {
     val root: Elem = document.documentElement
 
     assertResult(Set(EName(nsFooBar, "root"), EName(nsFooBar, "child"))) {
-      val result = root.findAllElemsOrSelf map { e => e.resolvedName }
+      val result = root.findAllElemsOrSelf.map { e =>
+        e.resolvedName
+      }
       result.toSet
     }
     assertResult(Set(QName("root"), QName("child"))) {
-      val result = root.findAllElemsOrSelf map { e => e.qname }
+      val result = root.findAllElemsOrSelf.map { e =>
+        e.qname
+      }
       result.toSet
     }
     assertResult("This is trivial XML") {
-      val result = document.comments map { com => com.text.trim }
+      val result = document.comments.map { com =>
+        com.text.trim
+      }
       result.mkString
     }
     assertResult("Trivial XML") {
-      val result = root.findAllElemsOrSelf flatMap { e => e.children } collect { case c: Comment => c.text.trim }
+      val result = root.findAllElemsOrSelf
+        .flatMap { e =>
+          e.children
+        }
+        .collect { case c: Comment => c.text.trim }
       result.mkString
     }
 
     // 2. Convert Elem to a DOM element
 
-    val dbf = DocumentBuilderFactory.newInstance
+    val dbf = DocumentBuilderFactory.newInstance()
     val db2 = dbf.newDocumentBuilder
     val doc2 = convertDocument(document)(db2.newDocument)
 
@@ -352,41 +399,61 @@ class DomLSInteropTest extends AnyFunSuite {
     // 4. Perform the checks of the converted DOM tree as Elem against the originally parsed XML file as Elem
 
     assertResult(Set(EName(nsFooBar, "root"), EName(nsFooBar, "child"))) {
-      val result = root2.findAllElemsOrSelf map { e => e.resolvedName }
+      val result = root2.findAllElemsOrSelf.map { e =>
+        e.resolvedName
+      }
       result.toSet
     }
     assertResult(Set(QName("root"), QName("child"))) {
-      val result = root2.findAllElemsOrSelf map { e => e.qname }
+      val result = root2.findAllElemsOrSelf.map { e =>
+        e.qname
+      }
       result.toSet
     }
     assertResult("This is trivial XML") {
-      val result = document2.comments map { com => com.text.trim }
+      val result = document2.comments.map { com =>
+        com.text.trim
+      }
       result.mkString
     }
     assertResult("Trivial XML") {
-      val result = root2.findAllElemsOrSelf flatMap { e => e.children } collect { case c: Comment => c.text.trim }
+      val result = root2.findAllElemsOrSelf
+        .flatMap { e =>
+          e.children
+        }
+        .collect { case c: Comment => c.text.trim }
       result.mkString
     }
 
-    // 5. Convert to NodeBuilder and back, and check again
+    // 5. Copy document, and check again
 
-    val document3: eu.cdevreeze.yaidom.simple.Document = DocBuilder.fromDocument(document2).build()
+    val document3: eu.cdevreeze.yaidom.simple.Document = Document.document(None, document2.children)
     val root3: Elem = document3.documentElement
 
     assertResult(Set(EName(nsFooBar, "root"), EName(nsFooBar, "child"))) {
-      val result = root3.findAllElemsOrSelf map { e => e.resolvedName }
+      val result = root3.findAllElemsOrSelf.map { e =>
+        e.resolvedName
+      }
       result.toSet
     }
     assertResult(Set(QName("root"), QName("child"))) {
-      val result = root3.findAllElemsOrSelf map { e => e.qname }
+      val result = root3.findAllElemsOrSelf.map { e =>
+        e.qname
+      }
       result.toSet
     }
     assertResult("This is trivial XML") {
-      val result = document3.comments map { com => com.text.trim }
+      val result = document3.comments.map { com =>
+        com.text.trim
+      }
       result.mkString
     }
     assertResult("Trivial XML") {
-      val result = root3.findAllElemsOrSelf flatMap { e => e.children } collect { case c: Comment => c.text.trim }
+      val result = root3.findAllElemsOrSelf
+        .flatMap { e =>
+          e.children
+        }
+        .collect { case c: Comment => c.text.trim }
       result.mkString
     }
   }
@@ -397,7 +464,12 @@ class DomLSInteropTest extends AnyFunSuite {
     def createParser(domImplLS: DOMImplementationLS): LSParser = {
       val parser = domImplLS.createLSParser(DOMImplementationLS.MODE_SYNCHRONOUS, null)
       val resourceResolver = new LSResourceResolver {
-        override def resolveResource(tpe: String, namespaceURI: String, publicId: String, systemId: String, baseURI: String): LSInput = {
+        override def resolveResource(
+            tpe: String,
+            namespaceURI: String,
+            publicId: String,
+            systemId: String,
+            baseURI: String): LSInput = {
           logger.info(s"Trying to resolve entity. Public ID: $publicId. System ID: $systemId")
 
           if (systemId.endsWith("/XMLSchema.dtd") || systemId.endsWith("\\XMLSchema.dtd") || (systemId == "XMLSchema.dtd")) {
@@ -420,7 +492,7 @@ class DomLSInteropTest extends AnyFunSuite {
       parser
     }
 
-    val domParser = DocumentParserUsingDomLS.newInstance() withParserCreator (createParser _)
+    val domParser = DocumentParserUsingDomLS.newInstance().withParserCreator(createParser)
 
     val is = classOf[DomLSInteropTest].getResourceAsStream("XMLSchema.xsd")
 
@@ -429,30 +501,62 @@ class DomLSInteropTest extends AnyFunSuite {
     val ns = nsXmlSchema
 
     val xsElmENames: Set[EName] =
-      Set(EName(ns, "schema"), EName(ns, "annotation"), EName(ns, "documentation"),
-        EName(ns, "import"), EName(ns, "complexType"), EName(ns, "complexContent"),
-        EName(ns, "extension"), EName(ns, "sequence"), EName(ns, "element"),
-        EName(ns, "attribute"), EName(ns, "choice"), EName(ns, "group"),
-        EName(ns, "simpleType"), EName(ns, "restriction"), EName(ns, "enumeration"),
-        EName(ns, "list"), EName(ns, "union"), EName(ns, "key"),
-        EName(ns, "selector"), EName(ns, "field"), EName(ns, "attributeGroup"),
-        EName(ns, "anyAttribute"), EName(ns, "whiteSpace"), EName(ns, "fractionDigits"),
-        EName(ns, "pattern"), EName(ns, "any"), EName(ns, "appinfo"),
-        EName(ns, "minLength"), EName(ns, "maxInclusive"), EName(ns, "minInclusive"),
-        EName(ns, "notation"))
+      Set(
+        EName(ns, "schema"),
+        EName(ns, "annotation"),
+        EName(ns, "documentation"),
+        EName(ns, "import"),
+        EName(ns, "complexType"),
+        EName(ns, "complexContent"),
+        EName(ns, "extension"),
+        EName(ns, "sequence"),
+        EName(ns, "element"),
+        EName(ns, "attribute"),
+        EName(ns, "choice"),
+        EName(ns, "group"),
+        EName(ns, "simpleType"),
+        EName(ns, "restriction"),
+        EName(ns, "enumeration"),
+        EName(ns, "list"),
+        EName(ns, "union"),
+        EName(ns, "key"),
+        EName(ns, "selector"),
+        EName(ns, "field"),
+        EName(ns, "attributeGroup"),
+        EName(ns, "anyAttribute"),
+        EName(ns, "whiteSpace"),
+        EName(ns, "fractionDigits"),
+        EName(ns, "pattern"),
+        EName(ns, "any"),
+        EName(ns, "appinfo"),
+        EName(ns, "minLength"),
+        EName(ns, "maxInclusive"),
+        EName(ns, "minInclusive"),
+        EName(ns, "notation")
+      )
 
     assertResult(xsElmENames) {
-      val result = root \\ { e => e.resolvedName.namespaceUriOption.contains(nsXmlSchema) } map { e => e.resolvedName }
+      val result = (root \\ { e =>
+        e.resolvedName.namespaceUriOption.contains(nsXmlSchema)
+      }).map { e =>
+        e.resolvedName
+      }
       result.toSet
     }
     assertResult(Set(0, 1)) {
-      val result = root \\ { e => e.findAllChildElems.isEmpty } map { e => e.textChildren.size }
+      val result = (root \\ { e =>
+        e.findAllChildElems.isEmpty
+      }).map { e =>
+        e.textChildren.size
+      }
       result.toSet
     }
 
     def checkForChoiceDocumentation(rootElm: Elem): Unit = {
       val forChoiceDefOption: Option[Elem] = {
-        val result = rootElm filterChildElems { e => e.resolvedName == EName(ns, "simpleType") && e.attribute(EName("name")) == "formChoice" }
+        val result = rootElm.filterChildElems { e =>
+          e.resolvedName == EName(ns, "simpleType") && e.attribute(EName("name")) == "formChoice"
+        }
         result.headOption
       }
 
@@ -461,7 +565,12 @@ class DomLSInteropTest extends AnyFunSuite {
       }
 
       val forChoiceDefDocumentation: String =
-        forChoiceDefOption.get.filterElems(EName(ns, "documentation")) flatMap { e => e.trimmedText } mkString ""
+        forChoiceDefOption.get
+          .filterElems(EName(ns, "documentation"))
+          .flatMap { e =>
+            e.trimmedText
+          }
+          .mkString("")
 
       assertResult("A utility type, not for public use") {
         forChoiceDefDocumentation.trim
@@ -477,7 +586,13 @@ class DomLSInteropTest extends AnyFunSuite {
           documentationElm <- annotationElm \ EName(ns, "documentation")
         } yield documentationElm
 
-      val documentationText = documentationElms.drop(1).headOption map { e => e.trimmedText } getOrElse ""
+      val documentationText = documentationElms
+        .drop(1)
+        .headOption
+        .map { e =>
+          e.trimmedText
+        }
+        .getOrElse("")
 
       // The XML string contains "&lt;", but the parsed text should contain an unescaped "<" instead
       assertResult(true) {
@@ -490,14 +605,14 @@ class DomLSInteropTest extends AnyFunSuite {
     def checkIdentityConstraintElm(rootElm: Elem): Unit = {
       val identityConstraintElms =
         for {
-          schemaElm <- rootElm filterElems { e =>
+          schemaElm <- rootElm.filterElems { e =>
             e.resolvedName == EName(ns, "element") &&
-              e.attributeOption(EName("name")).contains("schema") &&
-              e.attributeOption(EName("id")).contains("schema")
+            e.attributeOption(EName("name")).contains("schema") &&
+            e.attributeOption(EName("id")).contains("schema")
           }
-          idConstraintElm <- schemaElm filterChildElems { e =>
+          idConstraintElm <- schemaElm.filterChildElems { e =>
             e.resolvedName == EName(ns, "key") &&
-              e.attributeOption(EName("name")).contains("identityConstraint")
+            e.attributeOption(EName("name")).contains("identityConstraint")
           }
         } yield idConstraintElm
 
@@ -520,10 +635,10 @@ class DomLSInteropTest extends AnyFunSuite {
 
     def checkComplexTypeElm(rootElm: Elem): Unit = {
       val complexTypeElms =
-        rootElm filterElems { e =>
+        rootElm.filterElems { e =>
           e.resolvedName == EName(ns, "complexType") &&
-            e.attributeOption(EName("name")).contains("element") &&
-            e.attributeOption(EName("abstract")).contains("true")
+          e.attributeOption(EName("name")).contains("element") &&
+          e.attributeOption(EName("abstract")).contains("true")
         }
 
       assertResult(1) {
@@ -539,41 +654,57 @@ class DomLSInteropTest extends AnyFunSuite {
       val attributeGroupElms = complexTypeElms.head.filterElems(EName(ns, "attributeGroup"))
 
       assertResult(Set(EName("base"))) {
-        val result = extensionElms flatMap { e => e.resolvedAttributes.toMap.keySet }
+        val result = extensionElms.flatMap { e =>
+          e.resolvedAttributes.toMap.keySet
+        }
         result.toSet
       }
       assertResult(Set("xs:annotated")) {
-        val result = extensionElms flatMap { e => e.resolvedAttributes.toMap.values }
+        val result = extensionElms.flatMap { e =>
+          e.resolvedAttributes.toMap.values
+        }
         result.toSet
       }
 
       assertResult(Set()) {
-        val result = sequenceElms flatMap { e => e.resolvedAttributes.toMap.keySet }
+        val result = sequenceElms.flatMap { e =>
+          e.resolvedAttributes.toMap.keySet
+        }
         result.toSet
       }
 
       assertResult(Set(EName("minOccurs"))) {
-        val result = choiceElms flatMap { e => e.resolvedAttributes.toMap.keySet }
+        val result = choiceElms.flatMap { e =>
+          e.resolvedAttributes.toMap.keySet
+        }
         result.toSet
       }
 
       assertResult(Set(EName("name"), EName("type"))) {
-        val result = elementElms flatMap { e => e.resolvedAttributes.toMap.keySet }
+        val result = elementElms.flatMap { e =>
+          e.resolvedAttributes.toMap.keySet
+        }
         result.toSet
       }
 
       assertResult(Set(EName("ref"), EName("minOccurs"), EName("maxOccurs"))) {
-        val result = groupElms flatMap { e => e.resolvedAttributes.toMap.keySet }
+        val result = groupElms.flatMap { e =>
+          e.resolvedAttributes.toMap.keySet
+        }
         result.toSet
       }
 
       assertResult(Set(EName("name"), EName("type"), EName("use"), EName("default"))) {
-        val result = attributeElms flatMap { e => e.resolvedAttributes.toMap.keySet }
+        val result = attributeElms.flatMap { e =>
+          e.resolvedAttributes.toMap.keySet
+        }
         result.toSet
       }
 
       assertResult(Set(EName("ref"))) {
-        val result = attributeGroupElms flatMap { e => e.resolvedAttributes.toMap.keySet }
+        val result = attributeGroupElms.flatMap { e =>
+          e.resolvedAttributes.toMap.keySet
+        }
         result.toSet
       }
     }
@@ -581,19 +712,22 @@ class DomLSInteropTest extends AnyFunSuite {
     checkComplexTypeElm(root)
 
     def checkFieldPattern(rootElm: Elem): Unit = {
-      val fieldElms = rootElm filterElems { e =>
+      val fieldElms = rootElm.filterElems { e =>
         e.resolvedName == EName(ns, "element") &&
-          e.attributeOption(EName("name")).contains("field") &&
-          e.attributeOption(EName("id")).contains("field")
+        e.attributeOption(EName("name")).contains("field") &&
+        e.attributeOption(EName("id")).contains("field")
       }
 
-      val patternElms = fieldElms flatMap { e => e.filterElems(EName(ns, "pattern")) }
+      val patternElms = fieldElms.flatMap { e =>
+        e.filterElems(EName(ns, "pattern"))
+      }
 
       assertResult(1) {
         patternElms.size
       }
 
-      assertResult("""(\.//)?((((child::)?((\i\c*:)?(\i\c*|\*)))|\.)/)*((((child::)?((\i\c*:)?(\i\c*|\*)))|\.)|((attribute::|@)((\i\c*:)?(\i\c*|\*))))(\|(\.//)?((((child::)?((\i\c*:)?(\i\c*|\*)))|\.)/)*((((child::)?((\i\c*:)?(\i\c*|\*)))|\.)|((attribute::|@)((\i\c*:)?(\i\c*|\*)))))*""") {
+      assertResult(
+        """(\.//)?((((child::)?((\i\c*:)?(\i\c*|\*)))|\.)/)*((((child::)?((\i\c*:)?(\i\c*|\*)))|\.)|((attribute::|@)((\i\c*:)?(\i\c*|\*))))(\|(\.//)?((((child::)?((\i\c*:)?(\i\c*|\*)))|\.)/)*((((child::)?((\i\c*:)?(\i\c*|\*)))|\.)|((attribute::|@)((\i\c*:)?(\i\c*|\*)))))*""") {
         patternElms.head.attributeOption(EName("value")).getOrElse("")
       }
     }
@@ -602,7 +736,7 @@ class DomLSInteropTest extends AnyFunSuite {
 
     // 2. Convert Elem to a DOM element
 
-    val dbf = DocumentBuilderFactory.newInstance
+    val dbf = DocumentBuilderFactory.newInstance()
     val db2 = dbf.newDocumentBuilder
     val doc2 = db2.newDocument
     val element = convertElem(root)(doc2)
@@ -615,11 +749,19 @@ class DomLSInteropTest extends AnyFunSuite {
     // 4. Perform the checks of the converted DOM tree as Elem against the originally parsed XML file as Elem
 
     assertResult(xsElmENames) {
-      val result = root2 \\ { e => e.resolvedName.namespaceUriOption.contains(nsXmlSchema) } map { e => e.resolvedName }
+      val result = (root2 \\ { e =>
+        e.resolvedName.namespaceUriOption.contains(nsXmlSchema)
+      }).map { e =>
+        e.resolvedName
+      }
       result.toSet
     }
     assertResult(Set(0, 1)) {
-      val result = root2 \\ { e => e.findAllChildElems.isEmpty } map { e => e.textChildren.size }
+      val result = (root2 \\ { e =>
+        e.findAllChildElems.isEmpty
+      }).map { e =>
+        e.textChildren.size
+      }
       result.toSet
     }
 
@@ -629,16 +771,24 @@ class DomLSInteropTest extends AnyFunSuite {
     checkComplexTypeElm(root2)
     checkFieldPattern(root2)
 
-    // 5. Convert to NodeBuilder and back, and check again
+    // 5. Call method notUndeclaringPrefixes, and check again
 
-    val root3: Elem = NodeBuilder.fromElem(root2)(Scope.Empty).build()
+    val root3: Elem = root2.notUndeclaringPrefixes(testScope)
 
     assertResult(xsElmENames) {
-      val result = root3 \\ { e => e.resolvedName.namespaceUriOption.contains(nsXmlSchema) } map { e => e.resolvedName }
+      val result = (root3 \\ { e =>
+        e.resolvedName.namespaceUriOption.contains(nsXmlSchema)
+      }).map { e =>
+        e.resolvedName
+      }
       result.toSet
     }
     assertResult(Set(0, 1)) {
-      val result = root3 \\ { e => e.findAllChildElems.isEmpty } map { e => e.textChildren.size }
+      val result = (root3 \\ { e =>
+        e.findAllChildElems.isEmpty
+      }).map { e =>
+        e.textChildren.size
+      }
       result.toSet
     }
 
@@ -652,7 +802,7 @@ class DomLSInteropTest extends AnyFunSuite {
   test("testParseXmlWithExpandedEntityRef") {
     // 1. Parse XML file into Elem
 
-    val domParser = DocumentParserUsingDomLS.newInstance
+    val domParser = DocumentParserUsingDomLS.newInstance()
     val is = classOf[DomLSInteropTest].getResourceAsStream("trivialXmlWithEntityRef.xml")
 
     val root: Elem = domParser.parse(is).documentElement
@@ -660,7 +810,9 @@ class DomLSInteropTest extends AnyFunSuite {
     val ns = "urn:foo:bar"
 
     assertResult(Set(EName(ns, "root"), EName(ns, "child"))) {
-      val result = root.findAllElemsOrSelf map { e => e.resolvedName }
+      val result = root.findAllElemsOrSelf.map { e =>
+        e.resolvedName
+      }
       result.toSet
     }
 
@@ -683,7 +835,7 @@ class DomLSInteropTest extends AnyFunSuite {
 
     // 2. Convert Elem to a DOM element
 
-    val dbf = DocumentBuilderFactory.newInstance
+    val dbf = DocumentBuilderFactory.newInstance()
     val db2 = dbf.newDocumentBuilder
     val doc2 = db2.newDocument
     val element = convertElem(root)(doc2)
@@ -696,18 +848,22 @@ class DomLSInteropTest extends AnyFunSuite {
     // 4. Perform the checks of the converted DOM tree as Elem against the originally parsed XML file as Elem
 
     assertResult(Set(EName(ns, "root"), EName(ns, "child"))) {
-      val result = root2.findAllElemsOrSelf map { e => e.resolvedName }
+      val result = root2.findAllElemsOrSelf.map { e =>
+        e.resolvedName
+      }
       result.toSet
     }
 
     checkChildText(root2)
 
-    // 5. Convert to NodeBuilder and back, and check again
+    // 5. Call method notUndeclaringPrefixes, and check again
 
-    val root3: Elem = NodeBuilder.fromElem(root2)(Scope.Empty).build()
+    val root3: Elem = root2.notUndeclaringPrefixes(testScope)
 
     assertResult(Set(EName(ns, "root"), EName(ns, "child"))) {
-      val result = root3.findAllElemsOrSelf map { e => e.resolvedName }
+      val result = root3.findAllElemsOrSelf.map { e =>
+        e.resolvedName
+      }
       result.toSet
     }
 
@@ -723,7 +879,7 @@ class DomLSInteropTest extends AnyFunSuite {
       parser
     }
 
-    val domParser = DocumentParserUsingDomLS.newInstance().withParserCreator(createParser _)
+    val domParser = DocumentParserUsingDomLS.newInstance().withParserCreator(createParser)
     val is = classOf[DomLSInteropTest].getResourceAsStream("trivialXmlWithEntityRef.xml")
 
     val root: Elem = domParser.parse(is).documentElement
@@ -731,7 +887,9 @@ class DomLSInteropTest extends AnyFunSuite {
     val ns = "urn:foo:bar"
 
     assertResult(Set(EName(ns, "root"), EName(ns, "child"))) {
-      val result = root.findAllElemsOrSelf map { e => e.resolvedName }
+      val result = root.findAllElemsOrSelf.map { e =>
+        e.resolvedName
+      }
       result.toSet
     }
 
@@ -744,11 +902,11 @@ class DomLSInteropTest extends AnyFunSuite {
         childOption.get.textChildren.size
       }
       assertResult(1) {
-        val result = childOption.get.children collect { case er: EntityRef => er }
+        val result = childOption.get.children.collect { case er: EntityRef => er }
         result.size
       }
       assertResult(EntityRef("hello")) {
-        val entityRefs = childOption.get.children collect { case er: EntityRef => er }
+        val entityRefs = childOption.get.children.collect { case er: EntityRef => er }
         val entityRef: EntityRef = entityRefs.head
         entityRef
       }
@@ -762,7 +920,7 @@ class DomLSInteropTest extends AnyFunSuite {
 
     // 2. Convert Elem to a DOM element
 
-    val dbf = DocumentBuilderFactory.newInstance
+    val dbf = DocumentBuilderFactory.newInstance()
     val db2 = dbf.newDocumentBuilder
     val doc2 = db2.newDocument
     val element = convertElem(root)(doc2)
@@ -775,18 +933,22 @@ class DomLSInteropTest extends AnyFunSuite {
     // 4. Perform the checks of the converted DOM tree as Elem against the originally parsed XML file as Elem
 
     assertResult(Set(EName(ns, "root"), EName(ns, "child"))) {
-      val result = root2.findAllElemsOrSelf map { e => e.resolvedName }
+      val result = root2.findAllElemsOrSelf.map { e =>
+        e.resolvedName
+      }
       result.toSet
     }
 
     checkChildTextAndEntityRef(root2)
 
-    // 5. Convert to NodeBuilder and back, and check again
+    // 5. Call method notUndeclaringPrefixes, and check again
 
-    val root3: Elem = NodeBuilder.fromElem(root2)(Scope.Empty).build()
+    val root3: Elem = root2.notUndeclaringPrefixes(testScope)
 
     assertResult(Set(EName(ns, "root"), EName(ns, "child"))) {
-      val result = root3.findAllElemsOrSelf map { e => e.resolvedName }
+      val result = root3.findAllElemsOrSelf.map { e =>
+        e.resolvedName
+      }
       result.toSet
     }
 
@@ -796,7 +958,7 @@ class DomLSInteropTest extends AnyFunSuite {
   test("testParseXmlWithNamespaceUndeclarations") {
     // 1. Parse XML file into Elem
 
-    val domParser = DocumentParserUsingDomLS.newInstance
+    val domParser = DocumentParserUsingDomLS.newInstance()
     val is = classOf[DomLSInteropTest].getResourceAsStream("trivialXmlWithNSUndeclarations.xml")
 
     val root: Elem = domParser.parse(is).documentElement
@@ -804,13 +966,15 @@ class DomLSInteropTest extends AnyFunSuite {
     val ns = "urn:foo:bar"
 
     assertResult(Set(EName(ns, "root"), EName(ns, "a"), EName("b"), EName("c"), EName(ns, "d"))) {
-      val result = root.findAllElemsOrSelf map { e => e.resolvedName }
+      val result = root.findAllElemsOrSelf.map { e =>
+        e.resolvedName
+      }
       result.toSet
     }
 
     // 2. Convert Elem to a DOM element
 
-    val dbf = DocumentBuilderFactory.newInstance
+    val dbf = DocumentBuilderFactory.newInstance()
     val db2 = dbf.newDocumentBuilder
     val doc2 = db2.newDocument
     val element = convertElem(root)(doc2)
@@ -823,16 +987,20 @@ class DomLSInteropTest extends AnyFunSuite {
     // 4. Perform the checks of the converted DOM tree as Elem against the originally parsed XML file as Elem
 
     assertResult(Set(EName(ns, "root"), EName(ns, "a"), EName("b"), EName("c"), EName(ns, "d"))) {
-      val result = root2.findAllElemsOrSelf map { e => e.resolvedName }
+      val result = root2.findAllElemsOrSelf.map { e =>
+        e.resolvedName
+      }
       result.toSet
     }
 
-    // 5. Convert to NodeBuilder and back, and check again
+    // 5. Call method notUndeclaringPrefixes, and check again
 
-    val root3: Elem = NodeBuilder.fromElem(root2)(Scope.Empty).build()
+    val root3: Elem = root2.notUndeclaringPrefixes(testScope)
 
     assertResult(Set(EName(ns, "root"), EName(ns, "a"), EName("b"), EName("c"), EName(ns, "d"))) {
-      val result = root3.findAllElemsOrSelf map { e => e.resolvedName }
+      val result = root3.findAllElemsOrSelf.map { e =>
+        e.resolvedName
+      }
       result.toSet
     }
   }
@@ -849,7 +1017,9 @@ class DomLSInteropTest extends AnyFunSuite {
     val ns = "urn:foo:bar"
 
     assertResult(Set(EName(ns, "root"), EName(ns, "child"))) {
-      val result = root.findAllElemsOrSelf map { e => e.resolvedName }
+      val result = root.findAllElemsOrSelf.map { e =>
+        e.resolvedName
+      }
       result.toSet
     }
 
@@ -863,17 +1033,23 @@ class DomLSInteropTest extends AnyFunSuite {
 
       // Remember: we set the parser to coalescing!
       assertResult(Set(text)) {
-        val result = childElms map { e => e.trimmedText }
+        val result = childElms.map { e =>
+          e.trimmedText
+        }
         result.toSet
       }
 
       assertResult(Set(text)) {
-        val result = childElms map { e => e.attributeOption(EName("about")).getOrElse("Missing text") }
+        val result = childElms.map { e =>
+          e.attributeOption(EName("about")).getOrElse("Missing text")
+        }
         result.toSet
       }
 
       assertResult(Set(text)) {
-        val result = rootElm.commentChildren map { c => c.text.trim }
+        val result = rootElm.commentChildren.map { c =>
+          c.text.trim
+        }
         result.toSet
       }
     }
@@ -882,7 +1058,7 @@ class DomLSInteropTest extends AnyFunSuite {
 
     // 2. Convert Elem to a DOM element
 
-    val dbf = DocumentBuilderFactory.newInstance
+    val dbf = DocumentBuilderFactory.newInstance()
     val db2 = dbf.newDocumentBuilder
     val doc2 = db2.newDocument
     val element = convertElem(root)(doc2)
@@ -895,18 +1071,22 @@ class DomLSInteropTest extends AnyFunSuite {
     // 4. Perform the checks of the converted DOM tree as Elem against the originally parsed XML file as Elem
 
     assertResult(Set(EName(ns, "root"), EName(ns, "child"))) {
-      val result = root2.findAllElemsOrSelf map { e => e.resolvedName }
+      val result = root2.findAllElemsOrSelf.map { e =>
+        e.resolvedName
+      }
       result.toSet
     }
 
     doChecks(root2)
 
-    // 5. Convert to NodeBuilder and back, and check again
+    // 5. Call method notUndeclaringPrefixes, and check again
 
-    val root3: Elem = NodeBuilder.fromElem(root2)(Scope.Empty).build()
+    val root3: Elem = root2.notUndeclaringPrefixes(testScope)
 
     assertResult(Set(EName(ns, "root"), EName(ns, "child"))) {
-      val result = root3.findAllElemsOrSelf map { e => e.resolvedName }
+      val result = root3.findAllElemsOrSelf.map { e =>
+        e.resolvedName
+      }
       result.toSet
     }
 
@@ -916,7 +1096,7 @@ class DomLSInteropTest extends AnyFunSuite {
   test("testParseXmlWithSpecialChars") {
     // 1. Parse XML file into Elem
 
-    val domParser = DocumentParserUsingDomLS.newInstance
+    val domParser = DocumentParserUsingDomLS.newInstance()
 
     val is = classOf[DomLSInteropTest].getResourceAsStream("trivialXmlWithEuro.xml")
 
@@ -925,7 +1105,9 @@ class DomLSInteropTest extends AnyFunSuite {
     val ns = "urn:foo:bar"
 
     assertResult(Set(EName(ns, "root"), EName(ns, "child"))) {
-      val result = root.findAllElemsOrSelf map { e => e.resolvedName }
+      val result = root.findAllElemsOrSelf.map { e =>
+        e.resolvedName
+      }
       result.toSet
     }
 
@@ -938,19 +1120,23 @@ class DomLSInteropTest extends AnyFunSuite {
       val text = "\u20AC 200"
 
       assertResult(Set(text)) {
-        val result = childElms map { e => e.trimmedText }
+        val result = childElms.map { e =>
+          e.trimmedText
+        }
         result.toSet
       }
     }
 
     doChecks(root)
 
-    // 2. Convert to NodeBuilder and back, and check again
+    // 2. Call method notUndeclaringPrefixes, and check again
 
-    val root2: Elem = NodeBuilder.fromElem(root)(Scope.Empty).build()
+    val root2: Elem = root.notUndeclaringPrefixes(testScope)
 
     assertResult(Set(EName(ns, "root"), EName(ns, "child"))) {
-      val result = root2.findAllElemsOrSelf map { e => e.resolvedName }
+      val result = root2.findAllElemsOrSelf.map { e =>
+        e.resolvedName
+      }
       result.toSet
     }
 
@@ -958,12 +1144,13 @@ class DomLSInteropTest extends AnyFunSuite {
 
     // 3. Show the output with different output encodings
 
-    val printer = DocumentPrinterUsingDomLS.newInstance().withDocumentConverter(DomConversions) withSerializerCreator { domImpl =>
-      val serializer = domImpl.createLSSerializer()
-      // This configuration fixes the following exception:
-      // org.w3c.dom.ls.LSException: Attribute "xmlns" was already specified for element "root"
-      serializer.getDomConfig.setParameter("namespaces", java.lang.Boolean.FALSE)
-      serializer
+    val printer = DocumentPrinterUsingDomLS.newInstance().withDocumentConverter(DomConversions).withSerializerCreator {
+      domImpl =>
+        val serializer = domImpl.createLSSerializer()
+        // This configuration fixes the following exception:
+        // org.w3c.dom.ls.LSException: Attribute "xmlns" was already specified for element "root"
+        serializer.getDomConfig.setParameter("namespaces", java.lang.Boolean.FALSE)
+        serializer
     }
 
     val utf8Encoding = "utf-8"
@@ -973,7 +1160,8 @@ class DomLSInteropTest extends AnyFunSuite {
     val iso8859_1Output = printer.print(Document(root), iso8859_1Encoding)
 
     logger.info("UTF-8 output (with euro) converted to String:%n%s".format(new String(utf8Output, utf8Encoding)))
-    logger.info("ISO 8859-1 output (with euro) converted to String:%n%s".format(new String(iso8859_1Output, iso8859_1Encoding)))
+    logger.info(
+      "ISO 8859-1 output (with euro) converted to String:%n%s".format(new String(iso8859_1Output, iso8859_1Encoding)))
 
     val doc1 = domParser.parse(new jio.ByteArrayInputStream(utf8Output))
     val doc2 = domParser.parse(new jio.ByteArrayInputStream(iso8859_1Output))
@@ -981,8 +1169,7 @@ class DomLSInteropTest extends AnyFunSuite {
     doChecks(doc1.documentElement)
     doChecks(doc2.documentElement)
 
-    logger.info(
-      "ISO 8859-1 output (with euro) parsed and printed again, as UTF-8:%n%s".format(printer.print(doc2)))
+    logger.info("ISO 8859-1 output (with euro) parsed and printed again, as UTF-8:%n%s".format(printer.print(doc2)))
   }
 
   test("testParseBrokenXml") {
@@ -1002,7 +1189,7 @@ class DomLSInteropTest extends AnyFunSuite {
       parser
     }
 
-    val domParser = DocumentParserUsingDomLS.newInstance().withParserCreator(createParser _)
+    val domParser = DocumentParserUsingDomLS.newInstance().withParserCreator(createParser)
 
     val brokenXmlString = """<?xml version="1.0" encoding="UTF-8"?>%n<a><b><c>broken</b></c></a>""".format()
 
@@ -1021,7 +1208,7 @@ class DomLSInteropTest extends AnyFunSuite {
    * The Scala counterpart is more type-safe.
    */
   test("testParseGroovyXmlExample") {
-    val parser = DocumentParserUsingDomLS.newInstance
+    val parser = DocumentParserUsingDomLS.newInstance()
 
     val doc = parser.parse(classOf[DomLSInteropTest].getResourceAsStream("cars.xml"))
 
@@ -1039,7 +1226,7 @@ class DomLSInteropTest extends AnyFunSuite {
       recordsElm.findAllElemsOrSelf.size
     }
 
-    val firstRecordElm = (recordsElm \ (_.localName == "car")) (0)
+    val firstRecordElm = (recordsElm \ (_.localName == "car"))(0)
 
     assertResult("car") {
       firstRecordElm.localName
@@ -1055,7 +1242,9 @@ class DomLSInteropTest extends AnyFunSuite {
 
     assertResult(2) {
       val carElms = recordsElm \ (_.localName == "car")
-      val result = carElms filter { e => e.attributeOption(EName("make")).getOrElse("").contains('e') }
+      val result = carElms.filter { e =>
+        e.attributeOption(EName("make")).getOrElse("").contains('e')
+      }
       result.size
     }
 
@@ -1063,38 +1252,47 @@ class DomLSInteropTest extends AnyFunSuite {
       val carElms = recordsElm \ (_.localName == "car")
       val pattern = ".*s.*a.*".r.pattern
 
-      val resultElms = carElms filter { e =>
+      val resultElms = carElms.filter { e =>
         val s = e.getChildElem(_.localName == "country").trimmedText
         pattern.matcher(s).matches
       }
 
-      (resultElms map (e => e.attribute(EName("make")))).toSet
+      resultElms.map(e => e.attribute(EName("make"))).toSet
     }
 
     assertResult(Set("speed", "size", "price")) {
-      val result = recordsElm.findAllElemsOrSelf collect { case e if e.attributeOption(EName("type")).isDefined => e.attribute(EName("type")) }
+      val result = recordsElm.findAllElemsOrSelf.collect {
+        case e if e.attributeOption(EName("type")).isDefined => e.attribute(EName("type"))
+      }
       result.toSet
     }
 
-    import NodeBuilder._
+    import Node._
 
     val countryPath = PathBuilder.from(QName("car") -> 0, QName("country") -> 0).build(Scope.Empty)
-    val updatedCountryElm = textElem(QName("country"), "New Zealand").build()
+    val updatedCountryElm = textElem(QName("country"), Scope.Empty, "New Zealand")
     val updatedDoc = doc.updateElemOrSelf(countryPath, updatedCountryElm)
 
     assertResult("New Zealand") {
-      updatedDoc.documentElement.filterChildElems(_.localName == "car")(0).getChildElem(_.localName == "country").trimmedText
+      updatedDoc.documentElement
+        .filterChildElems(_.localName == "car")(0)
+        .getChildElem(_.localName == "country")
+        .trimmedText
     }
 
     assertResult(List("Royale", "P50", "HSV Maloo")) {
       val carElms = recordsElm \ (_.localName == "car")
-      val resultElms = carElms sortBy { e => e.attributeOption(EName("year")).getOrElse("0").toInt }
-      resultElms map { e => e.attribute(EName("name")) }
+      val resultElms = carElms.sortBy { e =>
+        e.attributeOption(EName("year")).getOrElse("0").toInt
+      }
+      resultElms.map { e =>
+        e.attribute(EName("name"))
+      }
     }
   }
 
   test("testNoAdjacentTextNodes") {
-    val parser = DocumentParserUsingDomLS.newInstance
+    val parser = DocumentParserUsingDomLS.newInstance()
 
     val xmlString = """<root><a> a <![CDATA[b]]> c </a></root>"""
     val doc = parser.parse(new InputSource(new jio.StringReader(xmlString)))
@@ -1116,7 +1314,7 @@ class DomLSInteropTest extends AnyFunSuite {
   }
 
   test("testNoEmptyTextNodes") {
-    val parser = DocumentParserUsingDomLS.newInstance
+    val parser = DocumentParserUsingDomLS.newInstance()
 
     val xmlString = """<root><a></a><b><![CDATA[]]></b><c/></root>"""
     val doc = parser.parse(new InputSource(new jio.StringReader(xmlString)))
@@ -1139,13 +1337,13 @@ class DomLSInteropTest extends AnyFunSuite {
   test("testKeepCData") {
     val parser1 = DocumentParserUsingDomLS.newInstance()
 
-    val parser2 = DocumentParserUsingDomLS.newInstance() withParserCreator { domImpl =>
+    val parser2 = DocumentParserUsingDomLS.newInstance().withParserCreator { domImpl =>
       val parser = domImpl.createLSParser(DOMImplementationLS.MODE_SYNCHRONOUS, null)
       parser.getDomConfig.setParameter("cdata-sections", java.lang.Boolean.TRUE)
       parser
     }
 
-    val parser3 = DocumentParserUsingDomLS.newInstance() withParserCreator { domImpl =>
+    val parser3 = DocumentParserUsingDomLS.newInstance().withParserCreator { domImpl =>
       val parser = domImpl.createLSParser(DOMImplementationLS.MODE_SYNCHRONOUS, null)
       parser.getDomConfig.setParameter("cdata-sections", java.lang.Boolean.FALSE)
       parser
@@ -1192,13 +1390,13 @@ class DomLSInteropTest extends AnyFunSuite {
   test("testKeepComments") {
     val parser1 = DocumentParserUsingDomLS.newInstance()
 
-    val parser2 = DocumentParserUsingDomLS.newInstance() withParserCreator { domImpl =>
+    val parser2 = DocumentParserUsingDomLS.newInstance().withParserCreator { domImpl =>
       val parser = domImpl.createLSParser(DOMImplementationLS.MODE_SYNCHRONOUS, null)
       parser.getDomConfig.setParameter("comments", java.lang.Boolean.TRUE)
       parser
     }
 
-    val parser3 = DocumentParserUsingDomLS.newInstance() withParserCreator { domImpl =>
+    val parser3 = DocumentParserUsingDomLS.newInstance().withParserCreator { domImpl =>
       val parser = domImpl.createLSParser(DOMImplementationLS.MODE_SYNCHRONOUS, null)
       parser.getDomConfig.setParameter("comments", java.lang.Boolean.FALSE)
       parser
@@ -1248,13 +1446,13 @@ class DomLSInteropTest extends AnyFunSuite {
   test("testElementContentWhitespace") {
     val parser1 = DocumentParserUsingDomLS.newInstance()
 
-    val parser2 = DocumentParserUsingDomLS.newInstance() withParserCreator { domImpl =>
+    val parser2 = DocumentParserUsingDomLS.newInstance().withParserCreator { domImpl =>
       val parser = domImpl.createLSParser(DOMImplementationLS.MODE_SYNCHRONOUS, null)
       parser.getDomConfig.setParameter("element-content-whitespace", java.lang.Boolean.TRUE)
       parser
     }
 
-    val parser3 = DocumentParserUsingDomLS.newInstance() withParserCreator { domImpl =>
+    val parser3 = DocumentParserUsingDomLS.newInstance().withParserCreator { domImpl =>
       val parser = domImpl.createLSParser(DOMImplementationLS.MODE_SYNCHRONOUS, null)
       parser.getDomConfig.setParameter("element-content-whitespace", java.lang.Boolean.FALSE)
       parser
@@ -1308,14 +1506,14 @@ class DomLSInteropTest extends AnyFunSuite {
 
     val parser1 = DocumentParserUsingDomLS.newInstance()
 
-    val parser2 = DocumentParserUsingDomLS.newInstance() withParserCreator { domImpl =>
+    val parser2 = DocumentParserUsingDomLS.newInstance().withParserCreator { domImpl =>
       val parser = domImpl.createLSParser(DOMImplementationLS.MODE_SYNCHRONOUS, "http://www.w3.org/TR/REC-xml")
       parser.getDomConfig.setParameter("validate", java.lang.Boolean.TRUE)
       parser.getDomConfig.setParameter("error-handler", new MyErrorHandler)
       parser
     }
 
-    val parser3 = DocumentParserUsingDomLS.newInstance() withParserCreator { domImpl =>
+    val parser3 = DocumentParserUsingDomLS.newInstance().withParserCreator { domImpl =>
       val parser = domImpl.createLSParser(DOMImplementationLS.MODE_SYNCHRONOUS, "http://www.w3.org/TR/REC-xml")
       parser.getDomConfig.setParameter("validate", java.lang.Boolean.FALSE)
       parser.getDomConfig.setParameter("error-handler", new MyErrorHandler)
@@ -1365,17 +1563,19 @@ class DomLSInteropTest extends AnyFunSuite {
       doc.documentElement.findAllElemsOrSelf.map(_.text).mkString
     }
 
-    val printer1 = DocumentPrinterUsingDomLS.newInstance().withDocumentConverter(DomConversions) withSerializerCreator { domImpl =>
-      val writer = domImpl.createLSSerializer()
-      writer.getDomConfig.setParameter("xml-declaration", java.lang.Boolean.FALSE)
-      writer
+    val printer1 = DocumentPrinterUsingDomLS.newInstance().withDocumentConverter(DomConversions).withSerializerCreator {
+      domImpl =>
+        val writer = domImpl.createLSSerializer()
+        writer.getDomConfig.setParameter("xml-declaration", java.lang.Boolean.FALSE)
+        writer
     }
 
-    val printer2 = DocumentPrinterUsingDomLS.newInstance().withDocumentConverter(DomConversions) withSerializerCreator { domImpl =>
-      val writer = domImpl.createLSSerializer()
-      writer.getDomConfig.setParameter("format-pretty-print", java.lang.Boolean.TRUE)
-      writer.getDomConfig.setParameter("xml-declaration", java.lang.Boolean.FALSE)
-      writer
+    val printer2 = DocumentPrinterUsingDomLS.newInstance().withDocumentConverter(DomConversions).withSerializerCreator {
+      domImpl =>
+        val writer = domImpl.createLSSerializer()
+        writer.getDomConfig.setParameter("format-pretty-print", java.lang.Boolean.TRUE)
+        writer.getDomConfig.setParameter("xml-declaration", java.lang.Boolean.FALSE)
+        writer
     }
 
     val xmlString1 = printer1.print(doc)
@@ -1384,19 +1584,20 @@ class DomLSInteropTest extends AnyFunSuite {
     logger.info("Non-prettified xmlString1 (method testPrettyPrint):%n%s".format(xmlString1))
     logger.info("Prettified xmlString2 (method testPrettyPrint):%n%s".format(xmlString2))
 
-    assert(xmlString1.size < xmlString2.size)
-    assert(xmlString1.trim.size < xmlString2.trim.size)
+    assert(xmlString1.length < xmlString2.length)
+    assert(xmlString1.trim.length < xmlString2.trim.length)
 
     val doc1 = parser.parse(new InputSource(new jio.StringReader(xmlString1)))
     val doc2 = parser.parse(new InputSource(new jio.StringReader(xmlString2)))
 
-    logger.info("Non-prettified xmlString1 after roundtripping (method testPrettyPrint):%n%s".format(printer1.print(doc1)))
+    logger.info(
+      "Non-prettified xmlString1 after roundtripping (method testPrettyPrint):%n%s".format(printer1.print(doc1)))
     logger.info("Prettified xmlString2 after roundtripping (method testPrettyPrint):%n%s".format(printer1.print(doc2)))
 
     val text1 = doc1.documentElement.findAllElemsOrSelf.map(_.text).mkString
     val text2 = doc2.documentElement.findAllElemsOrSelf.map(_.text).mkString
 
-    assert(text1.size < text2.size)
+    assert(text1.length < text2.length)
   }
 
   test("testPrettyPrintAgain") {
@@ -1413,13 +1614,13 @@ class DomLSInteropTest extends AnyFunSuite {
       doc.documentElement.findAllElemsOrSelf.map(_.text).mkString
     }
 
-    val printer1 = DocumentPrinterUsingDomLS.newInstance withSerializerCreator { domImpl =>
+    val printer1 = DocumentPrinterUsingDomLS.newInstance().withSerializerCreator { domImpl =>
       val writer = domImpl.createLSSerializer()
       writer.getDomConfig.setParameter("xml-declaration", java.lang.Boolean.FALSE)
       writer
     }
 
-    val printer2 = DocumentPrinterUsingDomLS.newInstance() withSerializerCreator { domImpl =>
+    val printer2 = DocumentPrinterUsingDomLS.newInstance().withSerializerCreator { domImpl =>
       val writer = domImpl.createLSSerializer()
       writer.getDomConfig.setParameter("format-pretty-print", java.lang.Boolean.TRUE)
       writer.getDomConfig.setParameter("xml-declaration", java.lang.Boolean.FALSE)
@@ -1432,26 +1633,33 @@ class DomLSInteropTest extends AnyFunSuite {
     logger.info("Non-prettified xmlString1 (method testPrettyPrintAgain):%n%s".format(xmlString1))
     logger.info("Prettified xmlString2 (method testPrettyPrintAgain):%n%s".format(xmlString2))
 
-    assert(xmlString1.size < xmlString2.size)
-    assert(xmlString1.trim.size < xmlString2.trim.size)
+    assert(xmlString1.length < xmlString2.length)
+    assert(xmlString1.trim.length < xmlString2.trim.length)
 
     val doc1 = parser.parse(new InputSource(new jio.StringReader(xmlString1)))
     val doc2 = parser.parse(new InputSource(new jio.StringReader(xmlString2)))
 
-    logger.info("Non-prettified xmlString1 after roundtripping (method testPrettyPrintAgain):%n%s".format(printer1.print(doc1)))
-    logger.info("Prettified xmlString2 after roundtripping (method testPrettyPrintAgain):%n%s".format(printer1.print(doc2)))
+    logger.info(
+      "Non-prettified xmlString1 after roundtripping (method testPrettyPrintAgain):%n%s".format(printer1.print(doc1)))
+    logger.info(
+      "Prettified xmlString2 after roundtripping (method testPrettyPrintAgain):%n%s".format(printer1.print(doc2)))
 
     val text1 = doc1.documentElement.findAllElemsOrSelf.map(_.text).mkString
     val text2 = doc2.documentElement.findAllElemsOrSelf.map(_.text).mkString
 
-    assert(text1.size < text2.size)
+    assert(text1.length < text2.length)
   }
 
   test("testSuppressDtdResolution") {
     def createParser(domImplLS: DOMImplementationLS): LSParser = {
       val parser = domImplLS.createLSParser(DOMImplementationLS.MODE_SYNCHRONOUS, null)
       val resourceResolver = new LSResourceResolver {
-        override def resolveResource(tpe: String, namespaceURI: String, publicId: String, systemId: String, baseURI: String): LSInput = {
+        override def resolveResource(
+            tpe: String,
+            namespaceURI: String,
+            publicId: String,
+            systemId: String,
+            baseURI: String): LSInput = {
           logger.info(s"Suppressing DTD resolution! Public ID: $publicId. System ID: $systemId")
 
           val input = domImplLS.createLSInput()
@@ -1463,7 +1671,7 @@ class DomLSInteropTest extends AnyFunSuite {
       parser
     }
 
-    val domParser = DocumentParserUsingDomLS.newInstance() withParserCreator (createParser _)
+    val domParser = DocumentParserUsingDomLS.newInstance().withParserCreator(createParser)
 
     val is = classOf[DomLSInteropTest].getResourceAsStream("XMLSchema.xsd")
 
@@ -1475,12 +1683,12 @@ class DomLSInteropTest extends AnyFunSuite {
   test("testParseFileWithUtf8Bom") {
     // 1. Parse XML file into Elem
 
-    val parser = DocumentParserUsingDomLS.newInstance
+    val parser = DocumentParserUsingDomLS.newInstance()
 
     val is = classOf[DomLSInteropTest].getResourceAsStream("books.xml")
     val ba = Iterator.continually(is.read()).takeWhile(b => b != -1).map(_.toByte).toArray
     val baWithBom = addUtf8Bom(ba)
-    assert(baWithBom.size == ba.size + 3)
+    assert(baWithBom.length == ba.length + 3)
     assert(baWithBom.toSeq.drop(3) == ba.toSeq)
 
     val root: Elem = parser.parse(new jio.ByteArrayInputStream(baWithBom)).documentElement

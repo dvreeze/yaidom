@@ -23,7 +23,6 @@ import eu.cdevreeze.yaidom.indexed
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
 import eu.cdevreeze.yaidom.queryapi.BackingElemApi
 import eu.cdevreeze.yaidom.resolved
-import eu.cdevreeze.yaidom.simple.NodeBuilder
 import eu.cdevreeze.yaidom.utils.NamespaceUtils.findAllENames
 import eu.cdevreeze.yaidom.utils.NamespaceUtils.findAllNamespaces
 import eu.cdevreeze.yaidom.utils.NamespaceUtils.findENamesInElementItself
@@ -39,7 +38,12 @@ import org.scalatest.funsuite.AnyFunSuite
  */
 class NamespaceUtilsTest extends AnyFunSuite {
 
-  private val docParser = DocumentParserUsingSax.newInstance
+  private val docParser = DocumentParserUsingSax.newInstance()
+
+  private val XbrliNs = "http://www.xbrl.org/2003/instance"
+  private val Iso4217Ns = "http://www.xbrl.org/2003/iso4217"
+
+  private val xbrliMeasureENameExtractor = SimpleTextENameExtractor
 
   test("testPushUpNamespacesInFeed1") {
     val doc = docParser.parse(classOf[NamespaceUtilsTest].getResourceAsStream("feed1.txt"))
@@ -51,10 +55,10 @@ class NamespaceUtilsTest extends AnyFunSuite {
       resolved.Elem.from(editedRootElem)
     }
 
-    val editedRootElemBuilder = NodeBuilder.fromElem(editedRootElem)(Scope.Empty)
+    val editedRootElemBuilder = editedRootElem.notUndeclaringPrefixes(Scope.Empty)
 
     assertResult(true) {
-      editedRootElemBuilder.allDeclarationsAreAtTopLevel
+      editedRootElemBuilder.findAllElems.forall(_.scope == editedRootElemBuilder.scope)
     }
   }
 
@@ -68,16 +72,17 @@ class NamespaceUtilsTest extends AnyFunSuite {
       resolved.Elem.from(editedRootElem)
     }
 
-    val editedRootElemBuilder = NodeBuilder.fromElem(editedRootElem)(Scope.Empty)
+    val editedRootElemBuilder = editedRootElem.notUndeclaringPrefixes(Scope.Empty)
 
     assertResult(false) {
-      editedRootElemBuilder.allDeclarationsAreAtTopLevel
+      editedRootElemBuilder.findAllElems.forall(_.scope == editedRootElemBuilder.scope)
     }
     assertResult(true) {
-      editedRootElemBuilder.findAllElems.forall(e => e.namespaces.prefixNamespaceMap.keySet.subsetOf(Set("")))
+      editedRootElemBuilder.findAllElems.forall(e =>
+        editedRootElemBuilder.scope.relativize(e.scope).prefixNamespaceMap.keySet.subsetOf(Set("")))
     }
     assertResult(true) {
-      editedRootElemBuilder.namespaces.prefixNamespaceMap.contains("example")
+      editedRootElemBuilder.scope.prefixNamespaceMap.contains("example")
     }
   }
 
@@ -91,13 +96,13 @@ class NamespaceUtilsTest extends AnyFunSuite {
       resolved.Elem.from(editedRootElem)
     }
 
-    val editedRootElemBuilder = NodeBuilder.fromElem(editedRootElem)(Scope.Empty)
+    val editedRootElemBuilder = editedRootElem.notUndeclaringPrefixes(Scope.Empty)
 
     assertResult(true) {
-      editedRootElemBuilder.allDeclarationsAreAtTopLevel
+      editedRootElemBuilder.findAllElems.forall(_.scope == editedRootElemBuilder.scope)
     }
     assertResult(Set("", "xhtml", "my")) {
-      editedRootElemBuilder.namespaces.prefixNamespaceMap.keySet
+      editedRootElemBuilder.scope.prefixNamespaceMap.keySet
     }
   }
 
@@ -111,21 +116,30 @@ class NamespaceUtilsTest extends AnyFunSuite {
       resolved.Elem.from(editedRootElem)
     }
 
-    val editedRootElemBuilder = NodeBuilder.fromElem(editedRootElem)(Scope.Empty)
+    val editedRootElemBuilder = editedRootElem.notUndeclaringPrefixes(Scope.Empty)
 
     assertResult(false) {
-      editedRootElemBuilder.allDeclarationsAreAtTopLevel
+      editedRootElemBuilder.findAllElems.forall(_.scope == editedRootElemBuilder.scope)
     }
     assertResult(Map("" -> "http://not-b", "a" -> "http://a", "b" -> "http://root-b")) {
-      editedRootElemBuilder.namespaces.prefixNamespaceMap
+      editedRootElemBuilder.scope.prefixNamespaceMap
     }
     assertResult(true) {
-      editedRootElemBuilder.findAllChildElems.dropRight(1).forall(e => e.namespaces.prefixNamespaceMap.keySet.contains("b"))
+      editedRootElemBuilder.findAllChildElems
+        .dropRight(1)
+        .forall(e => editedRootElemBuilder.scope.relativize(e.scope).prefixNamespaceMap.keySet.contains("b"))
     }
     assertResult(true) {
-      editedRootElemBuilder.findAllChildElems.flatMap(e => e.findAllElems) forall { e =>
-        e.namespaces.prefixNamespaceMap.keySet.subsetOf(Set("b")) &&
-          e.namespaces.prefixNamespaceMap.forall(kv => kv._1 == "b" && kv._2 == "http://b")
+      val childElems = editedRootElemBuilder.findAllChildElems.ensuring(_.nonEmpty)
+
+      childElems.forall { che =>
+        che.findAllElems.forall { e =>
+          che.scope.relativize(e.scope).prefixNamespaceMap.keySet.subsetOf(Set("b")) &&
+          che.scope
+            .relativize(e.scope)
+            .prefixNamespaceMap
+            .forall(kv => kv._1 == "b" && kv._2 == "http://b")
+        }
       }
     }
   }
@@ -140,13 +154,13 @@ class NamespaceUtilsTest extends AnyFunSuite {
       resolved.Elem.from(editedRootElem)
     }
 
-    val editedRootElemBuilder = NodeBuilder.fromElem(editedRootElem)(Scope.Empty)
+    val editedRootElemBuilder = editedRootElem.notUndeclaringPrefixes(Scope.Empty)
 
     assertResult(true) {
-      editedRootElemBuilder.allDeclarationsAreAtTopLevel
+      editedRootElemBuilder.findAllElems.forall(_.scope == editedRootElemBuilder.scope)
     }
     assertResult(Map("" -> "http://d", "a" -> "http://a", "b" -> "http://b", "c" -> "http://c")) {
-      editedRootElemBuilder.namespaces.prefixNamespaceMap
+      editedRootElemBuilder.scope.prefixNamespaceMap
     }
   }
 
@@ -218,11 +232,6 @@ class NamespaceUtilsTest extends AnyFunSuite {
       stripUnusedNamespaces(measureElem, xbrliENameExtractor).scope
     }
   }
-
-  private val XbrliNs = "http://www.xbrl.org/2003/instance"
-  private val Iso4217Ns = "http://www.xbrl.org/2003/iso4217"
-
-  private val xbrliMeasureENameExtractor = SimpleTextENameExtractor
 
   final class XbrliDocumentENameExtractor extends DocumentENameExtractor {
 

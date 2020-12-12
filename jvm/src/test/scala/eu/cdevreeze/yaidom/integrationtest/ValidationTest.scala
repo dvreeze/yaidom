@@ -16,15 +16,15 @@
 
 package eu.cdevreeze.yaidom.integrationtest
 
-import scala.collection.immutable
-
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
+import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
 import eu.cdevreeze.yaidom.simple.Elem
-import eu.cdevreeze.yaidom.simple.NodeBuilder.elem
-import eu.cdevreeze.yaidom.simple.NodeBuilder.textElem
+import eu.cdevreeze.yaidom.simple.Node._
 import org.scalatest.funsuite.AnyFunSuite
+
+import scala.collection.immutable
 
 /**
  * Test case using yaidom for validation of XML documents, playing with an "alternative schema language" (inspired by Relax NG and
@@ -46,26 +46,50 @@ class ValidationTest extends AnyFunSuite {
     val validator =
       and(
         sequence(
-          one(EName("name")) validatedBy { e => validateStringElem(e) },
-          one(EName("street")) validatedBy { e => validateStringElem(e) },
-          one(EName("city")) validatedBy { e => validateStringElem(e) },
-          one(EName("state")) validatedBy { e => validateStringElem(e) },
-          one(EName("zip")) validatedBy { e => validateStringElem(e) }),
-        hasAttribute(EName("country")))
+          one(EName("name")).validatedBy { e =>
+            validateStringElem(e)
+          },
+          one(EName("street")).validatedBy { e =>
+            validateStringElem(e)
+          },
+          one(EName("city")).validatedBy { e =>
+            validateStringElem(e)
+          },
+          one(EName("state")).validatedBy { e =>
+            validateStringElem(e)
+          },
+          one(EName("zip")).validatedBy { e =>
+            validateStringElem(e)
+          }
+        ),
+        hasAttribute(EName("country"))
+      )
     validator.apply(elm)
   }
 
   def validateItems(elm: Elem): ValidationResult = {
     val validator =
       sequence(
-        zeroOrMore(EName("item")) validatedBy (and(
+        zeroOrMore(EName("item")).validatedBy(and(
           sequence(
-            one(EName("productName")) validatedBy { e => validateStringElem(e) },
-            one(EName("quantity")) validatedBy { e => validateStringElem(e) },
-            one(EName("USPrice")) validatedBy { e => validateStringElem(e) },
-            zeroOrOne(EName("comment")) validatedBy { e => validateStringElem(e) },
-            zeroOrOne(EName("shipDate")) validatedBy { e => validateStringElem(e) }),
-          hasAttribute(EName("partNum")))))
+            one(EName("productName")).validatedBy { e =>
+              validateStringElem(e)
+            },
+            one(EName("quantity")).validatedBy { e =>
+              validateStringElem(e)
+            },
+            one(EName("USPrice")).validatedBy { e =>
+              validateStringElem(e)
+            },
+            zeroOrOne(EName("comment")).validatedBy { e =>
+              validateStringElem(e)
+            },
+            zeroOrOne(EName("shipDate")).validatedBy { e =>
+              validateStringElem(e)
+            }
+          ),
+          hasAttribute(EName("partNum"))
+        )))
     validator.apply(elm)
   }
 
@@ -73,20 +97,27 @@ class ValidationTest extends AnyFunSuite {
     val validator =
       and(
         sequence(
-          one(EName("shipTo")) validatedBy { e => validateUSAddress(e) },
-          one(EName("billTo")) validatedBy { e => validateUSAddress(e) },
-          zeroOrOne(EName("comment")) validatedBy { e => validateStringElem(e) },
-          one(EName("items")) validatedBy { e => validateItems(e) }),
-        hasAttribute(EName("orderDate")))
+          one(EName("shipTo")).validatedBy { e =>
+            validateUSAddress(e)
+          },
+          one(EName("billTo")).validatedBy { e =>
+            validateUSAddress(e)
+          },
+          zeroOrOne(EName("comment")).validatedBy { e =>
+            validateStringElem(e)
+          },
+          one(EName("items")).validatedBy { e =>
+            validateItems(e)
+          }
+        ),
+        hasAttribute(EName("orderDate"))
+      )
     validator.apply(elm)
   }
 
   def validateRootElement(elm: Elem): ValidationResult = {
     val validator =
-      and(
-        hasName(EName("purchaseOrder")),
-        hasAttribute(EName("orderDate")),
-        validatePurchaseOrder _)
+      and(hasName(EName("purchaseOrder")), hasAttribute(EName("orderDate")), validatePurchaseOrder)
     validator.apply(elm)
   }
 
@@ -97,13 +128,16 @@ class ValidationTest extends AnyFunSuite {
       elem(
         qname = QName("Address"),
         attributes = Vector(QName("country") -> "US"),
+        scope = Scope.Empty,
         children = Vector(
-          textElem(QName("name"), "Alice Smith"),
-          textElem(QName("street"), "123 Maple Street"),
-          textElem(QName("city"), "Mill Valley"),
-          textElem(QName("state"), "CA"),
-          textElem(QName("zip"), "90952")))
-    val addressElm = elmBuilder.build()
+          textElem(QName("name"), Scope.Empty, "Alice Smith"),
+          textElem(QName("street"), Scope.Empty, "123 Maple Street"),
+          textElem(QName("city"), Scope.Empty, "Mill Valley"),
+          textElem(QName("state"), Scope.Empty, "CA"),
+          textElem(QName("zip"), Scope.Empty, "90952")
+        )
+      )
+    val addressElm = elmBuilder
 
     val validationResult = validateUSAddress(addressElm)
 
@@ -111,7 +145,7 @@ class ValidationTest extends AnyFunSuite {
       validationResult.success
     }
 
-    val wrongAddressElm = addressElm.plusChild(textElem(QName("bogus"), "true").build())
+    val wrongAddressElm = addressElm.plusChild(textElem(QName("bogus"), Scope.Empty, "true"))
 
     val nonOkValidationResult = validateUSAddress(wrongAddressElm)
 
@@ -119,7 +153,7 @@ class ValidationTest extends AnyFunSuite {
       nonOkValidationResult.success
     }
 
-    val anotherWrongAddressElm = addressElm.plusChild(2, textElem(QName("bogus"), "true").build())
+    val anotherWrongAddressElm = addressElm.plusChild(2, textElem(QName("bogus"), Scope.Empty, "true"))
 
     val anotherNonOkValidationResult = validateUSAddress(anotherWrongAddressElm)
 
@@ -129,7 +163,7 @@ class ValidationTest extends AnyFunSuite {
   }
 
   test("testValidatePurchaseOrder") {
-    val docParser = DocumentParserUsingSax.newInstance
+    val docParser = DocumentParserUsingSax.newInstance()
     val is = classOf[ValidationTest].getResourceAsStream("po.xml")
     val doc = docParser.parse(is)
 
@@ -139,7 +173,7 @@ class ValidationTest extends AnyFunSuite {
       validationResult.success
     }
 
-    val extraCommentElm = textElem(QName("comment"), "That's it for now, folks").build()
+    val extraCommentElm = textElem(QName("comment"), Scope.Empty, "That's it for now, folks")
     val wrongDoc = doc.withDocumentElement(doc.documentElement.plusChild(extraCommentElm))
 
     val nonOkValidationResult = validateRootElement(wrongDoc.documentElement)
@@ -152,7 +186,7 @@ class ValidationTest extends AnyFunSuite {
 
 object ValidationTest {
 
-  final class ValidationResult private(val success: Boolean, val messages: immutable.Seq[String])
+  final class ValidationResult private (val success: Boolean, val messages: immutable.Seq[String])
 
   object ValidationResult {
 
@@ -164,12 +198,13 @@ object ValidationTest {
   }
 
   /** The central validator type */
-  type ElemValidator = (Elem => ValidationResult)
+  type ElemValidator = Elem => ValidationResult
 
   /** Given an EName, its minOccurs and maxOccurs (None for unbounded maxOccurs) */
   final case class NameOccurrences(name: EName, minOccurs: Int, maxOccursOption: Option[Int]) {
 
-    def validatedBy(validator: ElemValidator): NameOccurrencesWithValidator = new NameOccurrencesWithValidator(this, validator)
+    def validatedBy(validator: ElemValidator): NameOccurrencesWithValidator =
+      new NameOccurrencesWithValidator(this, validator)
   }
 
   object NameOccurrences {
@@ -202,12 +237,15 @@ object ValidationTest {
 
     for (nameOccsWithValidator <- nameOccsWithValidators) {
       if (lastValidationResult.success) {
-        val matchingChildElms = remainingChildElms takeWhile { e => e.resolvedName == nameOccsWithValidator.nameOccurrences.name }
+        val matchingChildElms = remainingChildElms.takeWhile { e =>
+          e.resolvedName == nameOccsWithValidator.nameOccurrences.name
+        }
 
         if (matchingChildElms.size < nameOccsWithValidator.nameOccurrences.minOccurs ||
-          nameOccsWithValidator.nameOccurrences.maxOccursOption.getOrElse(java.lang.Integer.MAX_VALUE) < matchingChildElms.size) {
+            nameOccsWithValidator.nameOccurrences.maxOccursOption.getOrElse(java.lang.Integer.MAX_VALUE) < matchingChildElms.size) {
 
-          lastValidationResult = ValidationResult.notOk(s"Too few or too many ${nameOccsWithValidator.nameOccurrences.name} elements")
+          lastValidationResult =
+            ValidationResult.notOk(s"Too few or too many ${nameOccsWithValidator.nameOccurrences.name} elements")
         } else {
           for (elm <- matchingChildElms) {
             if (lastValidationResult.success) {
@@ -216,7 +254,9 @@ object ValidationTest {
           }
         }
 
-        remainingChildElms = remainingChildElms dropWhile { e => e.resolvedName == nameOccsWithValidator.nameOccurrences.name }
+        remainingChildElms = remainingChildElms.dropWhile { e =>
+          e.resolvedName == nameOccsWithValidator.nameOccurrences.name
+        }
       }
     }
 
@@ -228,10 +268,10 @@ object ValidationTest {
   }
 
   def and(validators: ElemValidator*): ElemValidator = {
-    require(validators.size >= 1, "Expected at least one validator")
+    require(validators.nonEmpty, "Expected at least one validator")
 
     { e: Elem =>
-      validators map (vld => vld(e)) find (vldRes => !vldRes.success) getOrElse (ValidationResult.ok)
+      validators.map(vld => vld(e)).find(vldRes => !vldRes.success).getOrElse(ValidationResult.ok)
     }
   }
 

@@ -18,8 +18,6 @@ package eu.cdevreeze.yaidom.integrationtest
 
 import java.{util => jutil}
 
-import scala.collection.immutable
-
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.PathBuilder
 import eu.cdevreeze.yaidom.core.QName
@@ -29,13 +27,13 @@ import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.simple.Document
 import eu.cdevreeze.yaidom.simple.EntityRef
 import eu.cdevreeze.yaidom.simple.Node
-import eu.cdevreeze.yaidom.simple.NodeBuilder
 import eu.cdevreeze.yaidom.simple.Text
 import javax.xml.parsers.DocumentBuilder
 import javax.xml.parsers.DocumentBuilderFactory
 import org.scalatest.funsuite.AnyFunSuite
-import org.xml.sax.EntityResolver
 import org.xml.sax.InputSource
+
+import scala.collection.immutable
 
 /**
  * Node equality test case.
@@ -55,22 +53,24 @@ class EqualityTest extends AnyFunSuite {
   test("testBookstoreEquality") {
     // 1. Parse XML file into Document
 
-    val parser = parse.DocumentParserUsingDom.newInstance
+    val parser = parse.DocumentParserUsingDom.newInstance()
     val is1 = classOf[EqualityTest].getResourceAsStream("books.xml")
 
     val doc1: Document = parser.parse(is1)
     val root1 = doc1.documentElement
 
-    assertResult(Set("Bookstore", "Book", "Title", "Authors", "Author", "First_Name", "Last_Name", "Remark", "Magazine")) {
-      (root1.findAllElemsOrSelf map (e => e.localName)).toSet
+    assertResult(
+      Set("Bookstore", "Book", "Title", "Authors", "Author", "First_Name", "Last_Name", "Remark", "Magazine")) {
+      root1.findAllElemsOrSelf.map(e => e.localName).toSet
     }
 
     // 2. Now remove all element content whitespace
 
     val root2 = root1.removeAllInterElementWhitespace
 
-    assertResult(Set("Bookstore", "Book", "Title", "Authors", "Author", "First_Name", "Last_Name", "Remark", "Magazine")) {
-      (root2.findAllElemsOrSelf map (e => e.localName)).toSet
+    assertResult(
+      Set("Bookstore", "Book", "Title", "Authors", "Author", "First_Name", "Last_Name", "Remark", "Magazine")) {
+      root2.findAllElemsOrSelf.map(e => e.localName).toSet
     }
 
     // 3. Check these yaidom trees are not "equal"
@@ -107,14 +107,16 @@ class EqualityTest extends AnyFunSuite {
   test("testStrangeXmlDescendantsOrSelf") {
     // 1. Parse XML file into Document
 
-    val parser = parse.DocumentParserUsingDom.newInstance
+    val parser = parse.DocumentParserUsingDom.newInstance()
     val is = classOf[EqualityTest].getResourceAsStream("strangeXml.xml")
 
     val doc: Document = parser.parse(is)
     val root = doc.documentElement
 
     assertResult(Set(EName("bar"), EName(nsGoogle, "foo"))) {
-      val result = root.findAllElemsOrSelf map { e => e.resolvedName }
+      val result = root.findAllElemsOrSelf.map { e =>
+        e.resolvedName
+      }
       result.toSet
     }
 
@@ -123,7 +125,7 @@ class EqualityTest extends AnyFunSuite {
     val resolvedRoot = resolved.Elem.from(root)
 
     assertResult(Set(EName("bar"), EName("http://www.google.com", "foo"))) {
-      val result = resolvedRoot.findAllElemsOrSelf map {
+      val result = resolvedRoot.findAllElemsOrSelf.map {
         _.resolvedName
       }
       result.toSet
@@ -134,14 +136,16 @@ class EqualityTest extends AnyFunSuite {
   test("testDefaultNamespaceXmlDescendantsOrSelf") {
     // 1. Parse XML file into Document
 
-    val parser = parse.DocumentParserUsingDom.newInstance
+    val parser = parse.DocumentParserUsingDom.newInstance()
     val is = classOf[EqualityTest].getResourceAsStream("trivialXml.xml")
 
     val doc: Document = parser.parse(is)
     val root = doc.documentElement
 
     assertResult(Set(EName(nsFooBar, "root"), EName(nsFooBar, "child"))) {
-      val result = root.findAllElemsOrSelf map { e => e.resolvedName }
+      val result = root.findAllElemsOrSelf.map { e =>
+        e.resolvedName
+      }
       result.toSet
     }
 
@@ -150,7 +154,9 @@ class EqualityTest extends AnyFunSuite {
     val resolvedRoot = resolved.Elem.from(root)
 
     assertResult(Set(EName(nsFooBar, "root"), EName(nsFooBar, "child"))) {
-      val result = resolvedRoot.findAllElemsOrSelf map { e => e.resolvedName }
+      val result = resolvedRoot.findAllElemsOrSelf.map { e =>
+        e.resolvedName
+      }
       result.toSet
     }
   }
@@ -158,28 +164,28 @@ class EqualityTest extends AnyFunSuite {
   test("testSchemaXsdDescendantsOrSelf") {
     // 1. Parse XML file into Document
 
-    val dbf = DocumentBuilderFactory.newInstance
+    val dbf = DocumentBuilderFactory.newInstance()
 
     def createDocumentBuilder(documentBuilderFactory: DocumentBuilderFactory): DocumentBuilder = {
       val db = documentBuilderFactory.newDocumentBuilder()
-      db.setEntityResolver(new EntityResolver {
-        def resolveEntity(publicId: String, systemId: String): InputSource = {
-          logger.info(s"Trying to resolve entity. Public ID: $publicId. System ID: $systemId")
+      db.setEntityResolver((publicId: String, systemId: String) => {
+        logger.info(s"Trying to resolve entity. Public ID: $publicId. System ID: $systemId")
 
-          if (systemId.endsWith("/XMLSchema.dtd") || systemId.endsWith("\\XMLSchema.dtd") || (systemId == "XMLSchema.dtd")) {
-            new InputSource(classOf[EqualityTest].getResourceAsStream("XMLSchema.dtd"))
-          } else if (systemId.endsWith("/datatypes.dtd") || systemId.endsWith("\\datatypes.dtd") || (systemId == "datatypes.dtd")) {
-            new InputSource(classOf[EqualityTest].getResourceAsStream("datatypes.dtd"))
-          } else {
-            // Default behaviour
-            null
-          }
+        if (systemId.endsWith("/XMLSchema.dtd") || systemId
+              .endsWith("\\XMLSchema.dtd") || (systemId == "XMLSchema.dtd")) {
+          new InputSource(classOf[EqualityTest].getResourceAsStream("XMLSchema.dtd"))
+        } else if (systemId.endsWith("/datatypes.dtd") || systemId
+                     .endsWith("\\datatypes.dtd") || (systemId == "datatypes.dtd")) {
+          new InputSource(classOf[EqualityTest].getResourceAsStream("datatypes.dtd"))
+        } else {
+          // Default behaviour
+          null
         }
       })
       db
     }
 
-    val parser = parse.DocumentParserUsingDom.newInstance(dbf, createDocumentBuilder _)
+    val parser = parse.DocumentParserUsingDom.newInstance(dbf, createDocumentBuilder)
 
     val is = classOf[EqualityTest].getResourceAsStream("XMLSchema.xsd")
 
@@ -189,20 +195,46 @@ class EqualityTest extends AnyFunSuite {
     val ns = nsXmlSchema
 
     val xsElmENames: Set[EName] =
-      Set(EName(ns, "schema"), EName(ns, "annotation"), EName(ns, "documentation"),
-        EName(ns, "import"), EName(ns, "complexType"), EName(ns, "complexContent"),
-        EName(ns, "extension"), EName(ns, "sequence"), EName(ns, "element"),
-        EName(ns, "attribute"), EName(ns, "choice"), EName(ns, "group"),
-        EName(ns, "simpleType"), EName(ns, "restriction"), EName(ns, "enumeration"),
-        EName(ns, "list"), EName(ns, "union"), EName(ns, "key"),
-        EName(ns, "selector"), EName(ns, "field"), EName(ns, "attributeGroup"),
-        EName(ns, "anyAttribute"), EName(ns, "whiteSpace"), EName(ns, "fractionDigits"),
-        EName(ns, "pattern"), EName(ns, "any"), EName(ns, "appinfo"),
-        EName(ns, "minLength"), EName(ns, "maxInclusive"), EName(ns, "minInclusive"),
-        EName(ns, "notation"))
+      Set(
+        EName(ns, "schema"),
+        EName(ns, "annotation"),
+        EName(ns, "documentation"),
+        EName(ns, "import"),
+        EName(ns, "complexType"),
+        EName(ns, "complexContent"),
+        EName(ns, "extension"),
+        EName(ns, "sequence"),
+        EName(ns, "element"),
+        EName(ns, "attribute"),
+        EName(ns, "choice"),
+        EName(ns, "group"),
+        EName(ns, "simpleType"),
+        EName(ns, "restriction"),
+        EName(ns, "enumeration"),
+        EName(ns, "list"),
+        EName(ns, "union"),
+        EName(ns, "key"),
+        EName(ns, "selector"),
+        EName(ns, "field"),
+        EName(ns, "attributeGroup"),
+        EName(ns, "anyAttribute"),
+        EName(ns, "whiteSpace"),
+        EName(ns, "fractionDigits"),
+        EName(ns, "pattern"),
+        EName(ns, "any"),
+        EName(ns, "appinfo"),
+        EName(ns, "minLength"),
+        EName(ns, "maxInclusive"),
+        EName(ns, "minInclusive"),
+        EName(ns, "notation")
+      )
 
     assertResult(xsElmENames) {
-      val result = root \\ { e => e.resolvedName.namespaceUriOption.contains(nsXmlSchema) } map { e => e.resolvedName }
+      val result = (root \\ { e =>
+        e.resolvedName.namespaceUriOption.contains(nsXmlSchema)
+      }).map { e =>
+        e.resolvedName
+      }
       result.toSet
     }
 
@@ -211,7 +243,11 @@ class EqualityTest extends AnyFunSuite {
     val resolvedRoot = resolved.Elem.from(root)
 
     assertResult(xsElmENames) {
-      val result = resolvedRoot \\ { e => e.resolvedName.namespaceUriOption.contains(nsXmlSchema) } map { e => e.resolvedName }
+      val result = (resolvedRoot \\ { e =>
+        e.resolvedName.namespaceUriOption.contains(nsXmlSchema)
+      }).map { e =>
+        e.resolvedName
+      }
       result.toSet
     }
   }
@@ -219,7 +255,7 @@ class EqualityTest extends AnyFunSuite {
   test("testEqualityForXmlWithEntityRefs") {
     // 1. Parse XML file into Document, twice
 
-    val parser1 = parse.DocumentParserUsingDom.newInstance
+    val parser1 = parse.DocumentParserUsingDom.newInstance()
     val is1 = classOf[EqualityTest].getResourceAsStream("trivialXmlWithEntityRef.xml")
 
     val doc1: Document = parser1.parse(is1)
@@ -228,11 +264,13 @@ class EqualityTest extends AnyFunSuite {
     val ns = "urn:foo:bar"
 
     assertResult(Set(EName(ns, "root"), EName(ns, "child"))) {
-      val result = root1.findAllElemsOrSelf map { e => e.resolvedName }
+      val result = root1.findAllElemsOrSelf.map { e =>
+        e.resolvedName
+      }
       result.toSet
     }
 
-    val dbf = DocumentBuilderFactory.newInstance
+    val dbf = DocumentBuilderFactory.newInstance()
     dbf.setExpandEntityReferences(false)
     val parser2 = parse.DocumentParserUsingDom.newInstance(dbf)
     val is2 = classOf[EqualityTest].getResourceAsStream("trivialXmlWithEntityRef.xml")
@@ -241,12 +279,16 @@ class EqualityTest extends AnyFunSuite {
     val root2 = doc2.documentElement
 
     assertResult(Set(EName(ns, "root"), EName(ns, "child"))) {
-      val result = root2.findAllElemsOrSelf map { e => e.resolvedName }
+      val result = root2.findAllElemsOrSelf.map { e =>
+        e.resolvedName
+      }
       result.toSet
     }
 
     val entityRefs = {
-      val result = root2.findAllElemsOrSelf flatMap { e => e.children collect { case er: EntityRef => er } }
+      val result = root2.findAllElemsOrSelf.flatMap { e =>
+        e.children.collect { case er: EntityRef => er }
+      }
       result
     }
     assertResult(1) {
@@ -266,17 +308,16 @@ class EqualityTest extends AnyFunSuite {
 
     val path = PathBuilder.from(QName("foobar:child") -> 0).build(scope)
 
-    val root3 = root2.updateElemOrSelf(path) {
-      e =>
-        val newChildren: immutable.IndexedSeq[Node] = e.children flatMap { (n: Node) =>
-          n match {
-            case er: EntityRef if er.entity == "hello" => Some(Text("hi", false))
-            // This is very counter-intuitive, but it seems that the entity reference is there as well as (!) the expansion
-            case t: Text if t.text.startsWith("hi") => Some(Text(t.text.drop(2), t.isCData))
-            case n: Node => Some(n)
-          }
+    val root3 = root2.updateElemOrSelf(path) { e =>
+      val newChildren: immutable.IndexedSeq[Node] = e.children.flatMap { (n: Node) =>
+        n match {
+          case er: EntityRef if er.entity == "hello" => Some(Text("hi", isCData = false))
+          // This is very counter-intuitive, but it seems that the entity reference is there as well as (!) the expansion
+          case t: Text if t.text.startsWith("hi") => Some(Text(t.text.drop(2), t.isCData))
+          case n: Node                            => Some(n)
         }
-        e.withChildren(newChildren)
+      }
+      e.withChildren(newChildren)
     }
 
     val resolvedRoot3 = resolved.Elem.from(root3)
@@ -295,7 +336,7 @@ class EqualityTest extends AnyFunSuite {
   test("testXmlWithNSUndeclarationsDescendantsOrSelf") {
     // 1. Parse XML file into Document
 
-    val parser = parse.DocumentParserUsingDom.newInstance
+    val parser = parse.DocumentParserUsingDom.newInstance()
     val is = classOf[EqualityTest].getResourceAsStream("trivialXmlWithNSUndeclarations.xml")
 
     val doc: Document = parser.parse(is)
@@ -304,7 +345,9 @@ class EqualityTest extends AnyFunSuite {
     val ns = "urn:foo:bar"
 
     assertResult(Set(EName(ns, "root"), EName(ns, "a"), EName("b"), EName("c"), EName(ns, "d"))) {
-      val result = root.findAllElemsOrSelf map { e => e.resolvedName }
+      val result = root.findAllElemsOrSelf.map { e =>
+        e.resolvedName
+      }
       result.toSet
     }
 
@@ -313,7 +356,9 @@ class EqualityTest extends AnyFunSuite {
     val resolvedRoot = resolved.Elem.from(root)
 
     assertResult(Set(EName(ns, "root"), EName(ns, "a"), EName("b"), EName("c"), EName(ns, "d"))) {
-      val result = resolvedRoot.findAllElemsOrSelf map { e => e.resolvedName }
+      val result = resolvedRoot.findAllElemsOrSelf.map { e =>
+        e.resolvedName
+      }
       result.toSet
     }
   }
@@ -321,7 +366,7 @@ class EqualityTest extends AnyFunSuite {
   test("testEqualityForXmlWithEscapedCharacters") {
     // 1. Parse XML file into Document, and create an equivalent document
 
-    val parser1 = parse.DocumentParserUsingDom.newInstance
+    val parser1 = parse.DocumentParserUsingDom.newInstance()
     val is1 = classOf[EqualityTest].getResourceAsStream("trivialXmlWithEscapedChars.xml")
 
     val doc1: Document = parser1.parse(is1)
@@ -330,25 +375,32 @@ class EqualityTest extends AnyFunSuite {
     val ns = "urn:foo:bar"
 
     assertResult(Set(EName(ns, "root"), EName(ns, "child"))) {
-      val result = root1.findAllElemsOrSelf map { e => e.resolvedName }
+      val result = root1.findAllElemsOrSelf.map { e =>
+        e.resolvedName
+      }
       result.toSet
     }
 
-    import NodeBuilder._
+    import Node._
 
     val scope = Scope.from(Map("" -> "urn:foo:bar"))
     val root2 =
       elem(
         qname = QName("root"),
+        scope = scope,
         children = Vector(
           textElem(
             qname = QName("child"),
             attributes = Vector(QName("about") -> "Jansen & co"),
+            scope = scope,
             txt = "Jansen & co"),
           textElem(
             qname = QName("child"),
             attributes = Vector(QName("about") -> "Jansen & co"),
-            txt = "Jansen & co"))).build(scope)
+            scope = scope,
+            txt = "Jansen & co")
+        )
+      )
 
     // Check equalities
 
@@ -364,7 +416,7 @@ class EqualityTest extends AnyFunSuite {
   test("testEqualityForXmlWithEuro") {
     // 1. Parse XML file into Document, and create an equivalent document
 
-    val parser1 = parse.DocumentParserUsingDom.newInstance
+    val parser1 = parse.DocumentParserUsingDom.newInstance()
     val is1 = classOf[EqualityTest].getResourceAsStream("trivialXmlWithEuro.xml")
 
     val doc1: Document = parser1.parse(is1)
@@ -373,20 +425,21 @@ class EqualityTest extends AnyFunSuite {
     val ns = "urn:foo:bar"
 
     assertResult(Set(EName(ns, "root"), EName(ns, "child"))) {
-      val result = root1.findAllElemsOrSelf map { e => e.resolvedName }
+      val result = root1.findAllElemsOrSelf.map { e =>
+        e.resolvedName
+      }
       result.toSet
     }
 
-    import NodeBuilder._
+    import Node._
 
     val scope = Scope.from(Map("" -> "urn:foo:bar"))
     val txt = "\u20AC 200"
     val root2 =
       elem(
         qname = QName("root"),
-        children = Vector(
-          textElem(QName("child"), txt),
-          textElem(QName("child"), txt))).build(scope)
+        scope = scope,
+        children = Vector(textElem(QName("child"), scope, txt), textElem(QName("child"), scope, txt)))
 
     // Check equalities
 

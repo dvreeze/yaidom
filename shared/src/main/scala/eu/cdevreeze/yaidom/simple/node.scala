@@ -352,7 +352,7 @@ final class Elem(
     assert(this.scope.defaultNamespaceOption == newScope.defaultNamespaceOption)
 
     // Recursive (non-tail-recursive) calls
-    this.copy(scope = newScope) transformChildElems { e => e.notUndeclaringPrefixes(newScope) }
+    this.copy(scope = newScope).transformChildElems { _.notUndeclaringPrefixes(newScope) }
   }
 
   /**

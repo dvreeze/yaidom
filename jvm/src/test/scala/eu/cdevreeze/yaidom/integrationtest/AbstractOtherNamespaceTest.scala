@@ -26,7 +26,7 @@ import eu.cdevreeze.yaidom.queryapi.ClarkElemApi._
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.simple.Document
 import eu.cdevreeze.yaidom.simple.Elem
-import eu.cdevreeze.yaidom.simple.NodeBuilder
+import eu.cdevreeze.yaidom.simple.Node
 import org.scalatest.funsuite.AnyFunSuite
 import org.xml.sax.InputSource
 
@@ -521,7 +521,7 @@ abstract class AbstractOtherNamespaceTest extends AnyFunSuite {
       case e: resolved.Elem if e.resolvedName == EName(nsProd, "number") =>
         val scope = doc.documentElement.scope ++ Scope.from("prod" -> nsProd2)
         val v = (doc.documentElement \\ EName(nsProd2, "number")).map(_.text).mkString
-        val result = NodeBuilder.textElem(QName("prod", "number"), v).build(scope)
+        val result = Node.textElem(QName("prod", "number"), scope, v)
         resolved.Elem.from(result)
       case e: resolved.Elem => e
     }
@@ -1153,7 +1153,7 @@ abstract class AbstractOtherNamespaceTest extends AnyFunSuite {
     val fixedDoc = organizeNamespaces(doc)
 
     assertResult(true) {
-      NodeBuilder.fromElem(fixedDoc.documentElement)(Scope.Empty).allDeclarationsAreAtTopLevel
+      fixedDoc.documentElement.findAllElemsOrSelf.forall(_.scope == fixedDoc.documentElement.scope)
     }
 
     assertResult(resolved.Elem.from(doc.documentElement)) {
@@ -1209,7 +1209,7 @@ abstract class AbstractOtherNamespaceTest extends AnyFunSuite {
     val fixedDoc = organizeNamespaces(doc)
 
     assertResult(true) {
-      NodeBuilder.fromElem(fixedDoc.documentElement)(Scope.Empty).allDeclarationsAreAtTopLevel
+      fixedDoc.documentElement.findAllElemsOrSelf.forall(_.scope == fixedDoc.documentElement.scope)
     }
 
     assertResult(resolved.Elem.from(doc.documentElement)) {
@@ -1265,7 +1265,7 @@ abstract class AbstractOtherNamespaceTest extends AnyFunSuite {
     val fixedDoc = organizeNamespaces(doc)
 
     assertResult(true) {
-      NodeBuilder.fromElem(fixedDoc.documentElement)(Scope.Empty).allDeclarationsAreAtTopLevel
+      fixedDoc.documentElement.findAllElemsOrSelf.forall(_.scope == fixedDoc.documentElement.scope)
     }
 
     assertResult(resolved.Elem.from(doc.documentElement)) {
@@ -1320,11 +1320,11 @@ abstract class AbstractOtherNamespaceTest extends AnyFunSuite {
     val fixedDoc = organizeNamespaces(doc)
 
     assertResult(false) {
-      NodeBuilder.fromElem(doc.documentElement)(Scope.Empty).allDeclarationsAreAtTopLevel
+      doc.documentElement.findAllElemsOrSelf.forall(_.scope == fixedDoc.documentElement.scope)
     }
 
     assertResult(true) {
-      NodeBuilder.fromElem(fixedDoc.documentElement)(Scope.Empty).allDeclarationsAreAtTopLevel
+      fixedDoc.documentElement.findAllElemsOrSelf.forall(_.scope == fixedDoc.documentElement.scope)
     }
 
     assertResult(resolved.Elem.from(doc.documentElement)) {
@@ -1382,11 +1382,11 @@ abstract class AbstractOtherNamespaceTest extends AnyFunSuite {
     val fixedDoc = organizeNamespaces(doc)
 
     assertResult(false) {
-      NodeBuilder.fromElem(doc.documentElement)(Scope.Empty).allDeclarationsAreAtTopLevel
+      doc.documentElement.findAllElemsOrSelf.forall(_.scope == fixedDoc.documentElement.scope)
     }
 
     assertResult(false) {
-      NodeBuilder.fromElem(fixedDoc.documentElement)(Scope.Empty).allDeclarationsAreAtTopLevel
+      fixedDoc.documentElement.findAllElemsOrSelf.forall(_.scope == fixedDoc.documentElement.scope)
     }
 
     assertResult(resolved.Elem.from(doc.documentElement)) {
@@ -1441,11 +1441,11 @@ abstract class AbstractOtherNamespaceTest extends AnyFunSuite {
     val fixedDoc = organizeNamespaces(doc)
 
     assertResult(false) {
-      NodeBuilder.fromElem(doc.documentElement)(Scope.Empty).allDeclarationsAreAtTopLevel
+      doc.documentElement.findAllElemsOrSelf.forall(_.scope == fixedDoc.documentElement.scope)
     }
 
     assertResult(false) {
-      NodeBuilder.fromElem(fixedDoc.documentElement)(Scope.Empty).allDeclarationsAreAtTopLevel
+      fixedDoc.documentElement.findAllElemsOrSelf.forall(_.scope == fixedDoc.documentElement.scope)
     }
 
     assertResult(resolved.Elem.from(doc.documentElement)) {
@@ -1499,11 +1499,11 @@ abstract class AbstractOtherNamespaceTest extends AnyFunSuite {
     val fixedDoc = organizeNamespaces(doc)
 
     assertResult(false) {
-      NodeBuilder.fromElem(doc.documentElement)(Scope.Empty).allDeclarationsAreAtTopLevel
+      doc.documentElement.findAllElemsOrSelf.forall(_.scope == fixedDoc.documentElement.scope)
     }
 
     assertResult(false) {
-      NodeBuilder.fromElem(fixedDoc.documentElement)(Scope.Empty).allDeclarationsAreAtTopLevel
+      fixedDoc.documentElement.findAllElemsOrSelf.forall(_.scope == fixedDoc.documentElement.scope)
     }
 
     assertResult(resolved.Elem.from(doc.documentElement)) {

@@ -21,8 +21,7 @@ import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.indexed.IndexedClarkElem
 import eu.cdevreeze.yaidom.queryapitests.AbstractIndexedElemLikeQueryTest
 import eu.cdevreeze.yaidom.resolved.Elem
-import eu.cdevreeze.yaidom.simple.ElemBuilder
-import eu.cdevreeze.yaidom.simple.NodeBuilder
+import eu.cdevreeze.yaidom.simple
 
 /**
  * Query test case for resolved Elems wrapped in an IndexedClarkElem.
@@ -33,149 +32,200 @@ class IndexedElemQueryTest extends AbstractIndexedElemLikeQueryTest {
 
   final type U = Elem
 
-  private val book1Builder: ElemBuilder = {
-    import NodeBuilder._
+  private val book1Builder: simple.Elem = {
+    import simple.Node._
 
     elem(
       qname = QName("Book"),
       attributes = Vector(QName("ISBN") -> "ISBN-0-13-713526-2", QName("Price") -> "85", QName("Edition") -> "3rd"),
+      scope = Scope.Empty,
       children = Vector(
-        textElem(QName("Title"), "A First Course in Database Systems"),
+        textElem(QName("Title"), Scope.Empty, "A First Course in Database Systems"),
         elem(
           qname = QName("Authors"),
+          scope = Scope.Empty,
           children = Vector(
             elem(
               qname = QName("Author"),
+              scope = Scope.Empty,
               children = Vector(
-                textElem(QName("First_Name"), "Jeffrey"),
-                textElem(QName("Last_Name"), "Ullman"))),
+                textElem(QName("First_Name"), Scope.Empty, "Jeffrey"),
+                textElem(QName("Last_Name"), Scope.Empty, "Ullman"))
+            ),
             elem(
               qname = QName("Author"),
+              scope = Scope.Empty,
               children = Vector(
-                textElem(QName("First_Name"), "Jennifer"),
-                textElem(QName("Last_Name"), "Widom")))))))
+                textElem(QName("First_Name"), Scope.Empty, "Jennifer"),
+                textElem(QName("Last_Name"), Scope.Empty, "Widom"))
+            )
+          )
+        )
+      )
+    )
   }
 
-  private val book2Builder: ElemBuilder = {
-    import NodeBuilder._
+  private val book2Builder: simple.Elem = {
+    import simple.Node._
 
     elem(
       qname = QName("Book"),
       attributes = Vector(QName("ISBN") -> "ISBN-0-13-815504-6", QName("Price") -> "100"),
+      scope = Scope.Empty,
       children = Vector(
-        textElem(QName("Title"), "Database Systems: The Complete Book"),
+        textElem(QName("Title"), Scope.Empty, "Database Systems: The Complete Book"),
         elem(
           qname = QName("Authors"),
+          scope = Scope.Empty,
           children = Vector(
             elem(
               qname = QName("Author"),
+              scope = Scope.Empty,
               children = Vector(
-                textElem(QName("First_Name"), "Hector"),
-                textElem(QName("Last_Name"), "Garcia-Molina"))),
+                textElem(QName("First_Name"), Scope.Empty, "Hector"),
+                textElem(QName("Last_Name"), Scope.Empty, "Garcia-Molina"))
+            ),
             elem(
               qname = QName("Author"),
+              scope = Scope.Empty,
               children = Vector(
-                textElem(QName("First_Name"), "Jeffrey"),
-                textElem(QName("Last_Name"), "Ullman"))),
+                textElem(QName("First_Name"), Scope.Empty, "Jeffrey"),
+                textElem(QName("Last_Name"), Scope.Empty, "Ullman"))
+            ),
             elem(
               qname = QName("Author"),
+              scope = Scope.Empty,
               children = Vector(
-                textElem(QName("First_Name"), "Jennifer"),
-                textElem(QName("Last_Name"), "Widom"))))),
-        textElem(QName("Remark"), "Buy this book bundled with \"A First Course\" - a great deal!")))
+                textElem(QName("First_Name"), Scope.Empty, "Jennifer"),
+                textElem(QName("Last_Name"), Scope.Empty, "Widom"))
+            )
+          )
+        ),
+        textElem(QName("Remark"), Scope.Empty, "Buy this book bundled with \"A First Course\" - a great deal!")
+      )
+    )
   }
 
-  private val book3Builder: ElemBuilder = {
-    import NodeBuilder._
+  private val book3Builder: simple.Elem = {
+    import simple.Node._
 
     elem(
       qname = QName("Book"),
       attributes = Vector(QName("ISBN") -> "ISBN-0-11-222222-3", QName("Price") -> "50"),
+      scope = Scope.Empty,
       children = Vector(
-        textElem(QName("Title"), "Hector and Jeff's Database Hints"),
+        textElem(QName("Title"), Scope.Empty, "Hector and Jeff's Database Hints"),
         elem(
           qname = QName("Authors"),
+          scope = Scope.Empty,
           children = Vector(
             elem(
               qname = QName("Author"),
+              scope = Scope.Empty,
               children = Vector(
-                textElem(QName("First_Name"), "Jeffrey"),
-                textElem(QName("Last_Name"), "Ullman"))),
+                textElem(QName("First_Name"), Scope.Empty, "Jeffrey"),
+                textElem(QName("Last_Name"), Scope.Empty, "Ullman"))
+            ),
             elem(
               qname = QName("Author"),
+              scope = Scope.Empty,
               children = Vector(
-                textElem(QName("First_Name"), "Hector"),
-                textElem(QName("Last_Name"), "Garcia-Molina"))))),
-        textElem(QName("Remark"), "An indispensable companion to your textbook")))
+                textElem(QName("First_Name"), Scope.Empty, "Hector"),
+                textElem(QName("Last_Name"), Scope.Empty, "Garcia-Molina"))
+            )
+          )
+        ),
+        textElem(QName("Remark"), Scope.Empty, "An indispensable companion to your textbook")
+      )
+    )
   }
 
-  private val book4Builder: ElemBuilder = {
-    import NodeBuilder._
+  private val book4Builder: simple.Elem = {
+    import simple.Node._
 
     elem(
       qname = QName("Book"),
       attributes = Vector(QName("ISBN") -> "ISBN-9-88-777777-6", QName("Price") -> "25"),
+      scope = Scope.Empty,
       children = Vector(
-        textElem(QName("Title"), "Jennifer's Economical Database Hints"),
+        textElem(QName("Title"), Scope.Empty, "Jennifer's Economical Database Hints"),
         elem(
           qname = QName("Authors"),
+          scope = Scope.Empty,
           children = Vector(
             elem(
               qname = QName("Author"),
+              scope = Scope.Empty,
               children = Vector(
-                textElem(QName("First_Name"), "Jennifer"),
-                textElem(QName("Last_Name"), "Widom")))))))
+                textElem(QName("First_Name"), Scope.Empty, "Jennifer"),
+                textElem(QName("Last_Name"), Scope.Empty, "Widom"))
+            ))
+        )
+      )
+    )
   }
 
-  private val magazine1Builder: ElemBuilder = {
-    import NodeBuilder._
+  private val magazine1Builder: simple.Elem = {
+    import simple.Node._
 
     elem(
       qname = QName("Magazine"),
       attributes = Vector(QName("Month") -> "January", QName("Year") -> "2009"),
-      children = Vector(
-        textElem(QName("Title"), "National Geographic")))
+      scope = Scope.Empty,
+      children = Vector(textElem(QName("Title"), Scope.Empty, "National Geographic"))
+    )
   }
 
-  private val magazine2Builder: ElemBuilder = {
-    import NodeBuilder._
+  private val magazine2Builder: simple.Elem = {
+    import simple.Node._
 
     elem(
       qname = QName("Magazine"),
       attributes = Vector(QName("Month") -> "February", QName("Year") -> "2009"),
-      children = Vector(
-        textElem(QName("Title"), "National Geographic")))
+      scope = Scope.Empty,
+      children = Vector(textElem(QName("Title"), Scope.Empty, "National Geographic"))
+    )
   }
 
-  private val magazine3Builder: ElemBuilder = {
-    import NodeBuilder._
+  private val magazine3Builder: simple.Elem = {
+    import simple.Node._
 
     elem(
       qname = QName("Magazine"),
       attributes = Vector(QName("Month") -> "February", QName("Year") -> "2009"),
-      children = Vector(
-        textElem(QName("Title"), "Newsweek")))
+      scope = Scope.Empty,
+      children = Vector(textElem(QName("Title"), Scope.Empty, "Newsweek"))
+    )
   }
 
-  private val magazine4Builder: ElemBuilder = {
-    import NodeBuilder._
+  private val magazine4Builder: simple.Elem = {
+    import simple.Node._
 
     elem(
       qname = QName("Magazine"),
       attributes = Vector(QName("Month") -> "March", QName("Year") -> "2009"),
-      children = Vector(
-        textElem(QName("Title"), "Hector and Jeff's Database Hints")))
+      scope = Scope.Empty,
+      children = Vector(textElem(QName("Title"), Scope.Empty, "Hector and Jeff's Database Hints"))
+    )
   }
 
   protected final val bookstore: E = {
-    import NodeBuilder._
+    import simple.Node._
 
     val result =
       elem(
         qname = QName("Bookstore"),
+        scope = Scope.Empty,
         children = Vector(
-          book1Builder, book2Builder, book3Builder, book4Builder,
-          magazine1Builder, magazine2Builder, magazine3Builder, magazine4Builder)).build(Scope.Empty)
+          book1Builder,
+          book2Builder,
+          book3Builder,
+          book4Builder,
+          magazine1Builder,
+          magazine2Builder,
+          magazine3Builder,
+          magazine4Builder)
+      )
 
     IndexedClarkElem(Elem.from(result))
   }

@@ -20,9 +20,7 @@ import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.simple.Elem
-import eu.cdevreeze.yaidom.simple.ElemBuilder
 import eu.cdevreeze.yaidom.simple.Node
-import eu.cdevreeze.yaidom.simple.NodeBuilder
 import org.scalatest.funsuite.AnyFunSuite
 
 /**
@@ -39,29 +37,37 @@ class TransformTest extends AnyFunSuite {
 
     val scope = Scope.Empty
 
-    import NodeBuilder._
+    import Node._
+
+    val emptyScope: Scope = Scope.Empty
 
     def fooIdBits(i: Int): Iterator[Elem] = {
       Iterator.from(i).map { idx =>
-        val currentFooBuilder =
+        val currentFoo =
           elem(
             QName("foo"),
             Vector(QName("id") -> idx.toString),
+            emptyScope,
             Vector(
               elem(
                 QName("bar"),
                 Vector(QName("id") -> "0"),
+                emptyScope,
                 Vector(
                   elem(
                     QName("baz"),
                     Vector(QName("id") -> "0", QName("blah") -> "blah", QName("etc") -> "etc"),
-                    Vector(
-                      emptyElem(QName("buz"), Vector(QName("id") -> "0")))),
+                    emptyScope,
+                    Vector(emptyElem(QName("buz"), Vector(QName("id") -> "0"), emptyScope))
+                  ),
                   emptyElem(
                     QName("buz"),
-                    Vector(QName("id") -> "0", QName("blah") -> "blah", QName("etc") -> "etc"))))))
+                    Vector(QName("id") -> "0", QName("blah") -> "blah", QName("etc") -> "etc"),
+                    emptyScope)
+                )
+              ))
+          )
 
-        val currentFoo = currentFooBuilder.build(Scope.Empty)
         currentFoo
       }
     }
@@ -71,7 +77,9 @@ class TransformTest extends AnyFunSuite {
     def updateId(elem: Elem): Elem = {
       require(elem.localName == "foo")
       val id = elem.attribute(EName("id")).toInt
-      elem transformElems { e => e.plusAttribute(QName("id"), id.toString) }
+      elem.transformElems { e =>
+        e.plusAttribute(QName("id"), id.toString)
+      }
     }
 
     val updatedFooIdElem = fooIdElem.transformChildElems(e => updateId(e))
@@ -86,18 +94,17 @@ class TransformTest extends AnyFunSuite {
   test("testTransformAttributeValues") {
     // See http://stackoverflow.com/questions/2569580/how-to-change-attribute-on-scala-xml-element/2581712#2581712.
 
-    val scope = Scope.Empty
+    import Node._
 
-    import NodeBuilder._
-
-    def b(attr1Value: Int, attr2Value: Int): ElemBuilder = {
-      emptyElem(QName("b"), Vector(QName("attr1") -> attr1Value.toString, QName("attr2") -> attr2Value.toString))
+    def b(attr1Value: Int, attr2Value: Int): Elem = {
+      emptyElem(
+        QName("b"),
+        Vector(QName("attr1") -> attr1Value.toString, QName("attr2") -> attr2Value.toString),
+        Scope.Empty)
     }
 
     val a =
-      elem(
-        QName("a"),
-        Vector(b(100, 50), b(300, 40), b(20, 50))).build(scope)
+      elem(QName("a"), Scope.Empty, Vector(b(100, 50), b(300, 40), b(20, 50)))
 
     def doubleAttributes(elem: Elem): Elem = {
       require(elem.localName == "b")

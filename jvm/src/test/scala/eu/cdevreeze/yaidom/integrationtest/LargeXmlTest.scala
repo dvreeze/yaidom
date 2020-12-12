@@ -37,7 +37,6 @@ import eu.cdevreeze.yaidom.queryapi.ClarkElemApi._
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.saxon.SaxonElem
 import eu.cdevreeze.yaidom.scalaxml.ScalaXmlElem
-import eu.cdevreeze.yaidom.simple.DocBuilder
 import eu.cdevreeze.yaidom.simple.Document
 import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.simple.Text
@@ -72,7 +71,7 @@ class LargeXmlTest extends AnyFunSuite with BeforeAndAfterAll {
     val zipFile = new jutil.zip.ZipFile(new jio.File(zipFileUrl.toURI))
 
     val zipEntries = zipFile.entries()
-    require(zipEntries.hasMoreElements())
+    require(zipEntries.hasMoreElements)
 
     val zipEntry: jutil.zip.ZipEntry = zipEntries.nextElement()
 
@@ -80,7 +79,7 @@ class LargeXmlTest extends AnyFunSuite with BeforeAndAfterAll {
 
     val bos = new jio.ByteArrayOutputStream
     var b: Int = -1
-    while ( {
+    while ({
       b = is.read(); b >= 0
     }) {
       bos.write(b)
@@ -89,7 +88,7 @@ class LargeXmlTest extends AnyFunSuite with BeforeAndAfterAll {
 
     val xmlBytes = bos.toByteArray
 
-    val docParser = DocumentParserUsingSax.newInstance
+    val docParser = DocumentParserUsingSax.newInstance()
     this.doc = docParser.parse(new jio.ByteArrayInputStream(xmlBytes))
   }
 
@@ -105,10 +104,10 @@ class LargeXmlTest extends AnyFunSuite with BeforeAndAfterAll {
     // for a workaround. Yet that workaround causes the linter to complain about unused imports.
     // Let's not bother for now, especially because this test method is ignored anyway.
 
-    for (i <- (0 until 200)) {
+    for (i <- 0 until 200) {
       logger.info(s"Queried Document (run ${i + 1}) in thread ${Thread.currentThread.getName}")
 
-      (i % 5) match {
+      i % 5 match {
         case 0 =>
           val firstNameElms = doc.documentElement.filterElems(FirstNameEName)
           logger.info(s"Number of first names: ${firstNameElms.size}. Thread ${Thread.currentThread.getName}")
@@ -120,7 +119,7 @@ class LargeXmlTest extends AnyFunSuite with BeforeAndAfterAll {
           logger.info(s"Number of contacts: ${contactElms.size}. Thread ${Thread.currentThread.getName}")
         case 3 =>
           val emails = {
-            val result = doc.documentElement.findAllElemsOrSelf collect {
+            val result = doc.documentElement.findAllElemsOrSelf.collect {
               case e if e.resolvedName == EmailEName => e.trimmedText
             }
             result.toSet
@@ -179,7 +178,11 @@ class LargeXmlTest extends AnyFunSuite with BeforeAndAfterAll {
     logger.info(s"[testPrettify] Calling prettify took ${endMs - startMs} ms")
 
     assertResult(List(1, 4, 7)) {
-      prettifiedElem.findAllElemsOrSelf.flatMap(_.textChildren.filter(_.text.trim.isEmpty)).distinct.map(_.text.size).sorted
+      prettifiedElem.findAllElemsOrSelf
+        .flatMap(_.textChildren.filter(_.text.trim.isEmpty))
+        .distinct
+        .map(_.text.length)
+        .sorted
     }
 
     doQueryTest(doc.documentElement, "testPrettify: simple.Elem")
@@ -203,7 +206,7 @@ class LargeXmlTest extends AnyFunSuite with BeforeAndAfterAll {
   ignore("testSerializeLargeNodeBuilder") {
     val startMs2 = System.currentTimeMillis()
 
-    val docBuilder = DocBuilder.fromDocument(doc)
+    val docBuilder = doc
     val bos = new jio.ByteArrayOutputStream
     val oos = new jio.ObjectOutputStream(bos)
 
@@ -219,8 +222,8 @@ class LargeXmlTest extends AnyFunSuite with BeforeAndAfterAll {
     val bis = new jio.ByteArrayInputStream(objectBytes)
     val ois = new jio.ObjectInputStream(bis)
 
-    val doc2Builder = ois.readObject().asInstanceOf[DocBuilder]
-    val doc2 = doc2Builder.build()
+    val doc2Builder = ois.readObject().asInstanceOf[Document]
+    val doc2 = doc2Builder
 
     val endMs3 = System.currentTimeMillis()
     logger.info(s"[testSerializeLargeNodeBuilder] Deserializing took ${endMs3 - startMs3} ms")
@@ -260,30 +263,46 @@ class LargeXmlTest extends AnyFunSuite with BeforeAndAfterAll {
     assert(allElms.size >= 100000, "Expected at least 100000 elements in the XML")
 
     assertResult(true) {
-      val phoneElms = (rootElm \\ (_.localName == "phone")) filter { e => e.text.size == 1000 }
+      val phoneElms = (rootElm \\ (_.localName == "phone")).filter { e =>
+        e.text.length == 1000
+      }
       phoneElms.size < 4000
     }
     assertResult(true) {
-      val phoneElms = (rootElm \\ (_.localName == "phone")) filter { e => e.text.size == 2046 }
+      val phoneElms = (rootElm \\ (_.localName == "phone")).filter { e =>
+        e.text.length == 2046
+      }
       phoneElms.size > 15000
     }
 
-    val s = "b" * (1000)
+    val s = "b" * 1000
 
     // Note: Do not take the durations logged below too literally. This is not a properly set up performance test in any way!
 
-    rootElm findElemOrSelf { e => e.resolvedName == EName("phone") && e.trimmedText == s }
-    rootElm findElem { e => e.resolvedName == EName("phone") && e.trimmedText == s }
-    (rootElm findTopmostElemsOrSelf { e => e.resolvedName == EName("phone") && e.trimmedText == s }).headOption
-    (rootElm \\ { e => e.resolvedName == EName("phone") && e.trimmedText == s }).headOption
-    (rootElm.findAllElemsOrSelf filter { e => e.resolvedName == EName("phone") && e.trimmedText == s }).headOption
+    rootElm.findElemOrSelf { e =>
+      e.resolvedName == EName("phone") && e.trimmedText == s
+    }
+    rootElm.findElem { e =>
+      e.resolvedName == EName("phone") && e.trimmedText == s
+    }
+    rootElm.findTopmostElemsOrSelf { e =>
+      e.resolvedName == EName("phone") && e.trimmedText == s
+    }.headOption
+    (rootElm \\ { e =>
+      e.resolvedName == EName("phone") && e.trimmedText == s
+    }).headOption
+    rootElm.findAllElemsOrSelf.find { e =>
+      e.resolvedName == EName("phone") && e.trimmedText == s
+    }
 
     // Finding the fast way
     val start2Ms = System.currentTimeMillis()
 
     {
-      val result = rootElm findElemOrSelf { e => e.resolvedName == EName("phone") && e.trimmedText == s }
-      result.getOrElse(sys.error(s"Expected at least one phone element with text value '${s}'"))
+      val result = rootElm.findElemOrSelf { e =>
+        e.resolvedName == EName("phone") && e.trimmedText == s
+      }
+      result.getOrElse(sys.error(s"Expected at least one phone element with text value '$s'"))
     }
     val end2Ms = System.currentTimeMillis()
     logger.info(s"Finding an element the fast way (using findElemOrSelf) took ${end2Ms - start2Ms} ms")
@@ -292,8 +311,10 @@ class LargeXmlTest extends AnyFunSuite with BeforeAndAfterAll {
     val start3Ms = System.currentTimeMillis()
 
     {
-      val result = rootElm findElem { e => e.resolvedName == EName("phone") && e.trimmedText == s }
-      result.getOrElse(sys.error(s"Expected at least one phone element with text value '${s}'"))
+      val result = rootElm.findElem { e =>
+        e.resolvedName == EName("phone") && e.trimmedText == s
+      }
+      result.getOrElse(sys.error(s"Expected at least one phone element with text value '$s'"))
     }
     val end3Ms = System.currentTimeMillis()
     logger.info(s"Finding an element the fast way (using findElem) took ${end3Ms - start3Ms} ms")
@@ -302,8 +323,10 @@ class LargeXmlTest extends AnyFunSuite with BeforeAndAfterAll {
     val start4Ms = System.currentTimeMillis()
 
     {
-      val result = rootElm findTopmostElemsOrSelf { e => e.resolvedName == EName("phone") && e.trimmedText == s }
-      result.headOption.getOrElse(sys.error(s"Expected at least one phone element with text value '${s}'"))
+      val result = rootElm.findTopmostElemsOrSelf { e =>
+        e.resolvedName == EName("phone") && e.trimmedText == s
+      }
+      result.headOption.getOrElse(sys.error(s"Expected at least one phone element with text value '$s'"))
     }
     val end4Ms = System.currentTimeMillis()
     logger.info(s"Finding an element the slower way (using findTopmostElemsOrSelf) took ${end4Ms - start4Ms} ms")
@@ -312,21 +335,27 @@ class LargeXmlTest extends AnyFunSuite with BeforeAndAfterAll {
     val start5Ms = System.currentTimeMillis()
 
     {
-      val result = rootElm filterElemsOrSelf { e => e.resolvedName == EName("phone") && e.trimmedText == s }
-      result.headOption.getOrElse(sys.error(s"Expected at least one phone element with text value '${s}'"))
+      val result = rootElm.filterElemsOrSelf { e =>
+        e.resolvedName == EName("phone") && e.trimmedText == s
+      }
+      result.headOption.getOrElse(sys.error(s"Expected at least one phone element with text value '$s'"))
     }
     val end5Ms = System.currentTimeMillis()
-    logger.info(s"Finding an element the (theoretically) still slower way (using filterElemsOrSelf) took ${end5Ms - start5Ms} ms")
+    logger.info(
+      s"Finding an element the (theoretically) still slower way (using filterElemsOrSelf) took ${end5Ms - start5Ms} ms")
 
     // Finding the slowest way (in theory)
     val start6Ms = System.currentTimeMillis()
 
     {
-      val result = rootElm.findAllElemsOrSelf filter { e => e.resolvedName == EName("phone") && e.trimmedText == s }
-      result.headOption.getOrElse(sys.error(s"Expected at least one phone element with text value '${s}'"))
+      val result = rootElm.findAllElemsOrSelf.filter { e =>
+        e.resolvedName == EName("phone") && e.trimmedText == s
+      }
+      result.headOption.getOrElse(sys.error(s"Expected at least one phone element with text value '$s'"))
     }
     val end6Ms = System.currentTimeMillis()
-    logger.info(s"Finding an element the (theoretically) slowest way (using findAllElemsOrSelf) took ${end6Ms - start6Ms} ms")
+    logger.info(
+      s"Finding an element the (theoretically) slowest way (using findAllElemsOrSelf) took ${end6Ms - start6Ms} ms")
   }
 
   test("testUpdate") {
@@ -338,7 +367,8 @@ class LargeXmlTest extends AnyFunSuite with BeforeAndAfterAll {
 
     val newPhone = "012-34567890"
 
-    val oldPhoneElm: Elem = doc.documentElement.findElemOrSelfByPath(path).getOrElse(sys.error("Expected element at path: " + path))
+    val oldPhoneElm: Elem =
+      doc.documentElement.findElemOrSelfByPath(path).getOrElse(sys.error("Expected element at path: " + path))
 
     assertResult(false) {
       oldPhoneElm.text == newPhone
@@ -348,12 +378,13 @@ class LargeXmlTest extends AnyFunSuite with BeforeAndAfterAll {
 
     val start2Ms = System.currentTimeMillis()
     val updatedDoc: Document = doc.updateElemOrSelf(path) { e =>
-      e.withChildren(Vector(Text(newPhone, false)))
+      e.withChildren(Vector(Text(newPhone, isCData = false)))
     }
     val end2Ms = System.currentTimeMillis()
     logger.info(s"Updating an element in the document took ${end2Ms - start2Ms} ms")
 
-    val newPhoneElm: Elem = updatedDoc.documentElement.findElemOrSelfByPath(path).getOrElse(sys.error("Expected element at path: " + path))
+    val newPhoneElm: Elem =
+      updatedDoc.documentElement.findElemOrSelfByPath(path).getOrElse(sys.error("Expected element at path: " + path))
 
     assertResult(true) {
       newPhoneElm.text == newPhone
@@ -393,7 +424,8 @@ class LargeXmlTest extends AnyFunSuite with BeforeAndAfterAll {
 
     val newPhone = "012-34567890"
 
-    val oldPhoneElm: Elem = doc.documentElement.findElemOrSelfByPath(path).getOrElse(sys.error("Expected element at path: " + path))
+    val oldPhoneElm: Elem =
+      doc.documentElement.findElemOrSelfByPath(path).getOrElse(sys.error("Expected element at path: " + path))
 
     assertResult(false) {
       oldPhoneElm.text == newPhone
@@ -403,13 +435,14 @@ class LargeXmlTest extends AnyFunSuite with BeforeAndAfterAll {
 
     val start2Ms = System.currentTimeMillis()
     val updatedDoc: Document = doc.updateElemsOrSelf(paths) { (e, p) =>
-      if (p == path) e.withChildren(Vector(Text(newPhone, false)))
+      if (p == path) e.withChildren(Vector(Text(newPhone, isCData = false)))
       else e
     }
     val end2Ms = System.currentTimeMillis()
     logger.info(s"Updating an element in the document (using paths) took ${end2Ms - start2Ms} ms")
 
-    val newPhoneElm: Elem = updatedDoc.documentElement.findElemOrSelfByPath(path).getOrElse(sys.error("Expected element at path: " + path))
+    val newPhoneElm: Elem =
+      updatedDoc.documentElement.findElemOrSelfByPath(path).getOrElse(sys.error("Expected element at path: " + path))
 
     assertResult(true) {
       newPhoneElm.text == newPhone
@@ -448,7 +481,8 @@ class LargeXmlTest extends AnyFunSuite with BeforeAndAfterAll {
 
     val newPhone = "012-34567890"
 
-    val oldPhoneElm: Elem = doc.documentElement.findElemOrSelfByPath(path).getOrElse(sys.error("Expected element at path: " + path))
+    val oldPhoneElm: Elem =
+      doc.documentElement.findElemOrSelfByPath(path).getOrElse(sys.error("Expected element at path: " + path))
 
     assertResult(false) {
       oldPhoneElm.text == newPhone
@@ -464,7 +498,8 @@ class LargeXmlTest extends AnyFunSuite with BeforeAndAfterAll {
 
     val newPhone = "012-34567890"
 
-    val oldPhoneElm: Elem = doc.documentElement.findElemOrSelfByPath(path).getOrElse(sys.error("Expected element at path: " + path))
+    val oldPhoneElm: Elem =
+      doc.documentElement.findElemOrSelfByPath(path).getOrElse(sys.error("Expected element at path: " + path))
 
     assertResult(false) {
       oldPhoneElm.text == newPhone
@@ -476,16 +511,18 @@ class LargeXmlTest extends AnyFunSuite with BeforeAndAfterAll {
 
     def doUpdate(e: Elem): Elem = e match {
       case e if (e.localName == "phone") && (e.text == oldPhoneElm.text) =>
-        e.withChildren(Vector(Text(newPhone, false)))
+        e.withChildren(Vector(Text(newPhone, isCData = false)))
       case e => e
     }
 
-    var updatedDoc: Document = doc.transformElemsOrSelf(doUpdate _)
+    var updatedDoc: Document = doc.transformElemsOrSelf(doUpdate)
 
     val end2Ms = System.currentTimeMillis()
-    logger.info(s"Transforming an element in the document (using method transformElemsOrSelf) took ${end2Ms - start2Ms} ms")
+    logger.info(
+      s"Transforming an element in the document (using method transformElemsOrSelf) took ${end2Ms - start2Ms} ms")
 
-    var newPhoneElm: Elem = updatedDoc.documentElement.findElemOrSelfByPath(path).getOrElse(sys.error("Expected element at path: " + path))
+    var newPhoneElm: Elem =
+      updatedDoc.documentElement.findElemOrSelfByPath(path).getOrElse(sys.error("Expected element at path: " + path))
 
     assertResult(newPhone) {
       newPhoneElm.text
@@ -496,9 +533,11 @@ class LargeXmlTest extends AnyFunSuite with BeforeAndAfterAll {
     updatedDoc = doc.transformElemsToNodeSeq(e => Vector(doUpdate(e)))
 
     val end3Ms = System.currentTimeMillis()
-    logger.info(s"Transforming an element in the document (using method transformElemsToNodeSeq) took ${end3Ms - start3Ms} ms")
+    logger.info(
+      s"Transforming an element in the document (using method transformElemsToNodeSeq) took ${end3Ms - start3Ms} ms")
 
-    newPhoneElm = updatedDoc.documentElement.findElemOrSelfByPath(path).getOrElse(sys.error("Expected element at path: " + path))
+    newPhoneElm =
+      updatedDoc.documentElement.findElemOrSelfByPath(path).getOrElse(sys.error("Expected element at path: " + path))
 
     assertResult(newPhone) {
       newPhoneElm.text
@@ -542,17 +581,23 @@ class LargeXmlTest extends AnyFunSuite with BeforeAndAfterAll {
 
     assert(elm.findAllElemsOrSelf.size >= 100000, "Expected at least 100000 elements in the XML")
 
-    assertResult(Set(EName("contacts"), EName("contact"), EName("firstName"), EName("lastName"), EName("email"), EName("phone"))) {
-      val result = elm.findAllElemsOrSelf map { e => e.resolvedName }
+    assertResult(
+      Set(EName("contacts"), EName("contact"), EName("firstName"), EName("lastName"), EName("email"), EName("phone"))) {
+      val result = elm.findAllElemsOrSelf.map { e =>
+        e.resolvedName
+      }
       result.toSet
     }
 
     val s = "b" * (2000 + 46)
-    val elms1 = elm \\ { e => e.resolvedName == EName("phone") && e.trimmedText == s }
-    assert(elms1.size >= 1, s"Expected at least one phone element with text value '${s}'")
+    val elms1 = elm \\ { e =>
+      e.resolvedName == EName("phone") && e.trimmedText == s
+    }
+    assert(elms1.nonEmpty, s"Expected at least one phone element with text value '$s'")
 
     val endMs = System.currentTimeMillis()
-    logger.info(s"The test (invoking findAllElemsOrSelf twice, and filterElemsOrSelf once) took ${endMs - startMs} ms ($msg)")
+    logger.info(
+      s"The test (invoking findAllElemsOrSelf twice, and filterElemsOrSelf once) took ${endMs - startMs} ms ($msg)")
   }
 
   private def doNavigationTest[E <: ClarkElemApi.Aux[E]](elm: E, msg: String): Unit = {

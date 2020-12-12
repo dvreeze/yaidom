@@ -18,8 +18,6 @@ package eu.cdevreeze.yaidom.integrationtest
 
 import java.{io => jio}
 
-import scala.xml.NodeSeq.seqToNodeSeq
-
 import eu.cdevreeze.yaidom.convert.ScalaXmlConversions
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
@@ -28,17 +26,17 @@ import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingDomLS
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingStax
-import eu.cdevreeze.yaidom.queryapi.ClarkElemApi.withEName
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.scalaxml.ScalaXmlElem
 import eu.cdevreeze.yaidom.simple.Node
-import eu.cdevreeze.yaidom.simple.NodeBuilder
 import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.parsers.SAXParserFactory
 import org.scalatest.funsuite.AnyFunSuite
 import org.w3c.dom.DOMException
 import org.xml.sax.InputSource
 import org.xml.sax.SAXParseException
+
+import scala.xml.NodeSeq.seqToNodeSeq
 
 /**
  * Test case showing why preferring yaidom over the standard Scala XML library makes sense.
@@ -97,7 +95,7 @@ class TheCaseForYaidomTest extends AnyFunSuite {
    * Tries to parse the XML into a yaidom Elem (via SAX), but fails, as expected.
    */
   test("testTryParsingWrongXmlViaSax") {
-    val parser = DocumentParserUsingSax.newInstance
+    val parser = DocumentParserUsingSax.newInstance()
 
     intercept[SAXParseException] {
       parser.parse(new InputSource(new jio.StringReader(wrongXml)))
@@ -108,7 +106,7 @@ class TheCaseForYaidomTest extends AnyFunSuite {
    * Tries to parse the XML into a yaidom Elem (via StAX), but fails, as expected.
    */
   test("testTryParsingWrongXmlViaStax") {
-    val parser = DocumentParserUsingStax.newInstance
+    val parser = DocumentParserUsingStax.newInstance()
 
     intercept[Exception] {
       parser.parse(new InputSource(new jio.StringReader(wrongXml)))
@@ -119,7 +117,7 @@ class TheCaseForYaidomTest extends AnyFunSuite {
    * Tries to parse the XML into a yaidom Elem (via DOM), but fails, as expected.
    */
   test("testTryParsingWrongXmlViaDom") {
-    val parser = DocumentParserUsingDom.newInstance
+    val parser = DocumentParserUsingDom.newInstance()
 
     intercept[SAXParseException] {
       parser.parse(new InputSource(new jio.StringReader(wrongXml)))
@@ -130,7 +128,7 @@ class TheCaseForYaidomTest extends AnyFunSuite {
    * Tries to parse the XML into a yaidom Elem (via DOM LS), but fails, as expected.
    */
   test("testTryParsingWrongXmlViaDomLS") {
-    val parser = DocumentParserUsingDomLS.newInstance
+    val parser = DocumentParserUsingDomLS.newInstance()
 
     intercept[RuntimeException] {
       parser.parse(new InputSource(new jio.StringReader(wrongXml)))
@@ -185,19 +183,23 @@ class TheCaseForYaidomTest extends AnyFunSuite {
    * for expanded names.
    */
   test("testCreateElemBuilderForWrongXml") {
-    import NodeBuilder._
+    import Node._
 
-    val elemBuilder =
-      elem(QName("root"), Vector(emptyElem(QName("prefix:element"))))
+    val elemBuilderTry =
+      scala.util.Try(elem(QName("root"), Scope.Empty, Vector(emptyElem(QName("prefix:element"), Scope.Empty))))
 
     assertResult(false) {
-      elemBuilder.canBuild(Scope.Empty)
+      elemBuilderTry.toOption.nonEmpty
     }
 
     val ns = "http://namespace"
+    val sc: Scope = Scope.from("prefix" -> ns)
+
+    val elemBuilder2Try =
+      scala.util.Try(elem(QName("root"), sc, Vector(emptyElem(QName("prefix:element"), sc))))
 
     assertResult(true) {
-      elemBuilder.canBuild(Scope.from("prefix" -> ns))
+      elemBuilder2Try.toOption.nonEmpty
     }
   }
 
@@ -209,53 +211,7 @@ class TheCaseForYaidomTest extends AnyFunSuite {
     import Node._
 
     intercept[RuntimeException] {
-      elem(
-        QName("root"),
-        Scope.Empty,
-        Vector(emptyElem(QName("prefix:element"), Scope.Empty)))
-    }
-  }
-
-  /**
-   * Tries to convert an ElemBuilder for the XML into an Elem, this time passing the
-   * correct parent scope. This succeeds, as expected, and so do the subsequent queries.
-   */
-  test("testQueryElemForFixedWrongXml") {
-    import NodeBuilder._
-
-    val elemBuilder =
-      elem(QName("root"), Vector(emptyElem(QName("prefix:element"))))
-
-    val ns = "http://namespace"
-
-    val elm = elemBuilder.build(Scope.from("prefix" -> ns))
-
-    val elemENames = elm.findAllElemsOrSelf.map(_.resolvedName)
-
-    assertResult(List(EName("root"), EName(ns, "element"))) {
-      elemENames
-    }
-
-    assertResult(elm.findAllElemsOrSelf) {
-      elm.filterElemsOrSelf(e => e.localName == "root" || e.localName == "element")
-    }
-
-    assertResult(List(elm)) {
-      elm.filterElemsOrSelf(withEName(None, "root"))
-    }
-    assertResult(Nil) {
-      elm.filterElemsOrSelf(withEName(ns, "root"))
-    }
-
-    assertResult(elm.findAllElems) {
-      elm.filterElemsOrSelf(withEName(ns, "element"))
-    }
-    assertResult(Nil) {
-      elm.filterElemsOrSelf(withEName(None, "element"))
-    }
-
-    assertResult(elm.findAllElemsOrSelf) {
-      elm.filterElemsOrSelf(e => e.resolvedName == EName("root") || e.resolvedName == EName(ns, "element"))
+      elem(QName("root"), Scope.Empty, Vector(emptyElem(QName("prefix:element"), Scope.Empty)))
     }
   }
 
@@ -363,7 +319,7 @@ class TheCaseForYaidomTest extends AnyFunSuite {
    * Tries to parse the 2nd XML into a yaidom Elem (via SAX), but fails, as expected.
    */
   test("testTryParsingWrongXml2ViaSax") {
-    val parser = DocumentParserUsingSax.newInstance
+    val parser = DocumentParserUsingSax.newInstance()
 
     intercept[SAXParseException] {
       parser.parse(new InputSource(new jio.StringReader(wrongXml2)))
@@ -374,7 +330,7 @@ class TheCaseForYaidomTest extends AnyFunSuite {
    * Tries to parse the 2nd XML into a yaidom Elem (via StAX), but fails, as expected.
    */
   test("testTryParsingWrongXml2ViaStax") {
-    val parser = DocumentParserUsingStax.newInstance
+    val parser = DocumentParserUsingStax.newInstance()
 
     intercept[Exception] {
       parser.parse(new InputSource(new jio.StringReader(wrongXml2)))
@@ -385,7 +341,7 @@ class TheCaseForYaidomTest extends AnyFunSuite {
    * Tries to parse the 2nd XML into a yaidom Elem (via DOM), but fails, as expected.
    */
   test("testTryParsingWrongXml2ViaDom") {
-    val parser = DocumentParserUsingDom.newInstance
+    val parser = DocumentParserUsingDom.newInstance()
 
     intercept[SAXParseException] {
       parser.parse(new InputSource(new jio.StringReader(wrongXml2)))
@@ -396,7 +352,7 @@ class TheCaseForYaidomTest extends AnyFunSuite {
    * Tries to parse the 2nd XML into a yaidom Elem (via DOM LS), but fails, as expected.
    */
   test("testTryParsingWrongXml2ViaDomLS") {
-    val parser = DocumentParserUsingDomLS.newInstance
+    val parser = DocumentParserUsingDomLS.newInstance()
 
     intercept[RuntimeException] {
       parser.parse(new InputSource(new jio.StringReader(wrongXml2)))
@@ -449,29 +405,29 @@ class TheCaseForYaidomTest extends AnyFunSuite {
    * for expanded names.
    */
   test("testCreateElemBuilderForWrongXml2") {
-    import NodeBuilder._
-
-    val elemBuilder =
-      emptyElem(
-        QName("link:linkbaseRef"),
-        Vector(
-          QName("xlink:arcrole") -> "http://www.w3.org/1999/xlink/properties/linkbase",
-          QName("xlink:href") -> "my-lab-en.xml",
-          QName("xlink:role") -> "http://www.xbrl.org/2003/role/labelLinkbaseRef",
-          QName("xlink:type") -> "simple"))
-
-    assertResult(false) {
-      elemBuilder.canBuild(Scope.Empty)
-    }
+    import Node._
 
     val nsXLink = "http://www.w3.org/1999/xlink"
     val nsLink = "http://www.xbrl.org/2003/linkbase"
 
-    assertResult(false) {
-      elemBuilder.canBuild(Scope.from("xlink" -> nsXLink))
-    }
+    val sc: Scope = Scope.from("xlink" -> nsXLink, "link" -> nsLink)
+
+    val elemBuilderTry =
+      scala.util.Try {
+        emptyElem(
+          QName("link:linkbaseRef"),
+          Vector(
+            QName("xlink:arcrole") -> "http://www.w3.org/1999/xlink/properties/linkbase",
+            QName("xlink:href") -> "my-lab-en.xml",
+            QName("xlink:role") -> "http://www.xbrl.org/2003/role/labelLinkbaseRef",
+            QName("xlink:type") -> "simple"
+          ),
+          sc
+        )
+      }
+
     assertResult(true) {
-      elemBuilder.canBuild(Scope.from("xlink" -> nsXLink, "link" -> nsLink))
+      elemBuilderTry.toOption.nonEmpty
     }
   }
 
@@ -489,8 +445,10 @@ class TheCaseForYaidomTest extends AnyFunSuite {
           QName("xlink:arcrole") -> "http://www.w3.org/1999/xlink/properties/linkbase",
           QName("xlink:href") -> "my-lab-en.xml",
           QName("xlink:role") -> "http://www.xbrl.org/2003/role/labelLinkbaseRef",
-          QName("xlink:type") -> "simple"),
-        Scope.Empty)
+          QName("xlink:type") -> "simple"
+        ),
+        Scope.Empty
+      )
     }
   }
 
@@ -499,21 +457,24 @@ class TheCaseForYaidomTest extends AnyFunSuite {
    * correct parent scope. This succeeds, as expected, and so do the subsequent queries.
    */
   test("testQueryElemForFixedWrongXml2") {
-    import NodeBuilder._
+    import Node._
 
-    val elemBuilder =
+    val nsXLink = "http://www.w3.org/1999/xlink"
+    val nsLink = "http://www.xbrl.org/2003/linkbase"
+
+    val sc: Scope = Scope.from("xlink" -> nsXLink, "link" -> nsLink)
+
+    val elm =
       emptyElem(
         QName("link:linkbaseRef"),
         Vector(
           QName("xlink:arcrole") -> "http://www.w3.org/1999/xlink/properties/linkbase",
           QName("xlink:href") -> "my-lab-en.xml",
           QName("xlink:role") -> "http://www.xbrl.org/2003/role/labelLinkbaseRef",
-          QName("xlink:type") -> "simple"))
-
-    val nsXLink = "http://www.w3.org/1999/xlink"
-    val nsLink = "http://www.xbrl.org/2003/linkbase"
-
-    val elm = elemBuilder.build(Scope.from("xlink" -> nsXLink, "link" -> nsLink))
+          QName("xlink:type") -> "simple"
+        ),
+        sc
+      )
 
     val elemENames = elm.findAllElemsOrSelf.map(_.resolvedName)
     val rootAttrENames = elm.resolvedAttributes.map(_._1)
@@ -521,7 +482,8 @@ class TheCaseForYaidomTest extends AnyFunSuite {
     assertResult(List(EName(nsLink, "linkbaseRef"))) {
       elemENames
     }
-    assertResult(List(EName(nsXLink, "arcrole"), EName(nsXLink, "href"), EName(nsXLink, "role"), EName(nsXLink, "type"))) {
+    assertResult(
+      List(EName(nsXLink, "arcrole"), EName(nsXLink, "href"), EName(nsXLink, "role"), EName(nsXLink, "type"))) {
       rootAttrENames
     }
 
@@ -541,7 +503,7 @@ class TheCaseForYaidomTest extends AnyFunSuite {
       <link:linkbaseRef xlink:arcrole="http://www.w3.org/1999/xlink/properties/linkbase" xlink:href="my-lab-en.xml" xlink:role="http://www.xbrl.org/2003/role/labelLinkbaseRef" xlink:type="simple"/>
 
     assertResult(true) {
-      scalaElem.child.size == 0
+      scalaElem.child.isEmpty
     }
   }
 
@@ -686,8 +648,10 @@ class TheCaseForYaidomTest extends AnyFunSuite {
           QName("xlink:arcrole") -> "http://www.w3.org/1999/xlink/properties/linkbase",
           QName("xlink:href") -> "my-lab-en.xml",
           QName("xlink:role") -> "http://www.xbrl.org/2003/role/labelLinkbaseRef",
-          QName("xlink:type") -> "simple"),
-        scope1)
+          QName("xlink:type") -> "simple"
+        ),
+        scope1
+      )
 
     val scope2 = Scope.from("xl" -> nsXLink, "lb" -> nsLink)
 
@@ -698,8 +662,10 @@ class TheCaseForYaidomTest extends AnyFunSuite {
           QName("xl:arcrole") -> "http://www.w3.org/1999/xlink/properties/linkbase",
           QName("xl:href") -> "my-lab-en.xml",
           QName("xl:role") -> "http://www.xbrl.org/2003/role/labelLinkbaseRef",
-          QName("xl:type") -> "simple"),
-        scope2)
+          QName("xl:type") -> "simple"
+        ),
+        scope2
+      )
 
     val scope3 = Scope.from("xl" -> nsXLink, "" -> nsLink)
 
@@ -710,8 +676,10 @@ class TheCaseForYaidomTest extends AnyFunSuite {
           QName("xl:arcrole") -> "http://www.w3.org/1999/xlink/properties/linkbase",
           QName("xl:href") -> "my-lab-en.xml",
           QName("xl:role") -> "http://www.xbrl.org/2003/role/labelLinkbaseRef",
-          QName("xl:type") -> "simple"),
-        scope3)
+          QName("xl:type") -> "simple"
+        ),
+        scope3
+      )
 
     assertResult(false) {
       elm1 == elm2

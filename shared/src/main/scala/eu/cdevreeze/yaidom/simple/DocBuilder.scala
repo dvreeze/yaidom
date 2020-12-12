@@ -34,6 +34,7 @@ import eu.cdevreeze.yaidom.queryapi.DocumentApi
  * @author Chris de Vreeze
  */
 @SerialVersionUID(1L)
+@deprecated(message = "Deprecated, without replacement", since = "1.12.0")
 final class DocBuilder(
     val uriOption: Option[URI],
     val xmlDeclarationOption: Option[XmlDeclaration],
@@ -78,6 +79,7 @@ final class DocBuilder(
   final override def toString: String = toTreeRepr()
 }
 
+@deprecated(message = "Deprecated, without replacement", since = "1.12.0")
 object DocBuilder {
 
   /**

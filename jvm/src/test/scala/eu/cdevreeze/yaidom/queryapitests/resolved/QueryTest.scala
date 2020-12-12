@@ -16,8 +16,6 @@
 
 package eu.cdevreeze.yaidom.queryapitests.resolved
 
-import scala.collection.immutable
-
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.core.QName
@@ -26,8 +24,9 @@ import eu.cdevreeze.yaidom.queryapi.ClarkElemApi._
 import eu.cdevreeze.yaidom.queryapitests.AbstractElemLikeQueryTest
 import eu.cdevreeze.yaidom.resolved.Elem
 import eu.cdevreeze.yaidom.resolved.Text
-import eu.cdevreeze.yaidom.simple.ElemBuilder
-import eu.cdevreeze.yaidom.simple.NodeBuilder
+import eu.cdevreeze.yaidom.simple
+
+import scala.collection.immutable
 
 /**
  * Query test case for resolved Elems.
@@ -38,6 +37,203 @@ class QueryTest extends AbstractElemLikeQueryTest {
 
   final type E = Elem
 
+  private val book1Builder: simple.Elem = {
+    import simple.Node._
+
+    elem(
+      qname = QName("Book"),
+      attributes = Vector(QName("ISBN") -> "ISBN-0-13-713526-2", QName("Price") -> "85", QName("Edition") -> "3rd"),
+      scope = Scope.Empty,
+      children = Vector(
+        textElem(QName("Title"), Scope.Empty, "A First Course in Database Systems"),
+        elem(
+          qname = QName("Authors"),
+          scope = Scope.Empty,
+          children = Vector(
+            elem(
+              qname = QName("Author"),
+              scope = Scope.Empty,
+              children = Vector(
+                textElem(QName("First_Name"), Scope.Empty, "Jeffrey"),
+                textElem(QName("Last_Name"), Scope.Empty, "Ullman"))
+            ),
+            elem(
+              qname = QName("Author"),
+              scope = Scope.Empty,
+              children = Vector(
+                textElem(QName("First_Name"), Scope.Empty, "Jennifer"),
+                textElem(QName("Last_Name"), Scope.Empty, "Widom"))
+            )
+          )
+        )
+      )
+    )
+  }
+
+  private val book2Builder: simple.Elem = {
+    import simple.Node._
+
+    elem(
+      qname = QName("Book"),
+      attributes = Vector(QName("ISBN") -> "ISBN-0-13-815504-6", QName("Price") -> "100"),
+      scope = Scope.Empty,
+      children = Vector(
+        textElem(QName("Title"), Scope.Empty, "Database Systems: The Complete Book"),
+        elem(
+          qname = QName("Authors"),
+          scope = Scope.Empty,
+          children = Vector(
+            elem(
+              qname = QName("Author"),
+              scope = Scope.Empty,
+              children = Vector(
+                textElem(QName("First_Name"), Scope.Empty, "Hector"),
+                textElem(QName("Last_Name"), Scope.Empty, "Garcia-Molina"))
+            ),
+            elem(
+              qname = QName("Author"),
+              scope = Scope.Empty,
+              children = Vector(
+                textElem(QName("First_Name"), Scope.Empty, "Jeffrey"),
+                textElem(QName("Last_Name"), Scope.Empty, "Ullman"))
+            ),
+            elem(
+              qname = QName("Author"),
+              scope = Scope.Empty,
+              children = Vector(
+                textElem(QName("First_Name"), Scope.Empty, "Jennifer"),
+                textElem(QName("Last_Name"), Scope.Empty, "Widom"))
+            )
+          )
+        ),
+        textElem(QName("Remark"), Scope.Empty, "Buy this book bundled with \"A First Course\" - a great deal!")
+      )
+    )
+  }
+
+  private val book3Builder: simple.Elem = {
+    import simple.Node._
+
+    elem(
+      qname = QName("Book"),
+      attributes = Vector(QName("ISBN") -> "ISBN-0-11-222222-3", QName("Price") -> "50"),
+      scope = Scope.Empty,
+      children = Vector(
+        textElem(QName("Title"), Scope.Empty, "Hector and Jeff's Database Hints"),
+        elem(
+          qname = QName("Authors"),
+          scope = Scope.Empty,
+          children = Vector(
+            elem(
+              qname = QName("Author"),
+              scope = Scope.Empty,
+              children = Vector(
+                textElem(QName("First_Name"), Scope.Empty, "Jeffrey"),
+                textElem(QName("Last_Name"), Scope.Empty, "Ullman"))
+            ),
+            elem(
+              qname = QName("Author"),
+              scope = Scope.Empty,
+              children = Vector(
+                textElem(QName("First_Name"), Scope.Empty, "Hector"),
+                textElem(QName("Last_Name"), Scope.Empty, "Garcia-Molina"))
+            )
+          )
+        ),
+        textElem(QName("Remark"), Scope.Empty, "An indispensable companion to your textbook")
+      )
+    )
+  }
+
+  private val book4Builder: simple.Elem = {
+    import simple.Node._
+
+    elem(
+      qname = QName("Book"),
+      attributes = Vector(QName("ISBN") -> "ISBN-9-88-777777-6", QName("Price") -> "25"),
+      scope = Scope.Empty,
+      children = Vector(
+        textElem(QName("Title"), Scope.Empty, "Jennifer's Economical Database Hints"),
+        elem(
+          qname = QName("Authors"),
+          scope = Scope.Empty,
+          children = Vector(
+            elem(
+              qname = QName("Author"),
+              scope = Scope.Empty,
+              children = Vector(
+                textElem(QName("First_Name"), Scope.Empty, "Jennifer"),
+                textElem(QName("Last_Name"), Scope.Empty, "Widom"))
+            ))
+        )
+      )
+    )
+  }
+
+  private val magazine1Builder: simple.Elem = {
+    import simple.Node._
+
+    elem(
+      qname = QName("Magazine"),
+      attributes = Vector(QName("Month") -> "January", QName("Year") -> "2009"),
+      scope = Scope.Empty,
+      children = Vector(textElem(QName("Title"), Scope.Empty, "National Geographic"))
+    )
+  }
+
+  private val magazine2Builder: simple.Elem = {
+    import simple.Node._
+
+    elem(
+      qname = QName("Magazine"),
+      attributes = Vector(QName("Month") -> "February", QName("Year") -> "2009"),
+      scope = Scope.Empty,
+      children = Vector(textElem(QName("Title"), Scope.Empty, "National Geographic"))
+    )
+  }
+
+  private val magazine3Builder: simple.Elem = {
+    import simple.Node._
+
+    elem(
+      qname = QName("Magazine"),
+      attributes = Vector(QName("Month") -> "February", QName("Year") -> "2009"),
+      scope = Scope.Empty,
+      children = Vector(textElem(QName("Title"), Scope.Empty, "Newsweek"))
+    )
+  }
+
+  private val magazine4Builder: simple.Elem = {
+    import simple.Node._
+
+    elem(
+      qname = QName("Magazine"),
+      attributes = Vector(QName("Month") -> "March", QName("Year") -> "2009"),
+      scope = Scope.Empty,
+      children = Vector(textElem(QName("Title"), Scope.Empty, "Hector and Jeff's Database Hints"))
+    )
+  }
+
+  protected final val bookstore: Elem = {
+    import simple.Node._
+
+    val result =
+      elem(
+        qname = QName("Bookstore"),
+        scope = Scope.Empty,
+        children = Vector(
+          book1Builder,
+          book2Builder,
+          book3Builder,
+          book4Builder,
+          magazine1Builder,
+          magazine2Builder,
+          magazine3Builder,
+          magazine4Builder)
+      )
+    Elem.from(result)
+  }
+
   test("testQueryElementsWithParentNotBookOrBookstoreUsingStoredElemPaths") {
     // XPath: doc("bookstore.xml")//*[name(parent::*) != "Bookstore" and name(parent::*) != "Book"]
 
@@ -47,14 +243,14 @@ class QueryTest extends AbstractElemLikeQueryTest {
       def getChildPathEntry(e: Elem, nodeIdx: Int): Path.Entry = {
         val includedChildren = e.children.take(nodeIdx + 1)
         val ename = includedChildren.last.asInstanceOf[Elem].resolvedName
-        val childElmsWithSameName = includedChildren collect { case che: Elem if che.resolvedName == ename => che }
+        val childElmsWithSameName = includedChildren.collect { case che: Elem if che.resolvedName == ename => che }
         Path.Entry(ename, childElmsWithSameName.size - 1)
       }
 
       Elem(
         resolvedName = e.resolvedName,
         resolvedAttributes = e.resolvedAttributes + (EName("path") -> path.toResolvedCanonicalXPath),
-        children = e.children.zipWithIndex map {
+        children = e.children.zipWithIndex.map {
           case (ch, idx) =>
             ch match {
               case che: Elem =>
@@ -63,7 +259,8 @@ class QueryTest extends AbstractElemLikeQueryTest {
                 addElemPaths(che, childPath, scope)
               case _ => ch
             }
-        })
+        }
+      )
     }
 
     // Not using method Elem.updated here
@@ -79,7 +276,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
 
     assert(elms.size > 10, "Expected more than 10 matching elements")
     val enames: Set[EName] = {
-      val result = elms map { _.resolvedName }
+      val result = elms.map { _.resolvedName }
       result.toSet
     }
     assertResult(Set(EName("Title"), EName("Author"), EName("First_Name"), EName("Last_Name"))) {
@@ -106,24 +303,29 @@ class QueryTest extends AbstractElemLikeQueryTest {
         book <- bookstore \ (_.localName == "Book")
         title = book.getChildElem(EName("Title"))
         authorFirstNames = {
-          val result = book.filterElems(EName("Author")) map { _.getChildElem(EName("First_Name")).trimmedText }
+          val result = book.filterElems(EName("Author")).map { _.getChildElem(EName("First_Name")).trimmedText }
           result.toSet
         }
-        searchedForFirstNames = authorFirstNames filter { firstName => title.trimmedText.indexOf(firstName) >= 0 }
+        searchedForFirstNames = authorFirstNames.filter { firstName =>
+          title.trimmedText.indexOf(firstName) >= 0
+        }
         if searchedForFirstNames.nonEmpty
-      } yield Elem(
-        resolvedName = EName("Book"),
-        resolvedAttributes = Map(),
-        children = Vector(
-          title,
-          Elem(EName("First_Name"), Map(), Vector(Text(searchedForFirstNames.head)))))
+      } yield
+        Elem(
+          resolvedName = EName("Book"),
+          resolvedAttributes = Map(),
+          children = Vector(title, Elem(EName("First_Name"), Map(), Vector(Text(searchedForFirstNames.head)))))
 
     assertResult(2) {
       titleAndFirstNames.size
     }
     assertResult(Set("Hector and Jeff's Database Hints", "Jennifer's Economical Database Hints")) {
-      val titleElms = titleAndFirstNames map { e => e.filterElems(EName("Title")) }
-      val result = titleElms.flatten map { e => e.trimmedText }
+      val titleElms = titleAndFirstNames.map { e =>
+        e.filterElems(EName("Title"))
+      }
+      val result = titleElms.flatten.map { e =>
+        e.trimmedText
+      }
       result.toSet
     }
   }
@@ -149,29 +351,42 @@ class QueryTest extends AbstractElemLikeQueryTest {
         price = book.attribute(EName("Price")).toDouble
       } yield price
 
-    val avg: Double = prices.sum.toDouble / prices.size
+    val avg: Double = prices.sum / prices.size
 
     val cheapBooks =
       for {
         book <- bookstore \ (_.localName == "Book")
         price = book.attribute(EName("Price")).toDouble
         if price < avg
-      } yield Elem(
-        resolvedName = EName("Book"),
-        resolvedAttributes = Map(),
-        children = Vector(
-          book.getChildElem(EName("Title")),
-          Elem(EName("Price"), Map(), Vector(Text(price.toString)))))
+      } yield
+        Elem(
+          resolvedName = EName("Book"),
+          resolvedAttributes = Map(),
+          children =
+            Vector(book.getChildElem(EName("Title")), Elem(EName("Price"), Map(), Vector(Text(price.toString))))
+        )
 
     assertResult(2) {
       cheapBooks.size
     }
     assertResult(Set(50, 25)) {
-      val result = cheapBooks flatMap { e => e.filterElems(EName("Price")) } map { e => e.trimmedText.toDouble.intValue }
+      val result = cheapBooks
+        .flatMap { e =>
+          e.filterElems(EName("Price"))
+        }
+        .map { e =>
+          e.trimmedText.toDouble.intValue
+        }
       result.toSet
     }
     assertResult(Set("Hector and Jeff's Database Hints", "Jennifer's Economical Database Hints")) {
-      val result = cheapBooks flatMap { e => e.filterElems(EName("Title")) } map { e => e.trimmedText }
+      val result = cheapBooks
+        .flatMap { e =>
+          e.filterElems(EName("Title"))
+        }
+        .map { e =>
+          e.trimmedText
+        }
       result.toSet
     }
   }
@@ -198,28 +413,42 @@ class QueryTest extends AbstractElemLikeQueryTest {
 
     val books = {
       for {
-        book <- bookstore \ (_.localName == "Book") sortWith { cheaper _ }
+        book <- (bookstore \ (_.localName == "Book")).sortWith { cheaper }
         price = book.attribute(EName("Price")).toDouble
-      } yield Elem(
-        resolvedName = EName("Book"),
-        resolvedAttributes = Map(),
-        children = Vector(
-          book.getChildElem(EName("Title")),
-          Elem(EName("Price"), Map(), Vector(Text(price.toString)))))
+      } yield
+        Elem(
+          resolvedName = EName("Book"),
+          resolvedAttributes = Map(),
+          children =
+            Vector(book.getChildElem(EName("Title")), Elem(EName("Price"), Map(), Vector(Text(price.toString))))
+        )
     }
 
     assertResult(4) {
       books.size
     }
     assertResult(List(25, 50, 85, 100)) {
-      books flatMap { e => e.filterElems(EName("Price")) } map { e => e.trimmedText.toDouble.intValue }
+      books
+        .flatMap { e =>
+          e.filterElems(EName("Price"))
+        }
+        .map { e =>
+          e.trimmedText.toDouble.intValue
+        }
     }
-    assertResult(List(
-      "Jennifer's Economical Database Hints",
-      "Hector and Jeff's Database Hints",
-      "A First Course in Database Systems",
-      "Database Systems: The Complete Book")) {
-      books flatMap { e => e.filterElems(EName("Title")) } map { e => e.trimmedText }
+    assertResult(
+      List(
+        "Jennifer's Economical Database Hints",
+        "Hector and Jeff's Database Hints",
+        "A First Course in Database Systems",
+        "Database Systems: The Complete Book")) {
+      books
+        .flatMap { e =>
+          e.filterElems(EName("Title"))
+        }
+        .map { e =>
+          e.trimmedText
+        }
     }
   }
 
@@ -249,20 +478,19 @@ class QueryTest extends AbstractElemLikeQueryTest {
         author <- book.filterElems(EName("Author"))
         if author.getChildElem(EName("Last_Name")).trimmedText == authorLastName
       } yield {
-        val attrs = book.resolvedAttributes filter { case (en, v) => Set(EName("ISBN"), EName("Price")).contains(en) }
+        val attrs = book.resolvedAttributes.filter { case (en, _) => Set(EName("ISBN"), EName("Price")).contains(en) }
 
         val children = book.filterChildElems(EName("Title"))
 
-        Elem(
-          resolvedName = EName("Book"),
-          resolvedAttributes = attrs,
-          children = children)
+        Elem(resolvedName = EName("Book"), resolvedAttributes = attrs, children = children)
       }
 
     val authorsWithBooks =
       for {
         lastNameValue <- {
-          val result = bookstore.filterElems(EName("Author")) map { e => e.getChildElem(EName("Last_Name")).trimmedText }
+          val result = bookstore.filterElems(EName("Author")).map { e =>
+            e.getChildElem(EName("Last_Name")).trimmedText
+          }
           result.distinct
         }
       } yield {
@@ -282,10 +510,12 @@ class QueryTest extends AbstractElemLikeQueryTest {
           resolvedAttributes = Map(),
           children = Vector(
             Elem(EName("First_Name"), Map(), Vector(Text(firstNameValue))),
-            Elem(EName("Last_Name"), Map(), Vector(Text(lastNameValue)))) ++ foundBooks)
+            Elem(EName("Last_Name"), Map(), Vector(Text(lastNameValue)))) ++ foundBooks
+        )
       }
 
-    val invertedBookstore: Elem = Elem(resolvedName = EName("InvertedBookstore"), resolvedAttributes = Map(), children = authorsWithBooks)
+    val invertedBookstore: Elem =
+      Elem(resolvedName = EName("InvertedBookstore"), resolvedAttributes = Map(), children = authorsWithBooks)
 
     assertResult(3) {
       invertedBookstore.findAllChildElems.size
@@ -303,23 +533,26 @@ class QueryTest extends AbstractElemLikeQueryTest {
 
     def removePrice(book: Elem): Elem = {
       require(book.resolvedName == EName("Book"))
-      Elem(
-        resolvedName = book.resolvedName,
-        resolvedAttributes = book.resolvedAttributes filter { case (en, v) => en != EName("Price") },
-        children = book.children)
+      Elem(resolvedName = book.resolvedName, resolvedAttributes = book.resolvedAttributes.filter {
+        case (en, _) => en != EName("Price")
+      }, children = book.children)
     }
 
     val bookstoreWithoutPrices: Elem =
-      bookstore transformElemsOrSelf {
+      bookstore.transformElemsOrSelf {
         case e if e.resolvedName == EName("Book") => removePrice(e)
         case e                                    => e
       }
 
     assertResult(4) {
-      bookstore.filterElems(EName("Book")) count { e => e.attributeOption(EName("Price")).isDefined }
+      bookstore.filterElems(EName("Book")).count { e =>
+        e.attributeOption(EName("Price")).isDefined
+      }
     }
     assertResult(0) {
-      bookstoreWithoutPrices.filterElems(EName("Book")) count { e => e.attributeOption(EName("Price")).isDefined }
+      bookstoreWithoutPrices.filterElems(EName("Book")).count { e =>
+        e.attributeOption(EName("Price")).isDefined
+      }
     }
   }
 
@@ -340,20 +573,17 @@ class QueryTest extends AbstractElemLikeQueryTest {
       val nameValue: String = s"$firstNameValue $lastNameValue"
       val name: Elem = Elem(EName("Name"), Map(), Vector(Text(nameValue)))
 
-      Elem(
-        resolvedName = author.resolvedName,
-        resolvedAttributes = author.resolvedAttributes,
-        children = Vector(name))
+      Elem(resolvedName = author.resolvedName, resolvedAttributes = author.resolvedAttributes, children = Vector(name))
     }
 
     val bookstoreWithCombinedNames: Elem =
-      bookstore transformElemsOrSelf {
+      bookstore.transformElemsOrSelf {
         case e if e.resolvedName == EName("Author") => combineName(e)
         case e                                      => e
       }
 
     assertResult(Set("Jeffrey Ullman", "Jennifer Widom", "Hector Garcia-Molina")) {
-      val result = bookstoreWithCombinedNames.filterElems(EName("Name")) map { _.trimmedText }
+      val result = bookstoreWithCombinedNames.filterElems(EName("Name")).map { _.trimmedText }
       result.toSet
     }
   }
@@ -368,7 +598,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
     require(bookstore.localName == "Bookstore")
 
     val updatedBookstoreElm: Elem =
-      bookstore transformElemsOrSelf {
+      bookstore.transformElemsOrSelf {
         case e if e.resolvedName == EName("Author") =>
           val newElmName = EName("http://def", e.localName)
           Elem(newElmName, e.resolvedAttributes, e.children)
@@ -377,157 +607,21 @@ class QueryTest extends AbstractElemLikeQueryTest {
 
     // Only the Author elements are functionally changed!
 
-    assertResult(Set(EName("Bookstore"), EName("Magazine"), EName("Title"), EName("Book"), EName("Authors"),
-      EName("{http://def}Author"), EName("First_Name"), EName("Last_Name"), EName("Remark"))) {
+    assertResult(
+      Set(
+        EName("Bookstore"),
+        EName("Magazine"),
+        EName("Title"),
+        EName("Book"),
+        EName("Authors"),
+        EName("{http://def}Author"),
+        EName("First_Name"),
+        EName("Last_Name"),
+        EName("Remark")
+      )) {
 
-      val result = updatedBookstoreElm.findAllElemsOrSelf map { _.resolvedName }
+      val result = updatedBookstoreElm.findAllElemsOrSelf.map { _.resolvedName }
       result.toSet
     }
-  }
-
-  private val book1Builder: ElemBuilder = {
-    import NodeBuilder._
-
-    elem(
-      qname = QName("Book"),
-      attributes = Vector(QName("ISBN") -> "ISBN-0-13-713526-2", QName("Price") -> "85", QName("Edition") -> "3rd"),
-      children = Vector(
-        textElem(QName("Title"), "A First Course in Database Systems"),
-        elem(
-          qname = QName("Authors"),
-          children = Vector(
-            elem(
-              qname = QName("Author"),
-              children = Vector(
-                textElem(QName("First_Name"), "Jeffrey"),
-                textElem(QName("Last_Name"), "Ullman"))),
-            elem(
-              qname = QName("Author"),
-              children = Vector(
-                textElem(QName("First_Name"), "Jennifer"),
-                textElem(QName("Last_Name"), "Widom")))))))
-  }
-
-  private val book2Builder: ElemBuilder = {
-    import NodeBuilder._
-
-    elem(
-      qname = QName("Book"),
-      attributes = Vector(QName("ISBN") -> "ISBN-0-13-815504-6", QName("Price") -> "100"),
-      children = Vector(
-        textElem(QName("Title"), "Database Systems: The Complete Book"),
-        elem(
-          qname = QName("Authors"),
-          children = Vector(
-            elem(
-              qname = QName("Author"),
-              children = Vector(
-                textElem(QName("First_Name"), "Hector"),
-                textElem(QName("Last_Name"), "Garcia-Molina"))),
-            elem(
-              qname = QName("Author"),
-              children = Vector(
-                textElem(QName("First_Name"), "Jeffrey"),
-                textElem(QName("Last_Name"), "Ullman"))),
-            elem(
-              qname = QName("Author"),
-              children = Vector(
-                textElem(QName("First_Name"), "Jennifer"),
-                textElem(QName("Last_Name"), "Widom"))))),
-        textElem(QName("Remark"), "Buy this book bundled with \"A First Course\" - a great deal!")))
-  }
-
-  private val book3Builder: ElemBuilder = {
-    import NodeBuilder._
-
-    elem(
-      qname = QName("Book"),
-      attributes = Vector(QName("ISBN") -> "ISBN-0-11-222222-3", QName("Price") -> "50"),
-      children = Vector(
-        textElem(QName("Title"), "Hector and Jeff's Database Hints"),
-        elem(
-          qname = QName("Authors"),
-          children = Vector(
-            elem(
-              qname = QName("Author"),
-              children = Vector(
-                textElem(QName("First_Name"), "Jeffrey"),
-                textElem(QName("Last_Name"), "Ullman"))),
-            elem(
-              qname = QName("Author"),
-              children = Vector(
-                textElem(QName("First_Name"), "Hector"),
-                textElem(QName("Last_Name"), "Garcia-Molina"))))),
-        textElem(QName("Remark"), "An indispensable companion to your textbook")))
-  }
-
-  private val book4Builder: ElemBuilder = {
-    import NodeBuilder._
-
-    elem(
-      qname = QName("Book"),
-      attributes = Vector(QName("ISBN") -> "ISBN-9-88-777777-6", QName("Price") -> "25"),
-      children = Vector(
-        textElem(QName("Title"), "Jennifer's Economical Database Hints"),
-        elem(
-          qname = QName("Authors"),
-          children = Vector(
-            elem(
-              qname = QName("Author"),
-              children = Vector(
-                textElem(QName("First_Name"), "Jennifer"),
-                textElem(QName("Last_Name"), "Widom")))))))
-  }
-
-  private val magazine1Builder: ElemBuilder = {
-    import NodeBuilder._
-
-    elem(
-      qname = QName("Magazine"),
-      attributes = Vector(QName("Month") -> "January", QName("Year") -> "2009"),
-      children = Vector(
-        textElem(QName("Title"), "National Geographic")))
-  }
-
-  private val magazine2Builder: ElemBuilder = {
-    import NodeBuilder._
-
-    elem(
-      qname = QName("Magazine"),
-      attributes = Vector(QName("Month") -> "February", QName("Year") -> "2009"),
-      children = Vector(
-        textElem(QName("Title"), "National Geographic")))
-  }
-
-  private val magazine3Builder: ElemBuilder = {
-    import NodeBuilder._
-
-    elem(
-      qname = QName("Magazine"),
-      attributes = Vector(QName("Month") -> "February", QName("Year") -> "2009"),
-      children = Vector(
-        textElem(QName("Title"), "Newsweek")))
-  }
-
-  private val magazine4Builder: ElemBuilder = {
-    import NodeBuilder._
-
-    elem(
-      qname = QName("Magazine"),
-      attributes = Vector(QName("Month") -> "March", QName("Year") -> "2009"),
-      children = Vector(
-        textElem(QName("Title"), "Hector and Jeff's Database Hints")))
-  }
-
-  protected final val bookstore: Elem = {
-    import NodeBuilder._
-
-    val result =
-      elem(
-        qname = QName("Bookstore"),
-        children = Vector(
-          book1Builder, book2Builder, book3Builder, book4Builder,
-          magazine1Builder, magazine2Builder, magazine3Builder, magazine4Builder)).build(Scope.Empty)
-    Elem.from(result)
   }
 }

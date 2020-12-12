@@ -16,7 +16,6 @@
 
 package eu.cdevreeze.yaidom.integrationtest
 
-import eu.cdevreeze.yaidom.core.Declarations
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
@@ -24,10 +23,8 @@ import eu.cdevreeze.yaidom.indexed
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.simple
-import eu.cdevreeze.yaidom.simple.ElemBuilder
 import eu.cdevreeze.yaidom.simple.Node
-import eu.cdevreeze.yaidom.simple.NodeBuilder
-import eu.cdevreeze.yaidom.simple.NodeBuilder._
+import eu.cdevreeze.yaidom.simple.Node._
 import org.scalatest.funsuite.AnyFunSuite
 
 /**
@@ -54,10 +51,7 @@ class CreationTest extends AnyFunSuite {
         EName("{http://books}Book"),
         Map(EName("ISBN") -> "ISBN-9-88-777777-6", EName("Price") -> "25"),
         Vector(
-          Elem(
-            EName("{http://books}Title"),
-            Map(),
-            Vector(Text("Jennifer's Economical Database Hints"))),
+          Elem(EName("{http://books}Title"), Map(), Vector(Text("Jennifer's Economical Database Hints"))),
           Elem(
             EName("Authors"),
             Map(),
@@ -66,78 +60,90 @@ class CreationTest extends AnyFunSuite {
                 EName("{http://bookstore}Author"),
                 Map(),
                 Vector(
-                  Elem(
-                    EName("{http://ns}First_Name"),
-                    Map(),
-                    Vector(Text("Jennifer"))),
-                  Elem(
-                    EName("{http://ns}Last_Name"),
-                    Map(),
-                    Vector(Text("Widom")))))))))
+                  Elem(EName("{http://ns}First_Name"), Map(), Vector(Text("Jennifer"))),
+                  Elem(EName("{http://ns}Last_Name"), Map(), Vector(Text("Widom"))))
+              ))
+          )
+        )
+      )
     }
 
     assertResult(Some(expectedResolvedBookElm)) {
-      resolvedRootElm1.removeAllInterElementWhitespace findChildElem { e =>
+      resolvedRootElm1.removeAllInterElementWhitespace.findChildElem { e =>
         e.localName == "Book" && e.attributeOption(EName("ISBN")).contains("ISBN-9-88-777777-6")
       }
     }
 
-    val elm2Builder: ElemBuilder =
+    val scope: Scope = Scope.from("books" -> "http://books", "names" -> "http://names")
+    val otherScope: Scope = Scope.from("names" -> "http://names", "magazines" -> "http://magazines")
+    val yetAnotherScope: Scope = Scope.from("books" -> "http://bookstore", "names" -> "http://ns", "magazines" -> "http://magazines")
+
+    val elm2Builder: simple.Elem =
       elem(
         qname = QName("books:Book"),
         attributes = Vector(QName("ISBN") -> "ISBN-9-88-777777-6", QName("Price") -> "25"),
-        namespaces = Declarations.from("books" -> "http://books", "names" -> "http://names"),
+        scope = scope,
         children = Vector(
-          textElem(QName("books:Title"), "Jennifer's Economical Database Hints"),
+          textElem(QName("books:Title"), scope, "Jennifer's Economical Database Hints"),
           elem(
             qname = QName("Authors"),
-            namespaces = Declarations.from("books" -> "", "magazines" -> "http://magazines"),
+            scope = otherScope,
             children = Vector(
               elem(
                 qname = QName("books:Author"),
-                namespaces = Declarations.from("books" -> "http://bookstore", "names" -> "http://ns"),
+                scope = yetAnotherScope,
                 children = Vector(
-                  textElem(QName("names:First_Name"), "Jennifer"),
-                  textElem(QName("names:Last_Name"), "Widom")))))))
+                  textElem(QName("names:First_Name"), yetAnotherScope, "Jennifer"),
+                  textElem(QName("names:Last_Name"), yetAnotherScope, "Widom"))
+              ))
+          )
+        )
+      )
 
-    val elm2: simple.Elem = elm2Builder.build()
+    val elm2: simple.Elem = elm2Builder
     val resolvedElm2 = resolved.Elem.from(elm2)
 
     assertResult(expectedResolvedBookElm) {
       resolvedElm2
     }
 
-    assertResult(Set()) {
-      elm2Builder.nonDeclaredPrefixes(Scope.Empty)
-    }
-    assert(elm2Builder.canBuild(Scope.Empty))
-
     assertResult(false) {
-      elm2Builder.allDeclarationsAreAtTopLevel
+      elm2Builder.findAllElems.forall(_.scope == elm2Builder.scope)
     }
 
-    val elm3Builder: ElemBuilder =
+    val bookScope: Scope = Scope.from("books" -> "http://books")
+    val magazineScope: Scope = Scope.from("magazines" -> "http://magazines")
+    val bookAndNamesScope: Scope = Scope.from("books" -> "http://bookstore", "magazines" -> "http://magazines", "names" -> "http://ns")
+
+    val elm3Builder: simple.Elem =
       elem(
         qname = QName("books:Book"),
         attributes = Vector(QName("ISBN") -> "ISBN-9-88-777777-6", QName("Price") -> "25"),
+        scope = bookScope,
         children = Vector(
-          textElem(QName("books:Title"), "Jennifer's Economical Database Hints"),
+          textElem(QName("books:Title"), bookScope, "Jennifer's Economical Database Hints"),
           elem(
             qname = QName("Authors"),
-            namespaces = Declarations.from("books" -> "", "magazines" -> "http://magazines"),
+            scope = magazineScope,
             children = Vector(
               elem(
                 qname = QName("books:Author"),
-                namespaces = Declarations.from("books" -> "http://bookstore", "names" -> "http://ns"),
+                scope = bookAndNamesScope,
                 children = Vector(
-                  textElem(QName("names:First_Name"), "Jennifer"),
-                  textElem(QName("names:Last_Name"), "Widom")))))))
+                  textElem(QName("names:First_Name"), bookAndNamesScope, "Jennifer"),
+                  textElem(QName("names:Last_Name"), bookAndNamesScope, "Widom"))
+              ))
+          )
+        )
+      )
 
     val prefixesUsed: Set[String] = {
       elm3Builder.findAllElemsOrSelf.foldLeft(Set[String]()) { (acc, elemBuilder) =>
-        val qnames: Set[QName] = (elemBuilder.attributes.toMap.keySet) + elemBuilder.qname
-        val prefixes: Set[String] = qnames flatMap { qname => qname.prefixOption }
-        acc ++ prefixes.toSet
+        val qnames: Set[QName] = elemBuilder.attributes.toMap.keySet + elemBuilder.qname
+        val prefixes: Set[String] = qnames.flatMap { qname =>
+          qname.prefixOption
+        }
+        acc ++ prefixes
       }
     }
 
@@ -145,20 +151,11 @@ class CreationTest extends AnyFunSuite {
       prefixesUsed
     }
 
-    assertResult(Set("books")) {
-      elm3Builder.nonDeclaredPrefixes(Scope.Empty)
-    }
-    assertResult(Set()) {
-      elm3Builder.nonDeclaredPrefixes(Scope.from("books" -> "http://bookstore"))
-    }
-    assert(!elm3Builder.canBuild(Scope.Empty))
-    assert(elm3Builder.canBuild(Scope.from("books" -> "http://bookstore")))
-
     assertResult(false) {
-      elm3Builder.allDeclarationsAreAtTopLevel
+      elm3Builder.findAllElems.forall(_.scope == elm3Builder.scope)
     }
 
-    val elm3: simple.Elem = elm3Builder.build(Scope.from("books" -> "http://books"))
+    val elm3: simple.Elem = elm3Builder.notUndeclaringPrefixes(Scope.from("books" -> "http://bookstore"))
     val resolvedElm3 = resolved.Elem.from(elm3)
 
     assertResult(expectedResolvedBookElm) {
@@ -183,16 +180,24 @@ class CreationTest extends AnyFunSuite {
             children = Vector(
               elem(
                 qname = QName("books:Author"),
-                scope = Scope.from("books" -> "http://bookstore", "names" -> "http://ns", "magazines" -> "http://magazines"),
+                scope =
+                  Scope.from("books" -> "http://bookstore", "names" -> "http://ns", "magazines" -> "http://magazines"),
                 children = Vector(
                   textElem(
                     QName("names:First_Name"),
-                    Scope.from("books" -> "http://bookstore", "names" -> "http://ns", "magazines" -> "http://magazines"),
+                    Scope
+                      .from("books" -> "http://bookstore", "names" -> "http://ns", "magazines" -> "http://magazines"),
                     "Jennifer"),
                   textElem(
                     QName("names:Last_Name"),
-                    Scope.from("books" -> "http://bookstore", "names" -> "http://ns", "magazines" -> "http://magazines"),
-                    "Widom")))))))
+                    Scope
+                      .from("books" -> "http://bookstore", "names" -> "http://ns", "magazines" -> "http://magazines"),
+                    "Widom")
+                )
+              ))
+          )
+        )
+      )
     }
 
     val resolvedElm4 = resolved.Elem.from(elm4)
@@ -210,23 +215,29 @@ class CreationTest extends AnyFunSuite {
     val doc1: simple.Document = docParser.parse(is)
 
     val isbn = "ISBN-9-88-777777-6"
-    val bookElm1 = doc1.documentElement.findElem(e =>
-      e.localName == "Book" && e.attributeOption(EName("ISBN")).contains(isbn)).getOrElse(sys.error(s"No book with ISBN $isbn"))
+    val bookElm1 = doc1.documentElement
+      .findElem(e => e.localName == "Book" && e.attributeOption(EName("ISBN")).contains(isbn))
+      .getOrElse(sys.error(s"No book with ISBN $isbn"))
     val authorsElm1 = bookElm1.getChildElem(_.localName == "Authors")
 
     val doc2: simple.Document = simple.Document(doc1.documentElement.notUndeclaringPrefixes(Scope.Empty))
-    val bookElm2 = doc2.documentElement.findElem(e =>
-      e.localName == "Book" && e.attributeOption(EName("ISBN")).contains(isbn)).getOrElse(sys.error(s"No book with ISBN $isbn"))
+    val bookElm2 = doc2.documentElement
+      .findElem(e => e.localName == "Book" && e.attributeOption(EName("ISBN")).contains(isbn))
+      .getOrElse(sys.error(s"No book with ISBN $isbn"))
     val authorsElm2 = bookElm2.getChildElem(_.localName == "Authors")
 
-    val doc3: simple.Document = simple.Document(doc1.documentElement.notUndeclaringPrefixes(Scope.from("books" -> "http://bookstore")))
-    val bookElm3 = doc3.documentElement.findElem(e =>
-      e.localName == "Book" && e.attributeOption(EName("ISBN")).contains(isbn)).getOrElse(sys.error(s"No book with ISBN $isbn"))
+    val doc3: simple.Document =
+      simple.Document(doc1.documentElement.notUndeclaringPrefixes(Scope.from("books" -> "http://bookstore")))
+    val bookElm3 = doc3.documentElement
+      .findElem(e => e.localName == "Book" && e.attributeOption(EName("ISBN")).contains(isbn))
+      .getOrElse(sys.error(s"No book with ISBN $isbn"))
     val authorsElm3 = bookElm3.getChildElem(_.localName == "Authors")
 
-    val doc4: simple.Document = simple.Document(doc1.documentElement.notUndeclaringPrefixes(Scope.from("books" -> "http://abc")))
-    val bookElm4 = doc4.documentElement.findElem(e =>
-      e.localName == "Book" && e.attributeOption(EName("ISBN")).contains(isbn)).getOrElse(sys.error(s"No book with ISBN $isbn"))
+    val doc4: simple.Document =
+      simple.Document(doc1.documentElement.notUndeclaringPrefixes(Scope.from("books" -> "http://abc")))
+    val bookElm4 = doc4.documentElement
+      .findElem(e => e.localName == "Book" && e.attributeOption(EName("ISBN")).contains(isbn))
+      .getOrElse(sys.error(s"No book with ISBN $isbn"))
     val authorsElm4 = bookElm4.getChildElem(_.localName == "Authors")
 
     assertResult((bookElm1.scope ++ Scope.from("magazines" -> "http://magazines")) -- Set("books")) {
@@ -277,11 +288,6 @@ class CreationTest extends AnyFunSuite {
       resolved.Elem.from(rootElem2)
     }
 
-    assertResult(Set(Declarations.Empty)) {
-      NodeBuilder.fromElem(rootElem2)(parentScope2).findAllElemsOrSelf.
-        map(_.namespaces.withoutDefaultNamespace.retainingUndeclarations).toSet
-    }
-
     // Now call notUndeclaringPrefixes with Scope.from("books" -> "http://bookstore", "names" -> "http://xyz")
 
     val parentScope3 = Scope.from("books" -> "http://bookstore", "names" -> "http://xyz")
@@ -289,11 +295,6 @@ class CreationTest extends AnyFunSuite {
 
     assertResult(resolvedRootElm1) {
       resolved.Elem.from(rootElem3)
-    }
-
-    assertResult(Set(Declarations.Empty)) {
-      NodeBuilder.fromElem(rootElem3)(parentScope3).findAllElemsOrSelf.
-        map(_.namespaces.withoutDefaultNamespace.retainingUndeclarations).toSet
     }
 
     // Next call notUndeclaringPrefixes with Scope.from("abcde" -> "http://abcde")
@@ -305,11 +306,6 @@ class CreationTest extends AnyFunSuite {
       resolved.Elem.from(rootElem4)
     }
 
-    assertResult(Set(Declarations.Empty)) {
-      NodeBuilder.fromElem(rootElem4)(parentScope4).findAllElemsOrSelf.
-        map(_.namespaces.withoutDefaultNamespace.retainingUndeclarations).toSet
-    }
-
     // Finally call notUndeclaringPrefixes with Scope.from("books" -> "http://bookstore", "names" -> "http://xyz", "abcde" -> "http://abcde")
 
     val parentScope5 = Scope.from("books" -> "http://bookstore", "names" -> "http://xyz", "abcde" -> "http://abcde")
@@ -318,35 +314,29 @@ class CreationTest extends AnyFunSuite {
     assertResult(resolvedRootElm1) {
       resolved.Elem.from(rootElem5)
     }
-
-    assertResult(Set(Declarations.Empty)) {
-      NodeBuilder.fromElem(rootElem5)(parentScope5).findAllElemsOrSelf.
-        map(_.namespaces.withoutDefaultNamespace.retainingUndeclarations).toSet
-    }
   }
 
   test("testInsertionWhileReusingPrefixes") {
-    val booksElmBuilder: ElemBuilder =
+    val bookScope: Scope = Scope.from("books" -> "http://bookstore")
+
+    val booksElmBuilder: simple.Elem =
       elem(
         qname = QName("books:Book"),
         attributes = Vector(QName("ISBN") -> "ISBN-9-88-777777-6", QName("Price") -> "25"),
-        namespaces = Declarations.from("books" -> "http://bookstore"),
+        scope = bookScope,
         children = Vector(
-          textElem(QName("books:Title"), "Jennifer's Economical Database Hints"),
-          emptyElem(
-            qname = QName("books:Authors"))))
+          textElem(QName("books:Title"), bookScope, "Jennifer's Economical Database Hints"),
+          emptyElem(qname = QName("books:Authors"), scope = bookScope))
+      )
 
     assertResult(true) {
-      booksElmBuilder.canBuild(Scope.Empty)
+      booksElmBuilder.findAllElemsOrSelf.forall(_.qname.prefixOption.isDefined)
     }
     assertResult(true) {
-      booksElmBuilder.findAllElemsOrSelf forall (e => e.qname.prefixOption.isDefined)
-    }
-    assertResult(true) {
-      booksElmBuilder.allDeclarationsAreAtTopLevel
+      booksElmBuilder.findAllElems.forall(_.scope == booksElmBuilder.scope)
     }
 
-    val booksElm: simple.Elem = booksElmBuilder.build(Scope.Empty)
+    val booksElm: simple.Elem = booksElmBuilder.notUndeclaringPrefixes(Scope.Empty)
 
     val prefixBooks = booksElm.scope.prefixesForNamespace("http://bookstore").headOption.getOrElse("bks")
 
@@ -355,50 +345,47 @@ class CreationTest extends AnyFunSuite {
     }
 
     // Building an "independent" author ElemBuilder, which reuses the "books" prefix of the intended parent tree.
-    // "Independence" means: canBuild(Scope.Empty) && (findAllElemsOrSelf forall (e => e.qname.prefixOption.isDefined))
+    // "Independence" means: canBuild(Scope.Empty) && (findAllElemsOrSelf.forall(e => e.qname.prefixOption.isDefined))
     // In other words, it does not care about the specific parent scope.
 
-    val authorElmBuilder: ElemBuilder =
+    val authorElmBuilder: simple.Elem =
       elem(
         qname = QName(prefixBooks, "Author"),
-        namespaces = Declarations.from(prefixBooks -> "http://bookstore"),
+        scope = Scope.from(prefixBooks -> "http://bookstore"),
         children = Vector(
-          textElem(QName(prefixBooks, "First_Name"), "Jennifer"),
-          textElem(QName(prefixBooks, "Last_Name"), "Widom")))
+          textElem(QName(prefixBooks, "First_Name"), Scope.from(prefixBooks -> "http://bookstore"), "Jennifer"),
+          textElem(QName(prefixBooks, "Last_Name"), Scope.from(prefixBooks -> "http://bookstore"), "Widom")
+        )
+      )
 
     assertResult(true) {
-      authorElmBuilder.canBuild(Scope.Empty)
+      authorElmBuilder.findAllElemsOrSelf.forall(e => e.qname.prefixOption.isDefined)
     }
     assertResult(true) {
-      authorElmBuilder.findAllElemsOrSelf forall (e => e.qname.prefixOption.isDefined)
-    }
-    assertResult(true) {
-      authorElmBuilder.allDeclarationsAreAtTopLevel
+      authorElmBuilder.findAllElems.forall(_.scope == authorElmBuilder.scope)
     }
 
-    val authorElm: simple.Elem = authorElmBuilder.build(Scope.Empty)
+    val authorElm: simple.Elem = authorElmBuilder.notUndeclaringPrefixes(Scope.Empty)
 
     // Let's functionally insert the author
 
-    val authorsPath = indexed.Elem(booksElm).findElem(_.resolvedName == EName("{http://bookstore}Authors")).map(_.path).
-      getOrElse(sys.error("No 'Authors' element found"))
+    val authorsPath = indexed
+      .Elem(booksElm)
+      .findElem(_.resolvedName == EName("{http://bookstore}Authors"))
+      .map(_.path)
+      .getOrElse(sys.error("No 'Authors' element found"))
 
-    val updatedBooksElm: simple.Elem = booksElm.updateElemOrSelf(authorsPath) {
-      e => e.plusChild(authorElm)
+    val updatedBooksElm: simple.Elem = booksElm.updateElemOrSelf(authorsPath) { e =>
+      e.plusChild(authorElm)
     }
 
     assertResult(Some(authorsPath)) {
       indexed.Elem(updatedBooksElm).findElemOrSelf(e => e.localName == "Author").flatMap(e => e.path.parentPathOption)
     }
     assertResult(true) {
-      updatedBooksElm.findAllElemsOrSelf forall { e => e.scope == Scope.from("books" -> "http://bookstore") }
-    }
-
-    // Although the "inserted" tree had its own namespace declarations, they are superfluous within the parent tree,
-    // and are lost when converting the parent tree back to an ElemBuilder.
-
-    assertResult(true) {
-      NodeBuilder.fromElem(updatedBooksElm)(Scope.Empty).allDeclarationsAreAtTopLevel
+      updatedBooksElm.findAllElemsOrSelf.forall { e =>
+        e.scope == Scope.from("books" -> "http://bookstore")
+      }
     }
   }
 }

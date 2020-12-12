@@ -18,20 +18,19 @@ package eu.cdevreeze.yaidom.integrationtest
 
 import java.{io => jio}
 
-import scala.collection.immutable
-
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.QName
+import eu.cdevreeze.yaidom.core.Scope
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
 import eu.cdevreeze.yaidom.print.DocumentPrinterUsingSax
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.simple.Elem
-import eu.cdevreeze.yaidom.simple.NodeBuilder
-import eu.cdevreeze.yaidom.simple.NodeBuilder.elem
-import eu.cdevreeze.yaidom.simple.NodeBuilder.emptyElem
-import eu.cdevreeze.yaidom.simple.NodeBuilder.textElem
+import eu.cdevreeze.yaidom.simple.Node
+import eu.cdevreeze.yaidom.simple.Node._
 import org.scalatest.funsuite.AnyFunSuite
 import org.xml.sax.InputSource
+
+import scala.collection.immutable
 
 /**
  * Example http://www.javacodegeeks.com/2012/05/scala-basic-xml-processing.html (for Scala's XML library) "ported" to
@@ -55,19 +54,21 @@ class BasicXmlProcessingTest extends AnyFunSuite {
     val foo =
       elem(
         qname = QName("foo"),
+        scope = Scope.Empty,
         children = Vector(
           textElem(
             qname = QName("bar"),
             attributes = Vector(QName("type") -> "greet"),
+            scope = Scope.Empty,
             txt = "hi"),
-          textElem(
-            qname = QName("bar"),
-            attributes = Vector(QName("type") -> "count"),
-            txt = "1"),
+          textElem(qname = QName("bar"), attributes = Vector(QName("type") -> "count"), scope = Scope.Empty, txt = "1"),
           textElem(
             qname = QName("bar"),
             attributes = Vector(QName("type") -> "color"),
-            txt = "yellow"))).build()
+            scope = Scope.Empty,
+            txt = "yellow")
+        )
+      )
 
     // foo.text returns the empty string in yaidom's case, but it is still easy to get all text inside foo
     assertResult("hi1yellow") {
@@ -83,68 +84,71 @@ class BasicXmlProcessingTest extends AnyFunSuite {
     val bars = foo \ (_.localName == "bar")
 
     assertResult(List("bar", "bar", "bar")) {
-      bars map {
+      bars.map {
         _.localName
       }
     }
 
     assertResult("hi 1 yellow") {
       val bars = foo \ (_.localName == "bar")
-      bars map {
-        _.text
-      } mkString " "
+      bars
+        .map {
+          _.text
+        }
+        .mkString(" ")
     }
 
     assertResult(List("greet", "count", "color")) {
-      (foo \ (_.localName == "bar")) map {
+      (foo \ (_.localName == "bar")).map {
         _.attributeOption(EName("type")).getOrElse("")
       }
     }
     assertResult(List("greet", "count", "color")) {
       // Knowing that the attribute "type" is always present
-      (foo \ (_.localName == "bar")) map {
+      (foo \ (_.localName == "bar")).map {
         _.attribute(EName("type"))
       }
     }
 
     assertResult(List("greet" -> "hi", "count" -> "1", "color" -> "yellow")) {
-      (foo \ (_.localName == "bar")) map { e => (e.attribute(EName("type")) -> e.text) }
+      (foo \ (_.localName == "bar")).map { e =>
+        e.attribute(EName("type")) -> e.text
+      }
     }
 
     // Again verbose but "precise" creation of an Elem
     val baz =
       elem(
         qname = QName("a"),
+        scope = Scope.Empty,
         children = Vector(
-          emptyElem(
-            qname = QName("z"),
-            attributes = Vector(QName("x") -> "1")),
+          emptyElem(qname = QName("z"), attributes = Vector(QName("x") -> "1"), scope = Scope.Empty),
           elem(
             qname = QName("b"),
+            scope = Scope.Empty,
             children = Vector(
-              emptyElem(
-                qname = QName("z"),
-                attributes = Vector(QName("x") -> "2")),
+              emptyElem(qname = QName("z"), attributes = Vector(QName("x") -> "2"), scope = Scope.Empty),
               elem(
                 qname = QName("c"),
-                children = Vector(
-                  emptyElem(
-                    qname = QName("z"),
-                    attributes = Vector(QName("x") -> "3")))),
-              emptyElem(
-                qname = QName("z"),
-                attributes = Vector(QName("x") -> "4")))))).build()
+                scope = Scope.Empty,
+                children =
+                  Vector(emptyElem(qname = QName("z"), attributes = Vector(QName("x") -> "3"), scope = Scope.Empty))),
+              emptyElem(qname = QName("z"), attributes = Vector(QName("x") -> "4"), scope = Scope.Empty)
+            )
+          )
+        )
+      )
 
     val zs = baz \\ (_.localName == "z")
 
     assertResult(List("z", "z", "z", "z")) {
-      zs map {
+      zs.map {
         _.localName
       }
     }
 
     assertResult(List("1", "2", "3", "4")) {
-      (baz \\ (_.localName == "z")) map {
+      (baz \\ (_.localName == "z")).map {
         _.attribute(EName("x"))
       }
     }
@@ -152,7 +156,7 @@ class BasicXmlProcessingTest extends AnyFunSuite {
     val fooString = """<foo><bar type="greet">hi</bar><bar type="count">1</bar><bar type="color">yellow</bar></foo>"""
 
     // Using JAXP parsers (with all the possible parser configuration whenever needed) instead of drinking the Kool-Aid
-    val docParser = DocumentParserUsingSax.newInstance
+    val docParser = DocumentParserUsingSax.newInstance()
     val fooElemFromString: Elem = docParser.parse(new InputSource(new jio.StringReader(fooString))).documentElement
 
     // No, I do not believe in some magic implicit notion of equality for XML, for many reasons
@@ -170,10 +174,11 @@ class BasicXmlProcessingTest extends AnyFunSuite {
   }
 
   test("testConversions") {
-    val docParser = DocumentParserUsingSax.newInstance
-    val musicElm: Elem = docParser.parse(classOf[BasicXmlProcessingTest].getResourceAsStream("music.xml")).documentElement
+    val docParser = DocumentParserUsingSax.newInstance()
+    val musicElm: Elem =
+      docParser.parse(classOf[BasicXmlProcessingTest].getResourceAsStream("music.xml")).documentElement
 
-    val songs = (musicElm \\ (_.localName == "song")) map { songElm =>
+    val songs = (musicElm \\ (_.localName == "song")).map { songElm =>
       Song(songElm.attribute(EName("title")), songElm.attribute(EName("length")))
     }
 
@@ -183,14 +188,14 @@ class BasicXmlProcessingTest extends AnyFunSuite {
       totalTime
     }
 
-    val artists = (musicElm \ (_.localName == "artist")) map { artistElm =>
+    val artists = (musicElm \ (_.localName == "artist")).map { artistElm =>
       val name = artistElm.attribute(EName("name"))
 
-      val albums = (artistElm \ (_.localName == "album")) map { albumElm =>
+      val albums = (artistElm \ (_.localName == "album")).map { albumElm =>
         val title = albumElm.attribute(EName("title"))
         val description = albumElm.getChildElem(EName("description")).text
 
-        val songs = (albumElm \ (_.localName == "song")) map { songElm =>
+        val songs = (albumElm \ (_.localName == "song")).map { songElm =>
           Song(songElm.attribute(EName("title")), songElm.attribute(EName("length")))
         }
 
@@ -200,8 +205,10 @@ class BasicXmlProcessingTest extends AnyFunSuite {
       Artist(name, albums)
     }
 
-    val albumLengths = artists flatMap { artist =>
-      artist.albums map { album => (artist.name, album.title, album.length) }
+    val albumLengths = artists.flatMap { artist =>
+      artist.albums.map { album =>
+        (artist.name, album.title, album.length)
+      }
     }
 
     assertResult(4) {
@@ -216,40 +223,48 @@ class BasicXmlProcessingTest extends AnyFunSuite {
 
     // Marshalling the NodeBuilder way
 
-    val musicElm2 =
+    val musicElm2: Elem =
       elem(
         qname = QName("music"),
-        children = artists map { artist =>
+        scope = Scope.Empty,
+        children = artists.map { artist =>
           elem(
             qname = QName("artist"),
             attributes = Vector(QName("name") -> artist.name),
-            children = artist.albums map { album =>
-              elem(
-                qname = QName("album"),
-                attributes = Vector(QName("title") -> album.title),
-                children = {
-                  val songChildren: immutable.IndexedSeq[NodeBuilder] = album.songs map { song =>
-                    emptyElem(
-                      qname = QName("song"),
-                      attributes = Vector(QName("title") -> song.title, QName("length") -> song.length))
+            scope = Scope.Empty,
+            children = artist.albums.map {
+              album =>
+                elem(
+                  qname = QName("album"),
+                  attributes = Vector(QName("title") -> album.title),
+                  scope = Scope.Empty,
+                  children = {
+                    val songChildren: immutable.IndexedSeq[Node] = album.songs.map { song =>
+                      emptyElem(
+                        qname = QName("song"),
+                        attributes = Vector(QName("title") -> song.title, QName("length") -> song.length),
+                        scope = Scope.Empty)
+                    }
+
+                    val descriptionElm = textElem(QName("description"), Scope.Empty, album.description)
+
+                    songChildren :+ descriptionElm
                   }
+                )
+            }
+          )
+        }
+      )
 
-                  val descriptionElm = textElem(QName("description"), album.description)
-
-                  songChildren :+ descriptionElm
-                })
-            })
-        }).build()
-
-    val docPrinter = DocumentPrinterUsingSax.newInstance
+    val docPrinter = DocumentPrinterUsingSax.newInstance()
     val musicXml = docPrinter.print(musicElm2)
 
     val musicElm3 = docParser.parse(new InputSource(new jio.StringReader(musicXml))).documentElement
 
     val musicElmWithoutLinks: Elem =
-      musicElm transformElemsOrSelf {
+      musicElm.transformElemsOrSelf {
         case e if e.localName == "description" =>
-          val updatedAttrs = e.attributes filterNot { case (qn, v) => qn == QName("link") }
+          val updatedAttrs = e.attributes.filterNot { case (qn, _) => qn == QName("link") }
           Elem(e.qname, updatedAttrs, e.scope, e.children)
         case e => e
       }
@@ -272,7 +287,7 @@ class BasicXmlProcessingTest extends AnyFunSuite {
 
 object BasicXmlProcessingTest {
 
-  final case class Song(val title: String, val length: String) {
+  final case class Song(title: String, length: String) {
     val timeInSeconds: Int = {
       val arr = length.split(":")
       require(arr.length == 2)
@@ -282,11 +297,11 @@ object BasicXmlProcessingTest {
     }
   }
 
-  final case class Album(val title: String, val songs: immutable.IndexedSeq[Song], val description: String) {
+  final case class Album(title: String, songs: immutable.IndexedSeq[Song], description: String) {
     val timeInSeconds: Int = songs.map(_.timeInSeconds).sum
     val length: String = (timeInSeconds / 60).toString + ":" + (timeInSeconds % 60).toString
   }
 
-  final case class Artist(val name: String, val albums: immutable.IndexedSeq[Album])
+  final case class Artist(name: String, albums: immutable.IndexedSeq[Album])
 
 }

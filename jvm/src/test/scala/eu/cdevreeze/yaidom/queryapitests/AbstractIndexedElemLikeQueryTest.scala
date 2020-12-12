@@ -16,13 +16,13 @@
 
 package eu.cdevreeze.yaidom.queryapitests
 
-import scala.collection.immutable
-
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.PathConversions
 import eu.cdevreeze.yaidom.indexed.IndexedClarkElem
-import eu.cdevreeze.yaidom.queryapi.ClarkNodes
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi._
+import eu.cdevreeze.yaidom.queryapi.ClarkNodes
+
+import scala.collection.immutable
 
 /**
  * ElemLike-based query test case, taking an IndexedClarkElem.
@@ -43,7 +43,11 @@ abstract class AbstractIndexedElemLikeQueryTest extends AbstractElemLikeQueryTes
         author <- bookstore.filterElems(withLocalName("Author"))
         bookPath <- author.path.findAncestorPath(_.elementNameOption.map(_.localPart).contains("Book"))
         book <- bookstore.findElem(_.path == bookPath)
-        if book.getChildElem(withLocalName("Title")).underlyingElem.text.startsWith("A First Course in Database Systems")
+        if book
+          .getChildElem(withLocalName("Title"))
+          .underlyingElem
+          .text
+          .startsWith("A First Course in Database Systems")
       } yield author
 
     assertResult(List("Ullman", "Widom")) {
@@ -60,7 +64,11 @@ abstract class AbstractIndexedElemLikeQueryTest extends AbstractElemLikeQueryTes
         bookAbsolutePath <- author.absolutePath.findAncestor(_.elementName.localPart == "Book")
         bookPath = PathConversions.convertAbsolutePathToPath(bookAbsolutePath)
         book <- bookstore.findElem(_.path == bookPath)
-        if book.getChildElem(withLocalName("Title")).underlyingElem.text.startsWith("A First Course in Database Systems")
+        if book
+          .getChildElem(withLocalName("Title"))
+          .underlyingElem
+          .text
+          .startsWith("A First Course in Database Systems")
       } yield author
 
     assertResult(List("Ullman", "Widom")) {
@@ -81,15 +89,17 @@ abstract class AbstractIndexedElemLikeQueryTest extends AbstractElemLikeQueryTes
       for {
         book <- store \ (_.localName == "Book")
         if book.attribute(EName("Price")).toInt < 90
-        authors = book getChildElem { _.localName == "Authors" }
-        authorLastName <- authors \ { _.localName == "Author" } flatMap { e => e \ (_.localName == "Last_Name") } map { _.trimmedText }
+        authors = book.getChildElem { _.localName == "Authors" }
+        authorLastName <- (authors \ { _.localName == "Author" })
+          .flatMap { e =>
+            e \ (_.localName == "Last_Name")
+          }
+          .map { _.trimmedText }
         if authorLastName == "Ullman"
       } yield book.getChildElem(EName("Title"))
 
-    assertResult(Set(
-      "A First Course in Database Systems",
-      "Hector and Jeff's Database Hints")) {
-      val result = getBookTitles(bookstore) map { _.trimmedText }
+    assertResult(Set("A First Course in Database Systems", "Hector and Jeff's Database Hints")) {
+      val result = getBookTitles(bookstore).map { _.trimmedText }
       result.toSet
     }
 
@@ -116,7 +126,9 @@ abstract class AbstractIndexedElemLikeQueryTest extends AbstractElemLikeQueryTes
       } yield magazine
 
     assertResult(Set("Hector and Jeff's Database Hints")) {
-      val result = getMagazines(bookstore) flatMap { mag => mag.findElem(EName("Title")) map { _.trimmedText } }
+      val result = getMagazines(bookstore).flatMap { mag =>
+        mag.findElem(EName("Title")).map { _.trimmedText }
+      }
       result.toSet
     }
 
