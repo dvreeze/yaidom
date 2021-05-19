@@ -356,7 +356,7 @@ class TreeReprTest extends AnyFunSuite {
   }
 
   test("testCreateTreeForXmlWithNamespaceUndeclarations") {
-    val domParser = DocumentParserUsingDom.newInstance
+    val domParser = DocumentParserUsingDom.newInstance()
     val is = classOf[TreeReprTest].getResourceAsStream("trivialXmlWithNSUndeclarations.xml")
 
     val doc: Document = domParser.parse(is)
@@ -431,7 +431,7 @@ class TreeReprTest extends AnyFunSuite {
   }
 
   test("testCreateTreeForXmlWithSpecialChars") {
-    val domParser = DocumentParserUsingDom.newInstance
+    val domParser = DocumentParserUsingDom.newInstance()
 
     val is = classOf[TreeReprTest].getResourceAsStream("trivialXmlWithEuro.xml")
 
@@ -465,7 +465,7 @@ class TreeReprTest extends AnyFunSuite {
    * The Scala counterpart is more type-safe.
    */
   test("testCreateTreeForGroovyXmlExample") {
-    val parser = DocumentParserUsingDom.newInstance
+    val parser = DocumentParserUsingDom.newInstance()
 
     val doc = parser.parse(classOf[TreeReprTest].getResourceAsStream("cars.xml"))
 
@@ -531,7 +531,7 @@ class TreeReprTest extends AnyFunSuite {
   }
 
   test("testCreateTreeForFileWithUtf8Bom") {
-    val domParser = DocumentParserUsingDom.newInstance
+    val domParser = DocumentParserUsingDom.newInstance()
 
     val is = classOf[TreeReprTest].getResourceAsStream("books.xml")
     val ba = Iterator.continually(is.read()).takeWhile(b => b != -1).map(_.toByte).toArray
@@ -733,7 +733,7 @@ class TreeReprTest extends AnyFunSuite {
    * See https://github.com/dvreeze/yaidom/issues/5. Thanks to Matthias Hogerheijde for the bug report.
    */
   test("testCreateTreeForXmlFromBugReport") {
-    val parser = DocumentParserUsingDom.newInstance
+    val parser = DocumentParserUsingDom.newInstance()
 
     val xmlString =
       """<?xml version="1.0" encoding="UTF-8"?>

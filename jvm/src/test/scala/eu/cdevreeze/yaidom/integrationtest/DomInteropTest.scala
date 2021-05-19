@@ -195,76 +195,6 @@ class DomInteropTest extends AnyFunSuite {
       val result = root5 \\ { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
       result.size
     }
-
-    // 8. Serialize, deserialize it, and check again.
-
-    val rootDocBuilder = Document(root)
-    val bos = new jio.ByteArrayOutputStream
-    val oos = new jio.ObjectOutputStream(bos)
-
-    oos.writeObject(rootDocBuilder)
-
-    val objectBytes = bos.toByteArray
-
-    assert(objectBytes.size >= 1000 && objectBytes.size <= 50000, "Expected the serialized document to be >= 1000 and <= 50000 bytes")
-
-    val bis2 = new jio.ByteArrayInputStream(objectBytes)
-    val ois = new jio.ObjectInputStream(bis2)
-
-    val doc7 = ois.readObject().asInstanceOf[Document]
-    val root7 = doc7.documentElement
-
-    assertResult((root.findAllElems map (e => e.localName)).toSet) {
-      (root7.findAllElems map (e => e.localName)).toSet
-    }
-    assertResult((root.findAllElemsOrSelf map (e => e.localName)).toSet) {
-      (root7.findAllElemsOrSelf map (e => e.localName)).toSet
-    }
-    assertResult(root.filterElemsOrSelf(EName(nsBookstore, "Title")).size) {
-      root7.filterElemsOrSelf(EName(nsBookstore, "Title")).size
-    }
-    assertResult {
-      val result = root \\ { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
-      result.size
-    } {
-      val result = root7 \\ { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
-      result.size
-    }
-
-    // 10. Serialize the Document, deserialize it, and check again.
-
-    val rootDoc = Document(root)
-    val bos3 = new jio.ByteArrayOutputStream
-    val oos3 = new jio.ObjectOutputStream(bos3)
-
-    oos3.writeObject(rootDoc)
-
-    val objectBytes3 = bos3.toByteArray
-
-    assert(objectBytes3.size >= 1000 && objectBytes3.size <= 50000, "Expected the serialized document to be >= 1000 and <= 50000 bytes")
-
-    val bis3 = new jio.ByteArrayInputStream(objectBytes3)
-    val ois3 = new jio.ObjectInputStream(bis3)
-
-    val doc8 = ois3.readObject().asInstanceOf[Document]
-    val root8 = doc8.documentElement
-
-    assertResult((root.findAllElems map (e => e.localName)).toSet) {
-      (root8.findAllElems map (e => e.localName)).toSet
-    }
-    assertResult((root.findAllElemsOrSelf map (e => e.localName)).toSet) {
-      (root8.findAllElemsOrSelf map (e => e.localName)).toSet
-    }
-    assertResult(root.filterElemsOrSelf(EName(nsBookstore, "Title")).size) {
-      root8.filterElemsOrSelf(EName(nsBookstore, "Title")).size
-    }
-    assertResult {
-      val result = root \\ { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
-      result.size
-    } {
-      val result = root8 \\ { e => e.resolvedName == EName(nsBookstore, "Last_Name") && e.trimmedText == "Ullman" }
-      result.size
-    }
   }
 
   /** See discussion on https://github.com/djspiewak/anti-xml/issues/78 */
@@ -781,7 +711,7 @@ class DomInteropTest extends AnyFunSuite {
   test("testParseXmlWithNamespaceUndeclarations") {
     // 1. Parse XML file into Elem
 
-    val domParser = DocumentParserUsingDom.newInstance
+    val domParser = DocumentParserUsingDom.newInstance()
     val is = classOf[DomInteropTest].getResourceAsStream("trivialXmlWithNSUndeclarations.xml")
 
     val root: Elem = domParser.parse(is).documentElement
@@ -900,7 +830,7 @@ class DomInteropTest extends AnyFunSuite {
   test("testParseXmlWithSpecialChars") {
     // 1. Parse XML file into Elem
 
-    val domParser = DocumentParserUsingDom.newInstance
+    val domParser = DocumentParserUsingDom.newInstance()
 
     val is = classOf[DomInteropTest].getResourceAsStream("trivialXmlWithEuro.xml")
 
@@ -966,7 +896,7 @@ class DomInteropTest extends AnyFunSuite {
   test("testParseGeneratedHtml") {
     // 1. Parse XML file into Elem
 
-    val domParser = DocumentParserUsingDom.newInstance
+    val domParser = DocumentParserUsingDom.newInstance()
     val is = classOf[DomInteropTest].getResourceAsStream("books.xml")
 
     val root: Elem = domParser.parse(is).documentElement
@@ -1108,7 +1038,7 @@ class DomInteropTest extends AnyFunSuite {
    * The Scala counterpart is more type-safe.
    */
   test("testParseGroovyXmlExample") {
-    val parser = DocumentParserUsingDom.newInstance
+    val parser = DocumentParserUsingDom.newInstance()
 
     val doc = parser.parse(classOf[DomInteropTest].getResourceAsStream("cars.xml"))
 
@@ -1183,7 +1113,7 @@ class DomInteropTest extends AnyFunSuite {
   test("testParseFileWithUtf8Bom") {
     // 1. Parse XML file into Elem
 
-    val domParser = DocumentParserUsingDom.newInstance
+    val domParser = DocumentParserUsingDom.newInstance()
 
     val is = classOf[DomInteropTest].getResourceAsStream("books.xml")
     val ba = Iterator.continually(is.read()).takeWhile(b => b != -1).map(_.toByte).toArray

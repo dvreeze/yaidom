@@ -31,7 +31,7 @@ class RobustQueryTest extends AbstractRobustQueryTest {
   final type E = DomElem
 
   protected final val contactsElem: DomElem = {
-    val dbf = DocumentBuilderFactory.newInstance
+    val dbf = DocumentBuilderFactory.newInstance()
 
     def createDocumentBuilder(documentBuilderFactory: DocumentBuilderFactory): DocumentBuilder = {
       val db = documentBuilderFactory.newDocumentBuilder()

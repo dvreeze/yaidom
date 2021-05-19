@@ -75,7 +75,7 @@ class FriendFeedTest extends AnyFunSuite {
 
     // We can configure the DocumentParser (it's wrapped JAXP, after all), but we do not need that here
 
-    val docParser = DocumentParserUsingSax.newInstance
+    val docParser = DocumentParserUsingSax.newInstance()
 
     val doc: Document = {
       val is = classOf[FriendFeedTest].getResourceAsStream("friend-feed.xml")

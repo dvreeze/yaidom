@@ -125,7 +125,7 @@ class XPathInteropTest extends AnyFunSuite with BeforeAndAfterAll {
     val expr = xpath.compile(xpathExpr)
 
     val is = classOf[XPathInteropTest].getResourceAsStream("books.xml")
-    val docParser = parse.DocumentParserUsingSax.newInstance
+    val docParser = parse.DocumentParserUsingSax.newInstance()
     val doc = docParser.parse(is)
     val dbf = javax.xml.parsers.DocumentBuilderFactory.newInstance()
     dbf.setNamespaceAware(true)

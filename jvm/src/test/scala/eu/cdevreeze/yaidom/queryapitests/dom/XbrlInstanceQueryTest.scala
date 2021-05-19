@@ -30,7 +30,7 @@ class XbrlInstanceQueryTest extends AbstractXbrlInstanceQueryTest {
   final type E = DomElem
 
   protected final val xbrlInstance: DomElem = {
-    val dbf = DocumentBuilderFactory.newInstance
+    val dbf = DocumentBuilderFactory.newInstance()
     val db = dbf.newDocumentBuilder()
 
     val is = classOf[XbrlInstanceQueryTest].getResourceAsStream("/eu/cdevreeze/yaidom/queryapitests/sample-xbrl-instance.xml")

@@ -37,7 +37,7 @@ import org.scalatest.funsuite.AnyFunSuite
 class CdStoreTest extends AnyFunSuite with BeforeAndAfterAll {
 
   test("testQueryArtistElems") {
-    val parser = DocumentParserUsingSax.newInstance
+    val parser = DocumentParserUsingSax.newInstance()
 
     val doc = parser.parse(classOf[CdStoreTest].getResourceAsStream("cdstore.xml"))
 
@@ -77,7 +77,7 @@ class CdStoreTest extends AnyFunSuite with BeforeAndAfterAll {
   }
 
   test("testQueryArtistAsText") {
-    val parser = DocumentParserUsingSax.newInstance
+    val parser = DocumentParserUsingSax.newInstance()
 
     val doc = parser.parse(classOf[CdStoreTest].getResourceAsStream("cdstore.xml"))
 
@@ -129,7 +129,7 @@ class CdStoreTest extends AnyFunSuite with BeforeAndAfterAll {
   }
 
   test("testQueryPrice") {
-    val parser = DocumentParserUsingSax.newInstance
+    val parser = DocumentParserUsingSax.newInstance()
 
     val doc = parser.parse(classOf[CdStoreTest].getResourceAsStream("cdstore.xml"))
 

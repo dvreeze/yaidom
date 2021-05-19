@@ -162,7 +162,7 @@ class Blog2XbrlTest extends AnyFunSuite {
 
     val altInstanceElem = makeAlternativeInstance(idoc)
 
-    val docPrinter = DocumentPrinterUsingDom.newInstance
+    val docPrinter = DocumentPrinterUsingDom.newInstance()
     val altInstanceXmlString =
       docPrinter.print(altInstanceElem.prettify(2))
 
@@ -310,7 +310,7 @@ class Blog2XbrlTest extends AnyFunSuite {
     }
   }
 
-  private val docParser = DocumentParserUsingSax.newInstance
+  private val docParser = DocumentParserUsingSax.newInstance()
 
   private val idoc = indexed.Document(docParser.parse(sampleXbrlInstanceFile))
   private val idocElem = idoc.documentElement

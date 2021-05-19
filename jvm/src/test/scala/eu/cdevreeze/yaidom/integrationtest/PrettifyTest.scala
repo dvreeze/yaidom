@@ -76,7 +76,7 @@ class PrettifyTest extends AnyFunSuite {
   }
 
   test("testPrettifySchemaXsd") {
-    val dbf = DocumentBuilderFactory.newInstance
+    val dbf = DocumentBuilderFactory.newInstance()
 
     def createDocumentBuilder(documentBuilderFactory: DocumentBuilderFactory): DocumentBuilder = {
       val db = documentBuilderFactory.newDocumentBuilder()
@@ -116,7 +116,7 @@ class PrettifyTest extends AnyFunSuite {
   }
 
   test("testPrettifyXmlWithNonExpandedEntityRef") {
-    val dbf = DocumentBuilderFactory.newInstance
+    val dbf = DocumentBuilderFactory.newInstance()
     dbf.setExpandEntityReferences(false)
     val domParser = DocumentParserUsingDom.newInstance(dbf)
     val is = classOf[PrettifyTest].getResourceAsStream("trivialXmlWithEntityRef.xml")
@@ -127,7 +127,7 @@ class PrettifyTest extends AnyFunSuite {
   }
 
   test("testPrettifyXmlWithNamespaceUndeclarations") {
-    val domParser = DocumentParserUsingDom.newInstance
+    val domParser = DocumentParserUsingDom.newInstance()
     val is = classOf[PrettifyTest].getResourceAsStream("trivialXmlWithNSUndeclarations.xml")
 
     val doc: Document = domParser.parse(is)
@@ -136,7 +136,7 @@ class PrettifyTest extends AnyFunSuite {
   }
 
   test("testPrettifyXmlWithEscapedChars") {
-    val dbf = DocumentBuilderFactory.newInstance
+    val dbf = DocumentBuilderFactory.newInstance()
     dbf.setCoalescing(true)
     val domParser = DocumentParserUsingDom.newInstance(dbf)
     val is = classOf[PrettifyTest].getResourceAsStream("trivialXmlWithEscapedChars.xml")
@@ -147,7 +147,7 @@ class PrettifyTest extends AnyFunSuite {
   }
 
   test("testPrettifyXmlWithSpecialChars") {
-    val domParser = DocumentParserUsingDom.newInstance
+    val domParser = DocumentParserUsingDom.newInstance()
 
     val is = classOf[PrettifyTest].getResourceAsStream("trivialXmlWithEuro.xml")
 
@@ -161,7 +161,7 @@ class PrettifyTest extends AnyFunSuite {
    * The Scala counterpart is more type-safe.
    */
   test("testPrettifyGroovyXmlExample") {
-    val parser = DocumentParserUsingDom.newInstance
+    val parser = DocumentParserUsingDom.newInstance()
 
     val doc = parser.parse(classOf[PrettifyTest].getResourceAsStream("cars.xml"))
 
@@ -169,7 +169,7 @@ class PrettifyTest extends AnyFunSuite {
   }
 
   test("testPrettifyFileWithUtf8Bom") {
-    val domParser = DocumentParserUsingDom.newInstance
+    val domParser = DocumentParserUsingDom.newInstance()
 
     val is = classOf[PrettifyTest].getResourceAsStream("books.xml")
     val ba = Iterator.continually(is.read()).takeWhile(b => b != -1).map(_.toByte).toArray
@@ -186,7 +186,7 @@ class PrettifyTest extends AnyFunSuite {
    * See https://github.com/dvreeze/yaidom/issues/5. Thanks to Matthias Hogerheijde for the bug report.
    */
   test("testPrettifyXmlFromBugReport") {
-    val parser = DocumentParserUsingDom.newInstance
+    val parser = DocumentParserUsingDom.newInstance()
 
     val xmlString =
       """<?xml version="1.0" encoding="UTF-8"?>
@@ -208,7 +208,7 @@ class PrettifyTest extends AnyFunSuite {
    * See http://stackoverflow.com/questions/11703635/strip-whitespace-and-newlines-from-xml-in-java.
    */
   test("testRemoveIgnorableWhitespace") {
-    val dbf = DocumentBuilderFactory.newInstance
+    val dbf = DocumentBuilderFactory.newInstance()
     dbf.setCoalescing(false)
     val parser = DocumentParserUsingDom.newInstance(dbf)
 

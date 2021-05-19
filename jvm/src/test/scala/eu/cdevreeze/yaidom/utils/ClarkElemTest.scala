@@ -32,7 +32,7 @@ import org.scalatest.funsuite.AnyFunSuite
  */
 class ClarkElemTest extends AnyFunSuite {
 
-  private val docParser = DocumentParserUsingSax.newInstance
+  private val docParser = DocumentParserUsingSax.newInstance()
 
   test("testCreateXbrlInstance") {
     val instance = createInstance()

@@ -25,9 +25,7 @@ import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.dom.DomDocument
 import eu.cdevreeze.yaidom.dom.DomElem
 import eu.cdevreeze.yaidom.indexed
-import eu.cdevreeze.yaidom.indexed.AbstractIndexedClarkElem
-import eu.cdevreeze.yaidom.indexed.IndexedClarkElem
-import eu.cdevreeze.yaidom.indexed.IndexedScopedElem
+import eu.cdevreeze.yaidom.indexed.IndexedNode
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingSax
 import eu.cdevreeze.yaidom.queryapi.ClarkNodes
 import eu.cdevreeze.yaidom.resolved
@@ -44,59 +42,10 @@ import org.xml.sax.InputSource
  */
 class IndexedElemTest extends AnyFunSuite {
 
-  test("testIndexingForSimpleElem") {
-    doTestIndexing[Elem, indexed.Elem](IndexedScopedElem(docWithCommentAtEnd.documentElement))
+  test("testIndexedElem") {
+    doTestIndexing(IndexedNode.Elem(docWithCommentAtEnd.documentElement))
 
-    doTestIndexing[Elem, indexed.Elem](IndexedScopedElem(docUsingXml11.documentElement))
-  }
-
-  test("testIndexingForDomWrapperElem") {
-    val d1 = javax.xml.parsers.DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument()
-    doTestIndexing[DomElem, IndexedScopedElem[DomElem]](
-      IndexedScopedElem(DomDocument.wrapDocument(DomConversions.convertDocument(docWithCommentAtEnd)(d1)).documentElement))
-
-    val d2 = javax.xml.parsers.DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument()
-    doTestIndexing[DomElem, IndexedScopedElem[DomElem]](
-      IndexedScopedElem(DomDocument.wrapDocument(DomConversions.convertDocument(docUsingXml11)(d2)).documentElement))
-  }
-
-  test("testClarkElemIndexingForDomWrapperElem") {
-    val d1 = javax.xml.parsers.DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument()
-    doTestIndexing[DomElem, IndexedClarkElem[DomElem]](
-      IndexedClarkElem(DomDocument.wrapDocument(DomConversions.convertDocument(docWithCommentAtEnd)(d1)).documentElement))
-
-    val d2 = javax.xml.parsers.DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument()
-    doTestIndexing[DomElem, IndexedClarkElem[DomElem]](
-      IndexedClarkElem(DomDocument.wrapDocument(DomConversions.convertDocument(docUsingXml11)(d2)).documentElement))
-  }
-
-  test("testIndexingForScalaXmlWrapperElem") {
-    doTestIndexing[ScalaXmlElem, IndexedScopedElem[ScalaXmlElem]](
-      IndexedScopedElem(ScalaXmlElem(ScalaXmlConversions.convertElem(docWithCommentAtEnd.documentElement))))
-
-    doTestIndexing[ScalaXmlElem, IndexedScopedElem[ScalaXmlElem]](
-      IndexedScopedElem(ScalaXmlElem(ScalaXmlConversions.convertElem(docUsingXml11.documentElement))))
-  }
-
-  test("testDoubleIndexing") {
-    val rootElem = docWithCommentAtEnd.documentElement
-    val strangeElem = IndexedScopedElem(IndexedScopedElem(rootElem))
-
-    assertResult(IndexedScopedElem(rootElem).findAllElemsOrSelf.map(e => resolved.Elem.from(e.underlyingElem))) {
-      strangeElem.findAllElemsOrSelf.map(e => resolved.Elem.from(e.underlyingElem.underlyingElem))
-    }
-
-    assertResult(IndexedClarkElem(resolved.Elem.from(rootElem)).findAllElemsOrSelf.map(_.underlyingElem)) {
-      strangeElem.findAllElemsOrSelf.map(e => resolved.Elem.from(e.underlyingElem.underlyingElem))
-    }
-
-    assertResult(resolved.Elem.from(rootElem).findAllElemsOrSelf) {
-      strangeElem.findAllElemsOrSelf.map(e => resolved.Elem.from(e.underlyingElem.underlyingElem))
-    }
-
-    assertResult(resolved.Elem.from(rootElem).findAllElemsOrSelf) {
-      IndexedScopedElem(strangeElem).findAllElemsOrSelf.map(e => resolved.Elem.from(e.underlyingElem.underlyingElem.underlyingElem))
-    }
+    doTestIndexing(IndexedNode.Elem(docUsingXml11.documentElement))
   }
 
   test("testGetChildren") {
@@ -105,12 +54,12 @@ class IndexedElemTest extends AnyFunSuite {
     assertResult(2)(docChildren.size)
 
     val rootElem = docWithCommentAtEnd.documentElement.prettify(2)
-    val indexedElem = IndexedScopedElem(rootElem)
+    val indexedElem = IndexedNode.Elem(rootElem)
 
     val docElemChildren = indexedElem.children
 
     assertResult(indexedElem.findAllChildElems) {
-      docElemChildren collect { case che: IndexedScopedElem[_] => che }
+      docElemChildren.collect { case che: IndexedNode.Elem => che }
     }
 
     assertResult(rootElem.text) {
@@ -118,20 +67,21 @@ class IndexedElemTest extends AnyFunSuite {
     }
 
     assertResult(indexedElem.text) {
-      val textChildren = docElemChildren collect { case ch: ClarkNodes.Text => ch }
+      val textChildren = docElemChildren.collect { case ch: ClarkNodes.Text => ch }
       textChildren.map(_.text).mkString
     }
   }
 
-  private def doTestIndexing[U <: ClarkNodes.Elem.Aux[_, U], E <: AbstractIndexedClarkElem[U]](rootElem: E): Unit = {
+  private def doTestIndexing(rootElem: IndexedNode.Elem): Unit = {
     assertResult(List("product", "number", "size")) {
       rootElem.findAllElemsOrSelf.map(_.localName)
     }
 
-    assertResult(List(
-      List(EName(ns, "product")),
-      List(EName(ns, "product"), EName(ns, "number")),
-      List(EName(ns, "product"), EName(ns, "size")))) {
+    assertResult(
+      List(
+        List(EName(ns, "product")),
+        List(EName(ns, "product"), EName(ns, "number")),
+        List(EName(ns, "product"), EName(ns, "size")))) {
 
       rootElem.findAllElemsOrSelf.map(_.reverseAncestryOrSelfENames)
     }
@@ -140,52 +90,23 @@ class IndexedElemTest extends AnyFunSuite {
       rootElem.findAllElemsOrSelf.map(_.reverseAncestryENames)
     }
 
-    val resolvedElem = resolved.Elem.from(rootElem.underlyingElem)
-    val indexedClarkElem = IndexedClarkElem(resolvedElem)
-
-    assertResult(rootElem.findAllElemsOrSelf.map(_.reverseAncestryOrSelfENames)) {
-      indexedClarkElem.findAllElemsOrSelf.map(_.reverseAncestryOrSelfENames)
-    }
-
-    assertResult(rootElem.findAllElemsOrSelf.map(_.reverseAncestryENames)) {
-      indexedClarkElem.findAllElemsOrSelf.map(_.reverseAncestryENames)
-    }
-
     assertResult(List(List(EName(ns, "product"), EName(ns, "size")))) {
-      rootElem.filterElems(e =>
-        e.resolvedName == EName(ns, "size") && e.path == Path.from(EName(ns, "size") -> 0)).map(_.reverseAncestryOrSelfENames)
-    }
-
-    assertResult(rootElem.filterElems(e =>
-      e.resolvedName == EName(ns, "size") && e.path == Path.from(EName(ns, "size") -> 0)).map(_.reverseAncestryOrSelfENames)) {
-
-      indexedClarkElem.filterElems(e =>
-        e.resolvedName == EName(ns, "size") && e.path == Path.from(EName(ns, "size") -> 0)).map(_.reverseAncestryOrSelfENames)
+      rootElem
+        .filterElems(e => e.resolvedName == EName(ns, "size") && e.path == Path.from(EName(ns, "size") -> 0))
+        .map(_.reverseAncestryOrSelfENames)
     }
 
     // Some general properties
 
-    assertResult(resolvedElem.findAllElemsOrSelf) {
-      indexedClarkElem.findAllElemsOrSelf.map(e => resolved.Elem.from(e.underlyingElem))
-    }
-
-    assertResult(indexedClarkElem.findAllElemsOrSelf.map(e => resolved.Elem.from(e.underlyingElem))) {
-      rootElem.underlyingElem.findAllElemsOrSelf.map(e => resolved.Elem.from(e))
-    }
-
-    assertResult(resolvedElem.findAllElemsOrSelf) {
-      indexedClarkElem.findAllElemsOrSelf.map(e => e.underlyingRootElem.getElemOrSelfByPath(e.path))
-    }
-
-    assertResult(resolvedElem.findAllElemsOrSelf) {
-      rootElem.findAllElemsOrSelf.map(e => resolved.Elem.from(e.underlyingRootElem.getElemOrSelfByPath(e.path).asInstanceOf[ClarkNodes.Elem]))
+    assertResult(rootElem.findAllElemsOrSelf.map(resolved.Elem.from)) {
+      rootElem.findAllElemsOrSelf.map(e => e.underlyingRootElem.getElemOrSelfByPath(e.path)).map(resolved.Elem.from)
     }
   }
 
   private val ns = "http://datypic.com/prod"
 
   private val docWithCommentAtEnd: Document = {
-    val docParser = DocumentParserUsingSax.newInstance
+    val docParser = DocumentParserUsingSax.newInstance()
 
     val xml =
       """|<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -201,7 +122,7 @@ class IndexedElemTest extends AnyFunSuite {
   }
 
   private val docUsingXml11: Document = {
-    val docParser = DocumentParserUsingSax.newInstance
+    val docParser = DocumentParserUsingSax.newInstance()
 
     val xml =
       """|<?xml version="1.1" encoding="iso-8859-1" standalone="no"?>

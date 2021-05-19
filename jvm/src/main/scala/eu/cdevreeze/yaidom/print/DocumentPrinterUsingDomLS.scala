@@ -113,7 +113,7 @@ final class DocumentPrinterUsingDomLS(
   }
 
   def omittingXmlDeclaration: DocumentPrinterUsingDomLS = {
-    val newSerializerCreator = { domImpl: DOMImplementationLS =>
+    val newSerializerCreator = { (domImpl: DOMImplementationLS) =>
       val serializer = self.serializerCreator(domImpl)
       val domConfig = serializer.getDomConfig
       domConfig.setParameter("xml-declaration", java.lang.Boolean.FALSE)
@@ -138,16 +138,16 @@ object DocumentPrinterUsingDomLS {
   /** Producer of a DOM `Document`, given the DOM `Document` as factory of DOM objects */
   type DocumentProducer = (org.w3c.dom.Document => org.w3c.dom.Document)
 
-  /** Returns `newInstance(DocumentBuilderFactory.newInstance, domImplLS)`, for an appropriate `DOMImplementationLS` */
+  /** Returns `newInstance(DocumentBuilderFactory.newInstance(), domImplLS)`, for an appropriate `DOMImplementationLS` */
   def newInstance(): DocumentPrinterUsingDomLS = {
-    val registry = DOMImplementationRegistry.newInstance
+    val registry = DOMImplementationRegistry.newInstance()
     val domImpl = registry.getDOMImplementation("LS 3.0")
     require(domImpl ne null, "Expected non-null DOM Implementation for feature 'LS 3.0'") // scalastyle:off null
     require(domImpl.hasFeature("LS", "3.0"), "Expected DOM Implementation to have feature 'LS 3.0'")
     require(domImpl.isInstanceOf[DOMImplementationLS], "Expected DOM Implementation of type DOMImplementationLS")
     val domImplLS = domImpl.asInstanceOf[DOMImplementationLS]
 
-    val docBuilderFactory: DocumentBuilderFactory = DocumentBuilderFactory.newInstance
+    val docBuilderFactory: DocumentBuilderFactory = DocumentBuilderFactory.newInstance()
     newInstance(docBuilderFactory, domImplLS)
   }
 

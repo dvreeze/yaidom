@@ -39,7 +39,7 @@ class XmlBaseTest extends AbstractXmlBaseTest {
   type E = DomElem
 
   protected def getDocument(path: String, docUri: URI): DomDocument = {
-    val dbf = DocumentBuilderFactory.newInstance
+    val dbf = DocumentBuilderFactory.newInstance()
     val db = dbf.newDocumentBuilder
     val parsedDocUri = classOf[XmlBaseTest].getResource(path).toURI
 

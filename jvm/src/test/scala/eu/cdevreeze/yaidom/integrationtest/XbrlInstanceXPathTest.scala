@@ -54,7 +54,7 @@ class XbrlInstanceXPathTest extends AnyFunSuite with BeforeAndAfterAll {
   import XbrlInstanceXPathTest.XLinkNs
   import XbrlInstanceXPathTest.XbrliNs
 
-  private val docParser = parse.DocumentParserUsingSax.newInstance
+  private val docParser = parse.DocumentParserUsingSax.newInstance()
   private val doc =
     docParser.parse(classOf[XbrlInstanceXPathTest].getResourceAsStream("sample-xbrl-instance.xml"))
 

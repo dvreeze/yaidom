@@ -77,7 +77,9 @@ final case class UnprefixedName(override val localPart: String) extends QName {
   override def toString: String = localPart
 
   override def validated: UnprefixedName = {
-    require(XmlStringUtils.isAllowedElementLocalName(localPart), s"'${localPart}' is not an allowed name in QName '${this}'")
+    require(
+      XmlStringUtils.isAllowedElementLocalName(localPart),
+      s"'${localPart}' is not an allowed name in QName '${this}'")
     this
   }
 }
@@ -93,7 +95,9 @@ final case class PrefixedName(prefix: String, override val localPart: String) ex
 
   override def validated: PrefixedName = {
     require(XmlStringUtils.isAllowedPrefix(prefix), s"'${prefix}' is not an allowed prefix name in QName '${this}'")
-    require(XmlStringUtils.isAllowedElementLocalName(localPart), s"'${localPart}' is not an allowed name in QName '${this}'")
+    require(
+      XmlStringUtils.isAllowedElementLocalName(localPart),
+      s"'${localPart}' is not an allowed name in QName '${this}'")
     this
   }
 }
@@ -102,7 +106,11 @@ object QName {
 
   /** Creates a `QName` from an optional prefix and a localPart */
   def apply(prefixOption: Option[String], localPart: String): QName =
-    prefixOption map { pref => PrefixedName(pref, localPart) } getOrElse (UnprefixedName(localPart))
+    prefixOption
+      .map { pref =>
+        PrefixedName(pref, localPart)
+      }
+      .getOrElse(UnprefixedName(localPart))
 
   /** Creates a `PrefixedName` from a prefix and a localPart */
   def apply(prefix: String, localPart: String): QName = PrefixedName(prefix, localPart)
@@ -135,6 +143,6 @@ object QName {
   def unapply(qname: QName): Option[(Option[String], String)] = qname match {
     case UnprefixedName(localPart)       => Some((None, localPart))
     case PrefixedName(prefix, localPart) => Some((Some(prefix), localPart))
-    case _                               => None
+    case null                            => None
   }
 }

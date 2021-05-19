@@ -35,7 +35,7 @@ class XmlBaseOnIndexedClarkElemApiTest extends AbstractXmlBaseOnIndexedClarkElem
   type E = Elem
 
   protected def getDocElem(path: String, docUri: URI): E = {
-    val docParser = DocumentParserUsingSax.newInstance
+    val docParser = DocumentParserUsingSax.newInstance()
     val parsedDocUri = classOf[XmlBaseOnIndexedClarkElemApiTest].getResource(path).toURI
     val doc = docParser.parse(parsedDocUri)
 

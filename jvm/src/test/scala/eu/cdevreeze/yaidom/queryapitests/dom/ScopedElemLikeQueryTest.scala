@@ -37,7 +37,7 @@ class ScopedElemLikeQueryTest extends AbstractScopedElemLikeQueryTest {
   final type E = DomElem
 
   protected final val xsdSchemaElem: DomElem = {
-    val dbf = DocumentBuilderFactory.newInstance
+    val dbf = DocumentBuilderFactory.newInstance()
 
     def createDocumentBuilder(documentBuilderFactory: DocumentBuilderFactory): DocumentBuilder = {
       val db = documentBuilderFactory.newDocumentBuilder()

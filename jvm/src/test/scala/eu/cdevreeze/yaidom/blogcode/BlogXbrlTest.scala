@@ -72,7 +72,7 @@ class BlogXbrlTest extends AnyFunSuite with AbstractBlogXbrlTestSupport {
   }
 
   private val xbrlInstance: XbrlInstance = {
-    val docParser = DocumentParserUsingStax.newInstance
+    val docParser = DocumentParserUsingStax.newInstance()
 
     val doc = docParser.parse(sampleXbrlInstanceFile)
     val indexedDoc = indexed.Document(doc)
@@ -85,7 +85,7 @@ class BlogXbrlTest extends AnyFunSuite with AbstractBlogXbrlTestSupport {
    * Scala Collections. If you know ElemApi method `filterElemsOrSelf`, you basically know all of its methods.
    */
   test("testSimpleQueries") {
-    val docParser = DocumentParserUsingSax.newInstance
+    val docParser = DocumentParserUsingSax.newInstance()
 
     val doc = docParser.parse(sampleXbrlInstanceFile)
 
@@ -137,7 +137,7 @@ class BlogXbrlTest extends AnyFunSuite with AbstractBlogXbrlTestSupport {
    */
   test("testSpecificNodeQueries") {
     // Now use DOM-based DocumentParser
-    val docParser = DocumentParserUsingDom.newInstance
+    val docParser = DocumentParserUsingDom.newInstance()
 
     val doc = docParser.parse(sampleXbrlInstanceFile)
 
@@ -170,7 +170,7 @@ class BlogXbrlTest extends AnyFunSuite with AbstractBlogXbrlTestSupport {
    */
   test("testUsedNamespacePrefixes") {
     // Now use StAX-based DocumentParser
-    val docParser = DocumentParserUsingStax.newInstance
+    val docParser = DocumentParserUsingStax.newInstance()
 
     val doc = docParser.parse(sampleXbrlInstanceFile)
 
@@ -213,7 +213,7 @@ class BlogXbrlTest extends AnyFunSuite with AbstractBlogXbrlTestSupport {
    */
   test("testNoUnusedNamespaces") {
     // Now use DOM-LS-based DocumentParser
-    val docParser = DocumentParserUsingDomLS.newInstance
+    val docParser = DocumentParserUsingDomLS.newInstance()
 
     val doc = docParser.parse(sampleXbrlInstanceFile)
     // Introducing indexed elements, offering the same query API and more

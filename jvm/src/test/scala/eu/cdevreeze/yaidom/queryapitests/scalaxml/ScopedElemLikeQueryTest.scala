@@ -23,6 +23,9 @@ import eu.cdevreeze.yaidom.scalaxml.ScalaXmlElem
 import eu.cdevreeze.yaidom.scalaxml.ScalaXmlNode
 import org.xml.sax.InputSource
 
+import javax.xml.parsers.SAXParser
+import javax.xml.parsers.SAXParserFactory
+
 /**
  * Query test case for Scala XML wrapper elements.
  *
@@ -56,7 +59,11 @@ class ScopedElemLikeQueryTest extends AbstractScopedElemLikeQueryTest {
 
     val is = classOf[ScopedElemLikeQueryTest].getResourceAsStream("/eu/cdevreeze/yaidom/queryapitests/XMLSchema.xsd")
 
-    val root: ScalaXmlElem = ScalaXmlNode.wrapElement(resolvingXmlLoader.load(is))
+    val parserFactory: SAXParserFactory = SAXParserFactory.newInstance()
+    parserFactory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", false)
+    val parser: SAXParser = parserFactory.newSAXParser()
+
+    val root: ScalaXmlElem = ScalaXmlNode.wrapElement(resolvingXmlLoader.loadXML(new InputSource(is), parser))
     root
   }
 }

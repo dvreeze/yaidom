@@ -84,7 +84,7 @@ class StreamingLargeXmlTest extends AnyFunSuite with BeforeAndAfterAll {
    * This test example is simple, and does not use any namespaces.
    */
   test("testProcessLargeXmlUsingStreaming") {
-    val inputFactory = XMLInputFactory.newInstance
+    val inputFactory = XMLInputFactory.newInstance()
 
     val streamSource = new StreamSource(new jio.ByteArrayInputStream(this.xmlBytes))
     val xmlEventReader = inputFactory.createXMLEventReader(streamSource)
@@ -136,7 +136,7 @@ class StreamingLargeXmlTest extends AnyFunSuite with BeforeAndAfterAll {
    * This test example is simple, and does not use any namespaces.
    */
   test("testProcessLargeXmlUsingStreamingStoringMultipleElements") {
-    val inputFactory = XMLInputFactory.newInstance
+    val inputFactory = XMLInputFactory.newInstance()
 
     val streamSource = new StreamSource(new jio.ByteArrayInputStream(this.xmlBytes))
     val xmlEventReader = inputFactory.createXMLEventReader(streamSource)
@@ -188,7 +188,7 @@ class StreamingLargeXmlTest extends AnyFunSuite with BeforeAndAfterAll {
   test("testProcessAnotherXmlUsingStreaming") {
     val fileUri = classOf[StreamingLargeXmlTest].getResource("enterprise-info.xml").toURI
 
-    val inputFactory = XMLInputFactory.newInstance
+    val inputFactory = XMLInputFactory.newInstance()
 
     val streamSource = new StreamSource(new FileInputStream(new File(fileUri)))
     val xmlEventReader = inputFactory.createXMLEventReader(streamSource)
@@ -303,7 +303,7 @@ class StreamingLargeXmlTest extends AnyFunSuite with BeforeAndAfterAll {
       it.hasNext
     }
     assertResult(Some(EName(LinkNamespace, "linkbaseRef"))) {
-      val nextEv = it.next
+      val nextEv = it.next()
       nextEv.enames.headOption
     }
   }
@@ -457,7 +457,7 @@ class StreamingLargeXmlTest extends AnyFunSuite with BeforeAndAfterAll {
     dropWhileNot(it, isStreamingPI _)
 
     require(it.hasNext)
-    val piEvent = it.next
+    val piEvent = it.next()
 
     // The following check is a bit sensitive, but good enough for this test (because we know the input file)
 

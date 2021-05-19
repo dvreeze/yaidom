@@ -73,7 +73,7 @@ class LargeXmlParsingTest extends AnyFunSuite with BeforeAndAfterAll {
   }
 
   test("testParseLargeXmlUsingSax") {
-    val parser = DocumentParserUsingSax.newInstance
+    val parser = DocumentParserUsingSax.newInstance()
 
     val startMs = System.currentTimeMillis()
     val doc = parser.parse(new jio.ByteArrayInputStream(xmlBytes))
@@ -84,7 +84,7 @@ class LargeXmlParsingTest extends AnyFunSuite with BeforeAndAfterAll {
   }
 
   test("testParseLargeXmlIntoResolvedElemUsingSax") {
-    val parser = DocumentParserUsingSax.newInstance
+    val parser = DocumentParserUsingSax.newInstance()
 
     val startMs = System.currentTimeMillis()
     val doc = parser.parse(new jio.ByteArrayInputStream(xmlBytes))
@@ -106,7 +106,7 @@ class LargeXmlParsingTest extends AnyFunSuite with BeforeAndAfterAll {
   }
 
   test("testParseLargeXmlUsingStax") {
-    val parser = DocumentParserUsingStax.newInstance
+    val parser = DocumentParserUsingStax.newInstance()
 
     val startMs = System.currentTimeMillis()
     val doc = parser.parse(new jio.ByteArrayInputStream(xmlBytes))
@@ -117,7 +117,7 @@ class LargeXmlParsingTest extends AnyFunSuite with BeforeAndAfterAll {
   }
 
   test("testParseLargeXmlUsingDom") {
-    val parser = DocumentParserUsingDom.newInstance
+    val parser = DocumentParserUsingDom.newInstance()
 
     val startMs = System.currentTimeMillis()
     val doc = parser.parse(new jio.ByteArrayInputStream(xmlBytes))
@@ -128,7 +128,7 @@ class LargeXmlParsingTest extends AnyFunSuite with BeforeAndAfterAll {
   }
 
   test("testParseLargeXmlUsingDomLS") {
-    val parser = DocumentParserUsingDomLS.newInstance
+    val parser = DocumentParserUsingDomLS.newInstance()
 
     val startMs = System.currentTimeMillis()
     val doc = parser.parse(new jio.ByteArrayInputStream(xmlBytes))

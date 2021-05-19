@@ -33,7 +33,7 @@ import org.xml.sax.InputSource
 class XmlToFlatFileTest extends AnyFunSuite {
 
   test("testConvertXmlToFlatFile") {
-    val docParser = DocumentParserUsingStax.newInstance
+    val docParser = DocumentParserUsingStax.newInstance()
 
     val xmlData =
       """<?xml version="1.0"?>
@@ -65,15 +65,15 @@ class XmlToFlatFileTest extends AnyFunSuite {
     val rootElem = docParser.parse(new InputSource(new jio.StringReader(xmlData))).documentElement
 
     val columnMapping = Vector(
-      { bookElem: Elem =>
+      { (bookElem: Elem) =>
         val id = (bookElem \@ EName("id")).mkString.trim
         id.padTo(5, ' ').take(5)
       },
-      { bookElem: Elem =>
+      { (bookElem: Elem) =>
         val lastName = (bookElem \ (_.localName == "author")).map(_.text).mkString.split(',').apply(0).trim
         lastName.padTo(15, ' ').take(15)
       },
-      { bookElem: Elem =>
+      { (bookElem: Elem) =>
         val firstName = (bookElem \ (_.localName == "author")).map(_.text).mkString.split(',').apply(1).trim
         firstName.padTo(10, ' ').take(10)
       })

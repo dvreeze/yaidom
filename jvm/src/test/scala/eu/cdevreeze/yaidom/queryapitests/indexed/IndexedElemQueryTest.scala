@@ -14,27 +14,20 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom.queryapitests.dom
+package eu.cdevreeze.yaidom.queryapitests.indexed
 
-import eu.cdevreeze.yaidom.convert
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.core.Scope
-import eu.cdevreeze.yaidom.dom.DomElem
-import eu.cdevreeze.yaidom.indexed.IndexedClarkElem
-import eu.cdevreeze.yaidom.queryapitests.AbstractIndexedElemLikeQueryTest
-import eu.cdevreeze.yaidom.simple.Document
+import eu.cdevreeze.yaidom.indexed.IndexedNode
 import eu.cdevreeze.yaidom.simple.Elem
 import eu.cdevreeze.yaidom.simple.Node
-import javax.xml.parsers.DocumentBuilderFactory
 
 /**
- * Query test case for DOM wrapper elements wrapped in an IndexedClarkElem.
+ * Query test case for indexed elements.
  *
  * @author Chris de Vreeze
  */
 class IndexedElemQueryTest extends AbstractIndexedElemLikeQueryTest {
-
-  final type U = DomElem
 
   private val book1Builder: Elem = {
     import Node._
@@ -216,7 +209,7 @@ class IndexedElemQueryTest extends AbstractIndexedElemLikeQueryTest {
   protected final val bookstore: E = {
     import Node._
 
-    val resultElem: Elem =
+    val resultElem =
       elem(
         qname = QName("Bookstore"),
         scope = Scope.Empty,
@@ -230,14 +223,7 @@ class IndexedElemQueryTest extends AbstractIndexedElemLikeQueryTest {
           magazine3Builder,
           magazine4Builder)
       )
-    val resultDoc: Document = Document(resultElem)
 
-    val dbf = DocumentBuilderFactory.newInstance
-    val db = dbf.newDocumentBuilder
-    val domDoc = db.newDocument()
-
-    val indexedElemBuilder = IndexedClarkElem
-
-    indexedElemBuilder(DomElem(convert.DomConversions.convertElem(resultDoc.documentElement)(domDoc)))
+    IndexedNode.Elem(resultElem)
   }
 }

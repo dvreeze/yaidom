@@ -33,7 +33,7 @@ class I18nQueryTest extends AbstractI18nQueryTest {
   final type E = Elem
 
   protected final val rootElem: Elem = {
-    val dbf = DocumentBuilderFactory.newInstance
+    val dbf = DocumentBuilderFactory.newInstance()
 
     def createDocumentBuilder(documentBuilderFactory: DocumentBuilderFactory): DocumentBuilder = {
       val db = documentBuilderFactory.newDocumentBuilder()

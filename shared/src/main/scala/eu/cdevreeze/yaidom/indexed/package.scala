@@ -16,9 +16,6 @@
 
 package eu.cdevreeze.yaidom
 
-import eu.cdevreeze.yaidom.queryapi.ClarkNodes
-import eu.cdevreeze.yaidom.queryapi.ScopedNodes
-
 /**
  * This package contains element representations that contain the "context" of the element. That is, the elements
  * in this package are pairs of a root element and a path (to the actual element itself). The "context" of an element
@@ -46,25 +43,19 @@ import eu.cdevreeze.yaidom.queryapi.ScopedNodes
  * (replacing `indexedBookstoreElem` by `bookstoreElem`)!
  *
  * There is no explicit functional update support for the indexed elements in this package. Of course the underlying
- * elements can be functionally updated (for element implementations that offer such update support), and indexed
- * elements can be created from the update results, but this is hardly efficient functional update support.
+ * elements can be functionally updated, and indexed elements can be created from the update results, but this is
+ * hardly efficient functional update support.
  *
  * One problem with efficient functional updates for indexed elements is that updating just one child element means
  * that all subsequent child elements may have to be updated as well, adapting the stored paths. In comparison, simple
  * elements do not have this restriction, and can be updated in isolation. Hence the functional update support for
- * simple elements but not for the different indexed element implementations.
+ * simple elements but not for the indexed elements.
  *
  * @author Chris de Vreeze
  */
 package object indexed {
 
-  type Elem = IndexedScopedNode.Elem[simple.Elem]
+  type Elem = IndexedNode.Elem
 
-  type IndexedClarkElem[U <: ClarkNodes.Elem.Aux[_, U]] = IndexedClarkNode.Elem[U]
-
-  type IndexedScopedElem[U <: ScopedNodes.Elem.Aux[_, U]] = IndexedScopedNode.Elem[U]
-
-  val IndexedClarkElem = IndexedClarkNode.Elem
-
-  val IndexedScopedElem = IndexedScopedNode.Elem
+  val Elem = IndexedNode.Elem
 }

@@ -140,7 +140,7 @@ final class DocumentPrinterUsingDom(
   }
 
   def omittingXmlDeclaration: DocumentPrinterUsingDom = {
-    val newTransformerCreator = { tf: TransformerFactory =>
+    val newTransformerCreator = { (tf: TransformerFactory) =>
       val transformer = transformerCreator(tf)
       transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes")
       transformer

@@ -49,7 +49,7 @@ class Blog2Test extends AnyFunSuite {
     import eu.cdevreeze.yaidom.simple._
 
     // Using a yaidom DocumentParser that used SAX internally
-    val docParser = parse.DocumentParserUsingSax.newInstance
+    val docParser = parse.DocumentParserUsingSax.newInstance()
 
     val feed1Doc: Document =
       docParser.parse(new java.io.File(pathToParentDir, "feed1.txt"))

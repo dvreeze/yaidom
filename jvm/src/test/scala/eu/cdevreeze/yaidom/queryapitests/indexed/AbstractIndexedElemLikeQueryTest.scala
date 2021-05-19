@@ -14,26 +14,23 @@
  * limitations under the License.
  */
 
-package eu.cdevreeze.yaidom.queryapitests
+package eu.cdevreeze.yaidom.queryapitests.indexed
 
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.PathConversions
-import eu.cdevreeze.yaidom.indexed.IndexedClarkElem
+import eu.cdevreeze.yaidom.indexed.IndexedNode
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi._
 import eu.cdevreeze.yaidom.queryapi.ClarkNodes
-
-import scala.collection.immutable
+import eu.cdevreeze.yaidom.queryapitests.AbstractElemLikeQueryTest
 
 /**
- * ElemLike-based query test case, taking an IndexedClarkElem.
+ * ElemLike-based query test case, taking an indexed element.
  *
  * @author Chris de Vreeze
  */
 abstract class AbstractIndexedElemLikeQueryTest extends AbstractElemLikeQueryTest {
 
-  type U <: ClarkNodes.Elem.Aux[_, U]
-
-  final override type E = IndexedClarkElem[U]
+  final override type E = IndexedNode.Elem
 
   test("testQueryTheBookAuthors") {
     require(bookstore.localName == "Bookstore")
@@ -85,7 +82,7 @@ abstract class AbstractIndexedElemLikeQueryTest extends AbstractElemLikeQueryTes
 
     require(bookstore.localName == "Bookstore")
 
-    def getBookTitles[Elm <: ClarkNodes.Elem.Aux[_, Elm]](store: Elm): immutable.IndexedSeq[Elm] =
+    def getBookTitles(store: ClarkNodes.Elem): IndexedSeq[ClarkNodes.Elem] =
       for {
         book <- store \ (_.localName == "Book")
         if book.attribute(EName("Price")).toInt < 90
@@ -104,7 +101,7 @@ abstract class AbstractIndexedElemLikeQueryTest extends AbstractElemLikeQueryTes
     }
 
     assertResult(getBookTitles(bookstore.underlyingElem)) {
-      getBookTitles(bookstore).map(_.underlyingElem)
+      getBookTitles(bookstore).map(_.asInstanceOf[IndexedNode.Elem].underlyingElem)
     }
   }
 
@@ -113,7 +110,7 @@ abstract class AbstractIndexedElemLikeQueryTest extends AbstractElemLikeQueryTes
 
     require(bookstore.localName == "Bookstore")
 
-    def getMagazines[Elm <: ClarkNodes.Elem.Aux[_, Elm]](store: Elm): immutable.IndexedSeq[Elm] =
+    def getMagazines(store: ClarkNodes.Elem): IndexedSeq[ClarkNodes.Elem] =
       for {
         magazine <- store \ (_.localName == "Magazine")
         magazineTitle = magazine.getChildElem(EName("Title")).trimmedText
@@ -133,7 +130,7 @@ abstract class AbstractIndexedElemLikeQueryTest extends AbstractElemLikeQueryTes
     }
 
     assertResult(getMagazines(bookstore.underlyingElem)) {
-      getMagazines(bookstore).map(_.underlyingElem)
+      getMagazines(bookstore).map(_.asInstanceOf[IndexedNode.Elem].underlyingElem)
     }
   }
 }

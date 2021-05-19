@@ -41,7 +41,9 @@ import eu.cdevreeze.yaidom.core.Path
  */
 trait UpdatableElemLike extends IsNavigable with UpdatableElemApi {
 
-  type ThisElem <: UpdatableElemLike.Aux[ThisNode, ThisElem]
+  type ThisElem <: UpdatableElemLike.Aux[_, ThisElem]
+
+  type ThisNode >: ThisElem
 
   def children: immutable.IndexedSeq[ThisNode]
 
@@ -138,12 +140,15 @@ trait UpdatableElemLike extends IsNavigable with UpdatableElemApi {
         collectChildNodeIndexes(pathEntries).toSeq.sortBy(_._2)
 
       // Updating in reverse order of indexes, in order not to invalidate the path entries
-      val newChildren = indexesByPathEntries.reverse.foldLeft(thisElem.children) {
-        case (accChildNodes, (pathEntry, idx)) =>
-          val che = accChildNodes(idx).asInstanceOf[ThisElem]
-          accChildNodes.updated(idx, f(che, pathEntry))
+      val newChildren = indexesByPathEntries.reverse.foldLeft(thisElem.children.asInstanceOf[IndexedSeq[ThisNode]]) {
+        case (acc, (pathEntry, idx)) =>
+          val accChildNodes = acc.asInstanceOf[IndexedSeq[ThisNode]]
+          val che = accChildNodes.apply(idx).asInstanceOf[ThisElem]
+          val retVal = f(che, pathEntry).asInstanceOf[ThisNode]
+          accChildNodes.updated(idx, retVal)
       }
-      thisElem.withChildren(newChildren)
+
+      thisElem.asInstanceOf[UpdatableElemLike.this.type].withChildren(newChildren)
     }
   }
 
@@ -155,12 +160,14 @@ trait UpdatableElemLike extends IsNavigable with UpdatableElemApi {
         collectChildNodeIndexes(pathEntries).toSeq.sortBy(_._2)
 
       // Updating in reverse order of indexes, in order not to invalidate the path entries
-      val newChildren = indexesByPathEntries.reverse.foldLeft(thisElem.children) {
-        case (accChildNodes, (pathEntry, idx)) =>
+      val newChildren = indexesByPathEntries.reverse.foldLeft(thisElem.children.asInstanceOf[IndexedSeq[ThisNode]]) {
+        case (acc, (pathEntry, idx)) =>
+          val accChildNodes = acc.asInstanceOf[IndexedSeq[ThisNode]]
           val che = accChildNodes(idx).asInstanceOf[ThisElem]
-          accChildNodes.patch(idx, f(che, pathEntry), 1)
+          val retVal = f(che, pathEntry).asInstanceOf[IndexedSeq[ThisNode]]
+          accChildNodes.patch(idx, retVal, 1)
       }
-      thisElem.withChildren(newChildren)
+      thisElem.asInstanceOf[UpdatableElemLike.this.type].withChildren(newChildren)
     }
   }
 
@@ -199,7 +206,7 @@ trait UpdatableElemLike extends IsNavigable with UpdatableElemApi {
       updateChildElemsWithNodeSeq(pathsByFirstEntry.keySet) {
         case (che, pathEntry) =>
           // Recursive (but non-tail-recursive) call
-          che.updateElemsOrSelfWithNodeSeq(pathsByFirstEntry(pathEntry).map(_.withoutFirstEntry)) {
+          che.asInstanceOf[UpdatableElemLike.this.type].updateElemsOrSelfWithNodeSeq(pathsByFirstEntry(pathEntry).map(_.withoutFirstEntry)) {
             case (elm, path) =>
               f(elm, path.prepend(pathEntry))
           }
@@ -213,7 +220,7 @@ trait UpdatableElemLike extends IsNavigable with UpdatableElemApi {
 
     updateChildElemsWithNodeSeq(pathsByFirstEntry.keySet) {
       case (che, pathEntry) =>
-        che.updateElemsOrSelfWithNodeSeq(pathsByFirstEntry(pathEntry).map(_.withoutFirstEntry)) {
+        che.asInstanceOf[UpdatableElemLike.this.type].updateElemsOrSelfWithNodeSeq(pathsByFirstEntry(pathEntry).map(_.withoutFirstEntry)) {
           case (elm, path) =>
             f(elm, path.prepend(pathEntry))
         }

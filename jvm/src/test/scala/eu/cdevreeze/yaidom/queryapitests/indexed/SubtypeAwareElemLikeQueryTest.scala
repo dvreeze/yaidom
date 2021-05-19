@@ -28,7 +28,7 @@ import eu.cdevreeze.yaidom.queryapitests.AbstractSubtypeAwareElemLikeQueryTest
 class SubtypeAwareElemLikeQueryTest extends AbstractSubtypeAwareElemLikeQueryTest {
 
   protected val wrappedDocumentContent: BackingNodes.Elem = {
-    val docParser = DocumentParserUsingDom.newInstance
+    val docParser = DocumentParserUsingDom.newInstance()
     val docUri = classOf[AbstractSubtypeAwareElemLikeQueryTest].getResource("content.xml").toURI
     val doc = docParser.parse(docUri)
 

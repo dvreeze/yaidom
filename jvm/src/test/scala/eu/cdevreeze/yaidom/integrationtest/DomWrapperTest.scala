@@ -59,7 +59,7 @@ class DomWrapperTest extends AnyFunSuite {
   private val nsXmlSchema = "http://www.w3.org/2001/XMLSchema"
 
   test("testParse") {
-    val dbf = DocumentBuilderFactory.newInstance
+    val dbf = DocumentBuilderFactory.newInstance()
     val db = dbf.newDocumentBuilder
     val is = classOf[DomWrapperTest].getResourceAsStream("books.xml")
     val domDoc: DomDocument = DomDocument.wrapDocument(db.parse(is))
@@ -82,7 +82,7 @@ class DomWrapperTest extends AnyFunSuite {
   }
 
   test("testParseStrangeXml") {
-    val dbf = DocumentBuilderFactory.newInstance
+    val dbf = DocumentBuilderFactory.newInstance()
     val db = dbf.newDocumentBuilder
     val is = classOf[DomWrapperTest].getResourceAsStream("strangeXml.xml")
     val domDoc: DomDocument = DomDocument.wrapDocument(db.parse(is))
@@ -96,7 +96,7 @@ class DomWrapperTest extends AnyFunSuite {
   }
 
   test("testParseDefaultNamespaceXml") {
-    val dbf = DocumentBuilderFactory.newInstance
+    val dbf = DocumentBuilderFactory.newInstance()
     val db = dbf.newDocumentBuilder
     val is = classOf[DomWrapperTest].getResourceAsStream("trivialXml.xml")
     val domDoc: DomDocument = DomDocument.wrapDocument(db.parse(is))
@@ -118,7 +118,7 @@ class DomWrapperTest extends AnyFunSuite {
   }
 
   test("testParseSchemaXsd") {
-    val dbf = DocumentBuilderFactory.newInstance
+    val dbf = DocumentBuilderFactory.newInstance()
 
     def createDocumentBuilder(documentBuilderFactory: DocumentBuilderFactory): DocumentBuilder = {
       val db = documentBuilderFactory.newDocumentBuilder()
@@ -322,7 +322,7 @@ class DomWrapperTest extends AnyFunSuite {
   }
 
   test("testParseXmlWithExpandedEntityRef") {
-    val dbf = DocumentBuilderFactory.newInstance
+    val dbf = DocumentBuilderFactory.newInstance()
     val db = dbf.newDocumentBuilder
     val is = classOf[DomWrapperTest].getResourceAsStream("trivialXmlWithEntityRef.xml")
     val domDoc: DomDocument = DomDocument.wrapDocument(db.parse(is))
@@ -355,7 +355,7 @@ class DomWrapperTest extends AnyFunSuite {
   }
 
   test("testParseXmlWithNonExpandedEntityRef") {
-    val dbf = DocumentBuilderFactory.newInstance
+    val dbf = DocumentBuilderFactory.newInstance()
     dbf.setExpandEntityReferences(false)
     val db = dbf.newDocumentBuilder
     val is = classOf[DomWrapperTest].getResourceAsStream("trivialXmlWithEntityRef.xml")
@@ -397,7 +397,7 @@ class DomWrapperTest extends AnyFunSuite {
   }
 
   test("testParseXmlWithNamespaceUndeclarations") {
-    val dbf = DocumentBuilderFactory.newInstance
+    val dbf = DocumentBuilderFactory.newInstance()
     val db = dbf.newDocumentBuilder
     val is = classOf[DomWrapperTest].getResourceAsStream("trivialXmlWithNSUndeclarations.xml")
     val domDoc: DomDocument = DomDocument.wrapDocument(db.parse(is))
@@ -413,7 +413,7 @@ class DomWrapperTest extends AnyFunSuite {
   }
 
   test("testParseXmlWithEscapedChars") {
-    val dbf = DocumentBuilderFactory.newInstance
+    val dbf = DocumentBuilderFactory.newInstance()
     dbf.setCoalescing(true)
     val db = dbf.newDocumentBuilder
     val is = classOf[DomWrapperTest].getResourceAsStream("trivialXmlWithEscapedChars.xml")
@@ -457,7 +457,7 @@ class DomWrapperTest extends AnyFunSuite {
   }
 
   test("testParseXmlWithSpecialChars") {
-    val dbf = DocumentBuilderFactory.newInstance
+    val dbf = DocumentBuilderFactory.newInstance()
     val db = dbf.newDocumentBuilder
     val is = classOf[DomWrapperTest].getResourceAsStream("trivialXmlWithEuro.xml")
     val domDoc: DomDocument = DomDocument.wrapDocument(db.parse(is))
@@ -489,7 +489,7 @@ class DomWrapperTest extends AnyFunSuite {
   }
 
   test("testParseGeneratedHtml") {
-    val dbf = DocumentBuilderFactory.newInstance
+    val dbf = DocumentBuilderFactory.newInstance()
     val db = dbf.newDocumentBuilder
     val is = classOf[DomWrapperTest].getResourceAsStream("books.xml")
     val domDoc: DomDocument = DomDocument.wrapDocument(db.parse(is))
@@ -594,7 +594,7 @@ class DomWrapperTest extends AnyFunSuite {
       }
     }
 
-    val dbf = DocumentBuilderFactory.newInstance
+    val dbf = DocumentBuilderFactory.newInstance()
 
     def createDocumentBuilder(documentBuilderFactory: DocumentBuilderFactory): DocumentBuilder = {
       val db = documentBuilderFactory.newDocumentBuilder()
@@ -627,7 +627,7 @@ class DomWrapperTest extends AnyFunSuite {
    * The Scala counterpart is more type-safe.
    */
   test("testParseGroovyXmlExample") {
-    val dbf = DocumentBuilderFactory.newInstance
+    val dbf = DocumentBuilderFactory.newInstance()
     val db = dbf.newDocumentBuilder
     val is = classOf[DomWrapperTest].getResourceAsStream("cars.xml")
     val domDoc: DomDocument = DomDocument.wrapDocument(db.parse(is))
@@ -688,7 +688,7 @@ class DomWrapperTest extends AnyFunSuite {
    * Example of finding elements and their ancestors.
    */
   test("testParseSchemaExample") {
-    val dbf = DocumentBuilderFactory.newInstance
+    val dbf = DocumentBuilderFactory.newInstance()
     val db = dbf.newDocumentBuilder
     val is = classOf[DomWrapperTest].getResourceAsStream("gaap.xsd")
     val domDoc: DomDocument = DomDocument.wrapDocument(db.parse(is))
@@ -717,7 +717,7 @@ class DomWrapperTest extends AnyFunSuite {
    * Example of parsing a document with multiple kinds of nodes.
    */
   test("testParseMultipleNodeKinds") {
-    val dbf = DocumentBuilderFactory.newInstance
+    val dbf = DocumentBuilderFactory.newInstance()
     val db = dbf.newDocumentBuilder
     val is = classOf[DomWrapperTest].getResourceAsStream("trivialXmlWithDifferentKindsOfNodes.xml")
     val domDoc: DomDocument = DomDocument.wrapDocument(db.parse(is))

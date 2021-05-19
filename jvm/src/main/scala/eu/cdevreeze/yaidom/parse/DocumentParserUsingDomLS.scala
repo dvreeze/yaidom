@@ -128,7 +128,7 @@ object DocumentParserUsingDomLS {
 
   /** Returns `newInstance(domImplLS)` for an appropriate `DOMImplementationLS` */
   def newInstance(): DocumentParserUsingDomLS = {
-    val registry = DOMImplementationRegistry.newInstance
+    val registry = DOMImplementationRegistry.newInstance()
     val domImpl = registry.getDOMImplementation("LS 3.0")
     require(domImpl ne null, "Expected non-null DOM Implementation for feature 'LS 3.0'") // scalastyle:off null
     require(domImpl.hasFeature("LS", "3.0"), "Expected DOM Implementation to have feature 'LS 3.0'")

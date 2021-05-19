@@ -21,10 +21,12 @@ import eu.cdevreeze.yaidom.core.Path
 import eu.cdevreeze.yaidom.core.QName
 import eu.cdevreeze.yaidom.indexed
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingDom
-import eu.cdevreeze.yaidom.queryapi.ClarkNodes
+import eu.cdevreeze.yaidom.queryapi.ScopedNodes
 import eu.cdevreeze.yaidom.resolved
 import eu.cdevreeze.yaidom.simple
 import org.scalatest.funsuite.AnyFunSuite
+
+import scala.util.chaining._
 
 /**
  * XML diff test case. Yaidom resolved elements are a good basis for a namespace-aware XML difference tool, provided
@@ -77,9 +79,9 @@ class XmlDiffTest extends AnyFunSuite {
     val is2 = classOf[XmlDiffTest].getResourceAsStream("feed3.xml")
     val doc2: simple.Document = docParser.parse(is2)
 
-    val editedDoc2 = doc2 transformElemsOrSelf {
+    val editedDoc2 = doc2.transformElemsOrSelf {
       case e if e.localName == "title" => e.copy(children = Vector(simple.Text("Sample Feed", false)))
-      case e => e
+      case e                           => e
     }
 
     val diffs = XmlDiffTest.findDiffs(doc1.documentElement, editedDoc2.documentElement)
@@ -102,17 +104,18 @@ class XmlDiffTest extends AnyFunSuite {
     val is2 = classOf[XmlDiffTest].getResourceAsStream("feed3.xml")
     val doc2: simple.Document = docParser.parse(is2)
 
-    val editedDoc2 = doc2 transformElemsOrSelf {
+    val editedDoc2 = doc2.transformElemsOrSelf {
       case e if e.localName == "title" => e.copy(qname = QName(e.qname.prefixOption, "Title"))
-      case e => e
+      case e                           => e
     }
 
     val diffs = XmlDiffTest.findDiffs(doc1.documentElement, editedDoc2.documentElement)
 
-    assertResult(Set(
-      Path.Empty,
-      Path.from(EName("{http://www.w3.org/2005/Atom}title") -> 0),
-      Path.from(EName("{http://www.w3.org/2005/Atom}Title") -> 0))) {
+    assertResult(
+      Set(
+        Path.Empty,
+        Path.from(EName("{http://www.w3.org/2005/Atom}title") -> 0),
+        Path.from(EName("{http://www.w3.org/2005/Atom}Title") -> 0))) {
       diffs.allDiffs
     }
     assertResult(Set(Path.Empty)) {
@@ -140,14 +143,14 @@ object XmlDiffTest {
    * Both issues are resolvable. The matching function could be made pluggable. Using IndexedClarkElems is still
    * useful, for difference reporting purposes.
    */
-  def findDiffs[E <: ClarkNodes.Elem.Aux[_, E]](elem1: E, elem2: E): Diffs = {
-    val indexedResolvedElem1 =
-      indexed.IndexedClarkElem(resolved.Elem.from(elem1).removeAllInterElementWhitespace.coalesceAndNormalizeAllText)
-    val indexedResolvedElem2 =
-      indexed.IndexedClarkElem(resolved.Elem.from(elem2).removeAllInterElementWhitespace.coalesceAndNormalizeAllText)
+  def findDiffs[E <: ScopedNodes.Elem.Aux[_, E]](elem1: E, elem2: E): Diffs = {
+    val indexedElem1 =
+      indexed.Elem(simple.Elem.from(elem1).removeAllInterElementWhitespace.coalesceAndNormalizeAllText)
+    val indexedElem2 =
+      indexed.Elem(simple.Elem.from(elem2).removeAllInterElementWhitespace.coalesceAndNormalizeAllText)
 
-    val allElems1 = indexedResolvedElem1.findAllElemsOrSelf
-    val allElems2 = indexedResolvedElem2.findAllElemsOrSelf
+    val allElems1 = indexedElem1.findAllElemsOrSelf
+    val allElems2 = indexedElem2.findAllElemsOrSelf
 
     val allElem1Paths = allElems1.map(_.path)
     val allElem2Paths = allElems2.map(_.path)
@@ -164,15 +167,18 @@ object XmlDiffTest {
     val commonPaths = allElem1Paths.toSet.intersect(allElem2Paths.toSet)
 
     val inBothElemsButDiffering =
-      commonPaths.filter(p => allElems1ByPath(p).head.underlyingElem != allElems2ByPath(p).head.underlyingElem)
+      commonPaths.filter { p =>
+        allElems1ByPath(p).head.underlyingElem.pipe(resolved.Elem.from) != allElems2ByPath(p).head.underlyingElem
+          .pipe(resolved.Elem.from)
+      }
 
     Diffs(onlyInFirstElem, onlyInSecondElem, inBothElemsButDiffering)
   }
 
   final case class Diffs(
-    val onlyInFirstElem: Set[Path],
-    val onlyInSecondElem: Set[Path],
-    val inBothElemsButDiffering: Set[Path]) {
+      val onlyInFirstElem: Set[Path],
+      val onlyInSecondElem: Set[Path],
+      val inBothElemsButDiffering: Set[Path]) {
 
     def allDiffs = onlyInFirstElem.union(onlyInSecondElem).union(inBothElemsButDiffering)
   }

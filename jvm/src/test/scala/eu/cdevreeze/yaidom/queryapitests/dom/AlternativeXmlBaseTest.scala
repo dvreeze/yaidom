@@ -43,7 +43,7 @@ class AlternativeXmlBaseTest extends AbstractAlternativeXmlBaseTest {
   type E = DomElem
 
   protected def convertToDocument(elem: yaidom.simple.Elem, docUri: URI): DocumentApi.Aux[D, E] = {
-    val dbf = DocumentBuilderFactory.newInstance
+    val dbf = DocumentBuilderFactory.newInstance()
     val db = dbf.newDocumentBuilder
     val d = db.newDocument()
     DomConversions.convertDocument(Document(elem))(d)

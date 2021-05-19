@@ -56,7 +56,7 @@ class Blog1Test extends AnyFunSuite {
     import eu.cdevreeze.yaidom.simple._
 
     // Using a yaidom DocumentParser that used DOM internally
-    val docParser = DocumentParserUsingDom.newInstance
+    val docParser = DocumentParserUsingDom.newInstance()
 
     // Replace the following path!
     val parentDir = new File(pathToParentDir.getPath)
@@ -116,7 +116,7 @@ class Blog1Test extends AnyFunSuite {
     val ns = "http://bookstore"
 
     // Using a yaidom DocumentParser that used DOM internally
-    val docParser = DocumentParserUsingDom.newInstance
+    val docParser = DocumentParserUsingDom.newInstance()
 
     // Replace the following path!
     val parentDir = new File(pathToParentDir.getPath)
@@ -207,7 +207,7 @@ class Blog1Test extends AnyFunSuite {
     import eu.cdevreeze.yaidom.simple._
 
     // Using a yaidom DocumentParser that used DOM internally
-    val docParser = DocumentParserUsingDom.newInstance
+    val docParser = DocumentParserUsingDom.newInstance()
 
     // Replace the following path!
     val parentDir = new File(pathToParentDir.getPath)

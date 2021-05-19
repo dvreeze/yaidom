@@ -47,7 +47,7 @@ class MileageRecordsTest extends AnyFunSuite {
   import MileageRecordsTest.MileageRecords
 
   test("testReferentialIntegrity") {
-    val docParser = DocumentParserUsingSax.newInstance
+    val docParser = DocumentParserUsingSax.newInstance()
 
     val doc: Document = {
       val is = classOf[MileageRecordsTest].getResourceAsStream("trips.xml")
@@ -86,7 +86,7 @@ class MileageRecordsTest extends AnyFunSuite {
   }
 
   test("testSucceedingTrips") {
-    val docParser = DocumentParserUsingSax.newInstance
+    val docParser = DocumentParserUsingSax.newInstance()
 
     val doc: Document = {
       val is = classOf[MileageRecordsTest].getResourceAsStream("trips.xml")
@@ -118,7 +118,7 @@ class MileageRecordsTest extends AnyFunSuite {
   }
 
   test("testTripLengths") {
-    val docParser = DocumentParserUsingSax.newInstance
+    val docParser = DocumentParserUsingSax.newInstance()
 
     val doc: Document = {
       val is = classOf[MileageRecordsTest].getResourceAsStream("trips.xml")
@@ -147,7 +147,7 @@ class MileageRecordsTest extends AnyFunSuite {
   }
 
   test("testTotalPrivateKms") {
-    val docParser = DocumentParserUsingSax.newInstance
+    val docParser = DocumentParserUsingSax.newInstance()
 
     val doc: Document = {
       val is = classOf[MileageRecordsTest].getResourceAsStream("trips.xml")
@@ -159,7 +159,7 @@ class MileageRecordsTest extends AnyFunSuite {
 
     // Check total private kms
 
-    val totalPrivateKms = mileageRecords.totalPrivateKms
+    val totalPrivateKms = mileageRecords.totalPrivateKms()
 
     assertResult(true, s"Total private kms $totalPrivateKms larger than expected (>= 350)") {
       totalPrivateKms < 350
@@ -167,7 +167,7 @@ class MileageRecordsTest extends AnyFunSuite {
   }
 
   test("testConvertToCsv") {
-    val docParser = DocumentParserUsingSax.newInstance
+    val docParser = DocumentParserUsingSax.newInstance()
 
     val doc: Document = {
       val is = classOf[MileageRecordsTest].getResourceAsStream("trips.xml")
@@ -209,8 +209,8 @@ class MileageRecordsTest extends AnyFunSuite {
   }
 
   test("testUpdateKms") {
-    val docParser = DocumentParserUsingSax.newInstance
-    // val docPrinter = DocumentPrinterUsingDom.newInstance
+    val docParser = DocumentParserUsingSax.newInstance()
+    // val docPrinter = DocumentPrinterUsingDom.newInstance()
 
     val doc: Document = {
       val is = classOf[MileageRecordsTest].getResourceAsStream("trips.xml")
@@ -249,7 +249,7 @@ class MileageRecordsTest extends AnyFunSuite {
   }
 
   test("testNoWorkTripsInWeekends") {
-    val docParser = DocumentParserUsingSax.newInstance
+    val docParser = DocumentParserUsingSax.newInstance()
 
     val doc: Document = {
       val is = classOf[MileageRecordsTest].getResourceAsStream("trips.xml")

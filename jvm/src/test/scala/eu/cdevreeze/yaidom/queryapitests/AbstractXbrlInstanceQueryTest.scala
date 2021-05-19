@@ -21,9 +21,9 @@ import scala.reflect.classTag
 
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
-import eu.cdevreeze.yaidom.indexed.IndexedClarkElem
+import eu.cdevreeze.yaidom.indexed.IndexedNode
 import eu.cdevreeze.yaidom.queryapi.ClarkElemApi.withEName
-import eu.cdevreeze.yaidom.queryapi.ClarkNodes
+import eu.cdevreeze.yaidom.queryapi.ScopedNodes
 import org.scalatest.funsuite.AnyFunSuite
 
 /**
@@ -33,7 +33,7 @@ import org.scalatest.funsuite.AnyFunSuite
  */
 abstract class AbstractXbrlInstanceQueryTest extends AnyFunSuite {
 
-  type E <: ClarkNodes.Elem.Aux[_, E]
+  type E <: ScopedNodes.Elem.Aux[_, E]
 
   implicit val ttag: ClassTag[E] = classTag[E]
 
@@ -46,7 +46,7 @@ abstract class AbstractXbrlInstanceQueryTest extends AnyFunSuite {
     // Finding child elements (more verbose than XPath, but very precise)
 
     val contexts =
-      xbrlInstance filterChildElems { e =>
+      xbrlInstance.filterChildElems { e =>
         e.resolvedName == EName(XbrliNs, "context")
       }
 
@@ -54,7 +54,7 @@ abstract class AbstractXbrlInstanceQueryTest extends AnyFunSuite {
 
     val optNamespaces = Set(Option(XbrliNs), Option(LinkNs))
     val topLevelFacts =
-      xbrlInstance filterChildElems { e =>
+      xbrlInstance.filterChildElems { e =>
         !optNamespaces.contains(e.resolvedName.namespaceUriOption)
       }
 
@@ -99,7 +99,8 @@ abstract class AbstractXbrlInstanceQueryTest extends AnyFunSuite {
         EName(GaapNs, "ProceedsFromSaleOfPropertyPlantAndEquipment"),
         EName(GaapNs, "PreferredStockShares"),
         EName(GaapNs, "InventoryCostMethod"),
-        EName(GaapNs, "IncomeTaxesPolicy")).subsetOf(topLevelFactENames)
+        EName(GaapNs, "IncomeTaxesPolicy")
+      ).subsetOf(topLevelFactENames)
     }
 
     // No tuples
@@ -141,30 +142,36 @@ abstract class AbstractXbrlInstanceQueryTest extends AnyFunSuite {
   test("testBulkNavigation") {
     require(xbrlInstance.resolvedName == EName(XbrliNs, "xbrl"))
 
-    val indexedElemBuilder = IndexedClarkElem
+    val indexedElemBuilder = IndexedNode.Elem
 
-    val indexedInstance = indexedElemBuilder(xbrlInstance)
+    val indexedInstance = indexedElemBuilder(toSimpleElem(xbrlInstance))
 
     val elemsWithPaths =
       indexedInstance.findAllElemsOrSelf.map(p => (p.underlyingElem, p.path))
     val paths = elemsWithPaths.map(_._2)
 
-    assertResult(xbrlInstance.findAllElemsOrSelf) {
-      indexedInstance.filterElemsOrSelf(e => paths.toSet.contains(e.path)).map(_.underlyingElem)
+    assertResult(xbrlInstance.findAllElemsOrSelf.map(toResolvedElem)) {
+      indexedInstance.filterElemsOrSelf(e => paths.toSet.contains(e.path)).map(toResolvedElem)
     }
 
     def isIdentifierPath(p: Path): Boolean = {
       p.nonEmpty && (p.elementNameOption.get == EName(XbrliNs, "identifier"))
     }
 
-    assertResult(xbrlInstance.filterElemsOrSelf(_.resolvedName == EName(XbrliNs, "identifier"))) {
-      indexedInstance.filterElemsOrSelf(e => paths.filter(isIdentifierPath).toSet.contains(e.path)).map(_.underlyingElem)
+    assertResult(xbrlInstance.filterElemsOrSelf(_.resolvedName == EName(XbrliNs, "identifier")).map(toResolvedElem)) {
+      indexedInstance
+        .filterElemsOrSelf(e => paths.filter(isIdentifierPath).toSet.contains(e.path))
+        .map(toResolvedElem)
     }
   }
 
   protected val xbrlInstance: E
 
-  protected final def toResolvedElem(elem: E): eu.cdevreeze.yaidom.resolved.Elem = {
+  protected final def toResolvedElem(elem: ScopedNodes.Elem): eu.cdevreeze.yaidom.resolved.Elem = {
     eu.cdevreeze.yaidom.resolved.Elem.from(elem)
+  }
+
+  protected final def toSimpleElem(elem: ScopedNodes.Elem): eu.cdevreeze.yaidom.simple.Elem = {
+    eu.cdevreeze.yaidom.simple.Elem.from(elem)
   }
 }

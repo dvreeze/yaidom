@@ -56,7 +56,7 @@ class AlternativeQueryTest extends AbstractAlternativeQueryTest {
         </product>
       </catalog>
 
-    val dbf = DocumentBuilderFactory.newInstance
+    val dbf = DocumentBuilderFactory.newInstance()
     val db = dbf.newDocumentBuilder
     DomElem(DomConversions.convertElem(convertToElem(xml), db.newDocument, Scope.Empty))
   }
@@ -79,7 +79,7 @@ class AlternativeQueryTest extends AbstractAlternativeQueryTest {
         </priceList>
       </prices>
 
-    val dbf = DocumentBuilderFactory.newInstance
+    val dbf = DocumentBuilderFactory.newInstance()
     val db = dbf.newDocumentBuilder
     DomElem(DomConversions.convertElem(convertToElem(xml), db.newDocument, Scope.Empty))
   }
@@ -95,13 +95,13 @@ class AlternativeQueryTest extends AbstractAlternativeQueryTest {
         <item dept="WMN" num="557" quantity="1" color="black"/>
       </order>
 
-    val dbf = DocumentBuilderFactory.newInstance
+    val dbf = DocumentBuilderFactory.newInstance()
     val db = dbf.newDocumentBuilder
     DomElem(DomConversions.convertElem(convertToElem(xml), db.newDocument, Scope.Empty))
   }
 
   protected def fromScalaElem(elem: scala.xml.Elem): E = {
-    val dbf = DocumentBuilderFactory.newInstance
+    val dbf = DocumentBuilderFactory.newInstance()
     val db = dbf.newDocumentBuilder
     DomElem(DomConversions.convertElem(convertToElem(elem), db.newDocument, Scope.Empty))
   }

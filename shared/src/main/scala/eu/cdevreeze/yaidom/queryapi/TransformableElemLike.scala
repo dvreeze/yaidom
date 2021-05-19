@@ -36,7 +36,9 @@ import scala.collection.immutable
  */
 trait TransformableElemLike extends TransformableElemApi {
 
-  type ThisElem <: TransformableElemLike.Aux[ThisNode, ThisElem]
+  type ThisElem <: TransformableElemLike.Aux[_, ThisElem]
+
+  type ThisNode >: ThisElem
 
   def transformChildElems(f: ThisElem => ThisElem): ThisElem
 
@@ -50,11 +52,11 @@ trait TransformableElemLike extends TransformableElemApi {
     transformChildElems(e => e.transformElemsOrSelf(f))
 
   def transformElemsOrSelfToNodeSeq(f: ThisElem => immutable.IndexedSeq[ThisNode]): immutable.IndexedSeq[ThisNode] = {
-    f(transformChildElemsToNodeSeq(e => e.transformElemsOrSelfToNodeSeq(f)))
+    f(transformChildElemsToNodeSeq(e => e.asInstanceOf[TransformableElemLike.this.type].transformElemsOrSelfToNodeSeq(f)))
   }
 
   def transformElemsToNodeSeq(f: ThisElem => immutable.IndexedSeq[ThisNode]): ThisElem = {
-    transformChildElemsToNodeSeq(e => e.transformElemsOrSelfToNodeSeq(f))
+    transformChildElemsToNodeSeq(e => e.asInstanceOf[TransformableElemLike.this.type].transformElemsOrSelfToNodeSeq(f))
   }
 }
 

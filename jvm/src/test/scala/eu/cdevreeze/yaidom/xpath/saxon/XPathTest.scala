@@ -109,9 +109,9 @@ class XPathTest extends AnyFunSuite {
       } else if (variableName == JavaQNames.enameToJavaQName(EName(MyVarNamespace, "contextPosition"), None)) {
         java.lang.Integer.valueOf(4)
       } else if (variableName == JavaQNames.enameToJavaQName(EName(MyVarNamespace, "identity"), None)) {
-        { e: SaxonElem => e }
+        { (e: SaxonElem) => e }
       } else if (variableName == JavaQNames.enameToJavaQName(EName(MyVarNamespace, "useXbrliPrefix"), None)) {
-        { e: SaxonElem => useXbrliPrefix(e) }
+        { (e: SaxonElem) => useXbrliPrefix(e) }
       } else {
         sys.error(s"Unknown variable with name $variableName")
       }

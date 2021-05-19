@@ -37,7 +37,7 @@ class XmlBaseTest extends AbstractXmlBaseTest {
   type E = indexed.Elem
 
   protected def getDocument(path: String, docUri: URI): indexed.Document = {
-    val docParser = DocumentParserUsingSax.newInstance
+    val docParser = DocumentParserUsingSax.newInstance()
     val parsedDocUri = classOf[XmlBaseTest].getResource(path).toURI
     val doc = docParser.parse(parsedDocUri)
 

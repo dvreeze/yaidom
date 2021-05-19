@@ -78,14 +78,14 @@ final class Document(
   /** Expensive method to obtain all processing instructions, throughout the tree */
   def allProcessingInstructions: immutable.IndexedSeq[ProcessingInstruction] = {
     val elemPIs: immutable.IndexedSeq[ProcessingInstruction] =
-      documentElement.findAllElemsOrSelf flatMap { e: Elem => e.processingInstructionChildren }
+      documentElement.findAllElemsOrSelf flatMap { (e: Elem) => e.processingInstructionChildren }
     processingInstructions ++ elemPIs
   }
 
   /** Expensive method to obtain all comments, throughout the tree */
   def allComments: immutable.IndexedSeq[Comment] = {
     val elemComments: immutable.IndexedSeq[Comment] =
-      documentElement.findAllElemsOrSelf flatMap { e: Elem => e.commentChildren }
+      documentElement.findAllElemsOrSelf flatMap { (e: Elem) => e.commentChildren }
     comments ++ elemComments
   }
 
@@ -156,7 +156,7 @@ final class Document(
   }
 
   /** Returns the tree representation string corresponding to this element, that is, `toTreeRepr`. Possibly expensive! */
-  override def toString: String = toTreeRepr
+  override def toString: String = toTreeRepr()
 
   private[yaidom] def toTreeReprAsLineSeq(indent: Int)(indentStep: Int): immutable.IndexedSeq[Line] = {
     val innerIndent = indent + indentStep

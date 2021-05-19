@@ -603,7 +603,7 @@ class SaxInteropTest extends AnyFunSuite {
 
     // 2. Write Elem to an XML string
 
-    val printer = DocumentPrinterUsingSax.newInstance
+    val printer = DocumentPrinterUsingSax.newInstance()
 
     val xmlString = printer.print(Document(None, root))
 
@@ -656,7 +656,7 @@ class SaxInteropTest extends AnyFunSuite {
 
     // 2. Write Elem to an XML string
 
-    val printer = DocumentPrinterUsingSax.newInstance
+    val printer = DocumentPrinterUsingSax.newInstance()
 
     val xmlString = printer.print(Document(root))
 
@@ -731,7 +731,7 @@ class SaxInteropTest extends AnyFunSuite {
 
     // 2. Write Elem to an XML string
 
-    val printer = DocumentPrinterUsingSax.newInstance
+    val printer = DocumentPrinterUsingSax.newInstance()
 
     val xmlString = printer.print(Document(root))
 
@@ -992,7 +992,7 @@ class SaxInteropTest extends AnyFunSuite {
    * The Scala counterpart is more type-safe.
    */
   test("testParseGroovyXmlExample") {
-    val parser = DocumentParserUsingSax.newInstance
+    val parser = DocumentParserUsingSax.newInstance()
 
     val doc = parser.parse(classOf[SaxInteropTest].getResourceAsStream("cars.xml"))
 
@@ -1091,7 +1091,7 @@ class SaxInteropTest extends AnyFunSuite {
 
     // 2. Write Elem to an XML/HTML string
 
-    val printer = DocumentPrinterUsingSax.newInstance
+    val printer = DocumentPrinterUsingSax.newInstance()
 
     val xmlString = printer.print(Document(root))
 
@@ -1145,7 +1145,7 @@ class SaxInteropTest extends AnyFunSuite {
   test("testParseFileWithUtf8Bom") {
     // 1. Parse XML file into Elem
 
-    val saxParser = DocumentParserUsingSax.newInstance
+    val saxParser = DocumentParserUsingSax.newInstance()
 
     val is = classOf[SaxInteropTest].getResourceAsStream("books.xml")
     val ba = Iterator.continually(is.read()).takeWhile(b => b != -1).map(_.toByte).toArray

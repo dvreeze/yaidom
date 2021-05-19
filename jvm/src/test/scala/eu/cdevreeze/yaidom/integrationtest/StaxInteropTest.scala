@@ -206,7 +206,7 @@ class StaxInteropTest extends AnyFunSuite {
 
     // 2. Write Elem to an XML string
 
-    val printer = DocumentPrinterUsingStax.newInstance.withDocumentConverter(StaxConversions)
+    val printer = DocumentPrinterUsingStax.newInstance().withDocumentConverter(StaxConversions)
 
     val xmlString = printer.print(Document(None, root))
 
@@ -262,7 +262,7 @@ class StaxInteropTest extends AnyFunSuite {
 
     // 2. Write Elem to an XML string
 
-    val printer = DocumentPrinterUsingStax.newInstance.withDocumentConverter(StaxConversions)
+    val printer = DocumentPrinterUsingStax.newInstance().withDocumentConverter(StaxConversions)
 
     val xmlString = printer.print(document)
 
@@ -508,7 +508,7 @@ class StaxInteropTest extends AnyFunSuite {
 
     // 2. Write Elem to an XML string
 
-    val printer = DocumentPrinterUsingStax.newInstance.withDocumentConverter(StaxConversions)
+    val printer = DocumentPrinterUsingStax.newInstance().withDocumentConverter(StaxConversions)
 
     val xmlString = printer.print(Document(None, root))
 
@@ -592,7 +592,7 @@ class StaxInteropTest extends AnyFunSuite {
 
     // 2. Write Elem to an XML string
 
-    val printer = DocumentPrinterUsingStax.newInstance
+    val printer = DocumentPrinterUsingStax.newInstance()
 
     val xmlString = printer.print(Document(None, root))
 
@@ -670,7 +670,7 @@ class StaxInteropTest extends AnyFunSuite {
     // 2. Write Elem to an XML string
 
     // The entity references are lost in the conversion within the print method!
-    val printer = DocumentPrinterUsingStax.newInstance
+    val printer = DocumentPrinterUsingStax.newInstance()
 
     val xmlString = printer.print(Document(None, root))
 
@@ -719,7 +719,7 @@ class StaxInteropTest extends AnyFunSuite {
 
     // 2. Write Elem to an XML string
 
-    val printer = DocumentPrinterUsingStax.newInstance
+    val printer = DocumentPrinterUsingStax.newInstance()
 
     val xmlString = printer.print(Document(None, root))
 
@@ -793,7 +793,7 @@ class StaxInteropTest extends AnyFunSuite {
 
     // 2. Write Elem to an XML string
 
-    val printer = DocumentPrinterUsingStax.newInstance
+    val printer = DocumentPrinterUsingStax.newInstance()
 
     val xmlString = printer.print(Document(None, root))
 
@@ -827,7 +827,7 @@ class StaxInteropTest extends AnyFunSuite {
   test("testParseXmlWithSpecialChars") {
     // 1. Parse XML file into Elem
 
-    val staxParser = DocumentParserUsingStax.newInstance
+    val staxParser = DocumentParserUsingStax.newInstance()
 
     val is = classOf[StaxInteropTest].getResourceAsStream("trivialXmlWithEuro.xml")
 
@@ -895,7 +895,7 @@ class StaxInteropTest extends AnyFunSuite {
   test("testParseGeneratedHtml") {
     // 1. Parse XML file into Elem
 
-    val staxParser = DocumentParserUsingStax.newInstance
+    val staxParser = DocumentParserUsingStax.newInstance()
     val is = classOf[StaxInteropTest].getResourceAsStream("books.xml")
 
     val root: Elem = staxParser.parse(is).documentElement
@@ -1004,7 +1004,7 @@ class StaxInteropTest extends AnyFunSuite {
    * The Scala counterpart is more type-safe.
    */
   test("testParseGroovyXmlExample") {
-    val parser = DocumentParserUsingStax.newInstance
+    val parser = DocumentParserUsingStax.newInstance()
 
     val doc = parser.parse(classOf[StaxInteropTest].getResourceAsStream("cars.xml"))
 
@@ -1079,7 +1079,7 @@ class StaxInteropTest extends AnyFunSuite {
   test("testParseFileWithUtf8Bom") {
     // 1. Parse XML file into Elem
 
-    val staxParser = DocumentParserUsingStax.newInstance
+    val staxParser = DocumentParserUsingStax.newInstance()
 
     val is = classOf[StaxInteropTest].getResourceAsStream("books.xml")
     val ba = Iterator.continually(is.read()).takeWhile(b => b != -1).map(_.toByte).toArray

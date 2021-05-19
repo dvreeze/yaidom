@@ -150,7 +150,7 @@ object BookList {
       .map(_.wrappedNode.asInstanceOf[Input])
 
     genreInputElems.foreach { genreInputElem =>
-      genreInputElem.onclick = { event: MouseEvent =>
+      genreInputElem.onclick = { (event: MouseEvent) =>
         val bookRowsForGenre = getBookRowsForGenre(genreInputElem.value)
 
         bookRowsForGenre.foreach { bookRow =>
@@ -173,7 +173,7 @@ object BookList {
     headerCellElems.foreach { headerCellElem =>
       val headerCell = headerCellElem.wrappedNode.asInstanceOf[TableCell]
 
-      headerCell.onclick = { event: MouseEvent =>
+      headerCell.onclick = { (event: MouseEvent) =>
         val headerCellJsDomElem =
           htmlAsJsDomDocument.documentElement.findElem(_.path == headerCellElem.path).getOrElse(sys.error(s"Could not find back header cell"))
 
@@ -197,7 +197,7 @@ object BookList {
       .foreach { headerCellElem =>
         val headerCell = headerCellElem.wrappedNode.asInstanceOf[TableCell]
 
-        headerCell.onmouseover = { event: MouseEvent =>
+        headerCell.onmouseover = { (event: MouseEvent) =>
           sortToolTipDiv.style.left = s"${event.clientX + 30}px"
           sortToolTipDiv.style.top = s"${event.clientY - 15}px"
           sortToolTipDiv.style.visibility = "visible"
@@ -210,7 +210,7 @@ object BookList {
       .foreach { headerCellElem =>
         val headerCell = headerCellElem.wrappedNode.asInstanceOf[TableCell]
 
-        headerCell.onmouseout = { event: MouseEvent =>
+        headerCell.onmouseout = { (event: MouseEvent) =>
           sortToolTipDiv.style.visibility = "hidden"
         }
       }

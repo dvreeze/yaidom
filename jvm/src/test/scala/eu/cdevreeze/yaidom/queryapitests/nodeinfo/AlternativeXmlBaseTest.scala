@@ -48,7 +48,7 @@ class AlternativeXmlBaseTest extends AbstractAlternativeXmlBaseTest {
   private val processor = new Processor(false)
 
   protected def convertToDocument(elem: yaidom.simple.Elem, docUri: URI): DocumentApi.Aux[D, E] = {
-    val docPrinter = DocumentPrinterUsingDom.newInstance
+    val docPrinter = DocumentPrinterUsingDom.newInstance()
     val xmlString = docPrinter.print(elem)
 
     val parseOptions = new ParseOptions

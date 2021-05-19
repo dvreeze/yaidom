@@ -220,18 +220,18 @@ object ValidationTest {
 
   // "Schema language" as DSL, containing higher-order functions on validators
 
-  def hasName(ename: EName): ElemValidator = { elm: Elem =>
+  def hasName(ename: EName): ElemValidator = { (elm: Elem) =>
     val success = elm.resolvedName == ename
     if (success) ValidationResult.ok
     else ValidationResult.notOk(s"Expected name $ename but found name ${elm.resolvedName} instead")
   }
 
-  def hasAttribute(ename: EName): ElemValidator = { elm: Elem =>
+  def hasAttribute(ename: EName): ElemValidator = { (elm: Elem) =>
     val success = elm.attributeOption(ename).isDefined
     if (success) ValidationResult.ok else ValidationResult.notOk(s"Attribute $ename not found")
   }
 
-  def sequence(nameOccsWithValidators: NameOccurrencesWithValidator*): ElemValidator = { elm: Elem =>
+  def sequence(nameOccsWithValidators: NameOccurrencesWithValidator*): ElemValidator = { (elm: Elem) =>
     var remainingChildElms = elm.findAllChildElems
     var lastValidationResult = ValidationResult.ok
 
@@ -270,7 +270,7 @@ object ValidationTest {
   def and(validators: ElemValidator*): ElemValidator = {
     require(validators.nonEmpty, "Expected at least one validator")
 
-    { e: Elem =>
+    { (e: Elem) =>
       validators.map(vld => vld(e)).find(vldRes => !vldRes.success).getOrElse(ValidationResult.ok)
     }
   }

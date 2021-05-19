@@ -233,7 +233,7 @@ trait ElemLike extends ElemApi {
   def findAllChildElems: immutable.IndexedSeq[ThisElem]
 
   def filterChildElems(p: ThisElem => Boolean): immutable.IndexedSeq[ThisElem] = {
-    findAllChildElems filter p
+    findAllChildElems.filter(p)
   }
 
   def \(p: ThisElem => Boolean): immutable.IndexedSeq[ThisElem] = {
@@ -257,7 +257,9 @@ trait ElemLike extends ElemApi {
     // Not tail-recursive, but the depth should typically be limited
     def accumulate(elm: ThisElem): Unit = {
       result += elm
-      elm.findAllChildElems foreach { e => accumulate(e) }
+      elm.findAllChildElems.foreach { e =>
+        accumulate(e)
+      }
     }
 
     accumulate(thisElem)
@@ -270,7 +272,9 @@ trait ElemLike extends ElemApi {
     // Not tail-recursive, but the depth should typically be limited
     def accumulate(elm: ThisElem): Unit = {
       if (p(elm)) result += elm
-      elm.findAllChildElems foreach { e => accumulate(e) }
+      elm.findAllChildElems.foreach { e =>
+        accumulate(e)
+      }
     }
 
     accumulate(thisElem)
@@ -282,11 +286,15 @@ trait ElemLike extends ElemApi {
   }
 
   def findAllElems: immutable.IndexedSeq[ThisElem] = {
-    findAllChildElems flatMap { ch => ch.findAllElemsOrSelf }
+    findAllChildElems.flatMap { ch =>
+      ch.findAllElemsOrSelf
+    }
   }
 
   def filterElems(p: ThisElem => Boolean): immutable.IndexedSeq[ThisElem] = {
-    findAllChildElems flatMap { ch => ch filterElemsOrSelf p }
+    findAllChildElems.flatMap { ch =>
+      ch.filterElemsOrSelf(p)
+    }
   }
 
   def findTopmostElemsOrSelf(p: ThisElem => Boolean): immutable.IndexedSeq[ThisElem] = {
@@ -294,8 +302,11 @@ trait ElemLike extends ElemApi {
 
     // Not tail-recursive, but the depth should typically be limited
     def accumulate(elm: ThisElem): Unit = {
-      if (p(elm)) result += elm else {
-        elm.findAllChildElems foreach { e => accumulate(e) }
+      if (p(elm)) result += elm
+      else {
+        elm.findAllChildElems.foreach { e =>
+          accumulate(e)
+        }
       }
     }
 
@@ -308,13 +319,16 @@ trait ElemLike extends ElemApi {
   }
 
   def findTopmostElems(p: ThisElem => Boolean): immutable.IndexedSeq[ThisElem] = {
-    findAllChildElems flatMap { ch => ch findTopmostElemsOrSelf p }
+    findAllChildElems.flatMap { ch =>
+      ch.findTopmostElemsOrSelf(p)
+    }
   }
 
   def findElemOrSelf(p: ThisElem => Boolean): Option[ThisElem] = {
     // Not tail-recursive, but the depth should typically be limited
     def findMatch(elm: ThisElem): Option[ThisElem] = {
-      if (p(elm)) Some(elm) else {
+      if (p(elm)) Some(elm)
+      else {
         val childElms = elm.findAllChildElems
 
         var i = 0
@@ -333,7 +347,9 @@ trait ElemLike extends ElemApi {
   }
 
   def findElem(p: ThisElem => Boolean): Option[ThisElem] = {
-    val elms = thisElem.findAllChildElems.view flatMap { ch => ch findElemOrSelf p }
+    val elms = thisElem.findAllChildElems.view.flatMap { ch =>
+      ch.findElemOrSelf(p)
+    }
     elms.headOption
   }
 }

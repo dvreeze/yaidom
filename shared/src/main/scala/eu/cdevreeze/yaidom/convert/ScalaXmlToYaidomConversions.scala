@@ -86,7 +86,7 @@ trait ScalaXmlToYaidomConversions extends ConverterToDocument[scala.xml.Document
     val scope: Scope = extractScope(v.scope)
 
     // Recursive (not tail-recursive)
-    val childSeq = v.child.toIndexedSeq flatMap { n: scala.xml.Node => convertToNodeOption(n) }
+    val childSeq = v.child.toIndexedSeq flatMap { (n: scala.xml.Node) => convertToNodeOption(n) }
 
     new Elem(
       qname = qname,
@@ -131,7 +131,7 @@ trait ScalaXmlToYaidomConversions extends ConverterToDocument[scala.xml.Document
 
   /** Converts attributes, given as `scala.xml.MetaData`, to an `immutable.IndexedSeq[(QName, String)]`. */
   final def extractAttributes(attrs: scala.xml.MetaData): immutable.IndexedSeq[(QName, String)] = {
-    attrs.toIndexedSeq map { attr: scala.xml.MetaData =>
+    attrs.toIndexedSeq map { (attr: scala.xml.MetaData) =>
       val attrValue = attr.value
       val attrValueText = if (attrValue.size >= 1) attrValue(0).text else ""
       (toQName(attr) -> attrValueText)

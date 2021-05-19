@@ -648,7 +648,7 @@ class OtherNamespaceTestUsingXmlLiterals extends AnyFunSuite {
       <order xmlns="http://datypic.com/ord">
         <number>123ABBCC123</number>
         <items>
-          <product xmlns="">
+          <product xmlns={"".toString}>
             <number>557</number>
             <size system="US-DRESS">10</size>
           </product>
@@ -716,7 +716,7 @@ class OtherNamespaceTestUsingXmlLiterals extends AnyFunSuite {
       <ord:order xmlns:ord="http://datypic.com/ord">
         <ord:number>123ABBCC123</ord:number>
         <ord:items>
-          <prod:product xmlns:ord="" xmlns:prod="http://datypic.com/prod">
+          <prod:product xmlns:ord={"".toString} xmlns:prod="http://datypic.com/prod">
             <prod:number>557</prod:number>
             <prod:size system="US-DRESS">10</prod:size>
           </prod:product>
@@ -941,7 +941,7 @@ class OtherNamespaceTestUsingXmlLiterals extends AnyFunSuite {
           <items>
             <product xmlns="http://datypic.com/prod">
               <number prod:id="prod557">557</number>
-              <name xmlns="">Short-Sleeved Linen Blouse</name>
+              <name xmlns={"".toString}>Short-Sleeved Linen Blouse</name>
               <prod:size system="US-DRESS">10</prod:size>
               <prod:color xmlns:prod="http://datypic.com/prod2" prod:value="blue"/>
             </product>

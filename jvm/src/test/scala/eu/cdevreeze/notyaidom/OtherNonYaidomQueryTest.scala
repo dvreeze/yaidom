@@ -1142,11 +1142,11 @@ object OtherNonYaidomQueryTest {
 
     def filterChildElems(p: ThisElem => Boolean): immutable.IndexedSeq[ThisElem]
 
-    def findAllChildElems(): immutable.IndexedSeq[ThisElem]
+    def findAllChildElems: immutable.IndexedSeq[ThisElem]
 
     def filterElemsOrSelf(p: ThisElem => Boolean): immutable.IndexedSeq[ThisElem]
 
-    def findAllElemsOrSelf(): immutable.IndexedSeq[ThisElem]
+    def findAllElemsOrSelf: immutable.IndexedSeq[ThisElem]
   }
 
   trait ElemLike extends ElemApi {
@@ -1154,7 +1154,7 @@ object OtherNonYaidomQueryTest {
 
     type ThisElem <: ElemLike {type ThisElem = self.ThisElem}
 
-    final def findAllChildElems(): immutable.IndexedSeq[ThisElem] = {
+    final def findAllChildElems: immutable.IndexedSeq[ThisElem] = {
       filterChildElems(_ => true)
     }
 
@@ -1164,7 +1164,7 @@ object OtherNonYaidomQueryTest {
       Vector(thisElem).filter(p) ++ findAllChildElems.flatMap(e => e.filterElemsOrSelf(p))
     }
 
-    final def findAllElemsOrSelf(): immutable.IndexedSeq[ThisElem] = {
+    final def findAllElemsOrSelf: immutable.IndexedSeq[ThisElem] = {
       filterElemsOrSelf(_ => true)
     }
   }

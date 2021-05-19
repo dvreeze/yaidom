@@ -128,7 +128,7 @@ final class ScalaXmlElem(
   }
 
   def children: immutable.IndexedSeq[ScalaXmlNode] = {
-    wrappedNode.child.toIndexedSeq flatMap { n: scala.xml.Node => ScalaXmlNode.wrapNodeOption(n) }
+    wrappedNode.child.toIndexedSeq flatMap { (n: scala.xml.Node) => ScalaXmlNode.wrapNodeOption(n) }
   }
 
   override def qname: QName = ScalaXmlConversions.toQName(wrappedNode)

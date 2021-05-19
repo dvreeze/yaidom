@@ -30,7 +30,7 @@ class RobustQueryTest extends AbstractRobustQueryTest {
   final type E = Elem
 
   protected final val contactsElem: Elem = {
-    val docParser = DocumentParserUsingDom.newInstance
+    val docParser = DocumentParserUsingDom.newInstance()
 
     val is = classOf[RobustQueryTest].getResourceAsStream("/eu/cdevreeze/yaidom/queryapitests/contacts.xml")
 

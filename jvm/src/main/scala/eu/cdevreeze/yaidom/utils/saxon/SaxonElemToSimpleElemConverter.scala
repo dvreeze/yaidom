@@ -38,23 +38,20 @@ object SaxonElemToSimpleElemConverter {
     simple.Document(
       uriOption = doc.uriOption,
       xmlDeclarationOption = None,
-      children = doc.children flatMap {
+      children = doc.children.flatMap {
         case e: SaxonElem                   => Some(convertSaxonElem(doc.documentElement))
         case pi: SaxonProcessingInstruction => Some(convertSaxonProcessingInstruction(pi))
         case c: SaxonComment                => Some(convertSaxonComment(c))
-        case _                              => None
-      })
+        case null                           => None
+      }
+    )
   }
 
   def convertSaxonElem(elem: SaxonElem): simple.Elem = {
     val children = elem.children.flatMap(ch => optionallyConvertSaxonNode(ch))
 
     val resultElem =
-      simple.Node.elem(
-        elem.qname,
-        elem.attributes,
-        elem.scope,
-        children)
+      simple.Node.elem(elem.qname, elem.attributes, elem.scope, children)
 
     resultElem
   }
@@ -72,7 +69,7 @@ object SaxonElemToSimpleElemConverter {
         Some(convertSaxonProcessingInstruction(pi))
       case c: SaxonComment =>
         Some(convertSaxonComment(c))
-      case _ => None
+      case null => None
     }
   }
 
@@ -85,7 +82,8 @@ object SaxonElemToSimpleElemConverter {
     simple.Node.comment(comment.text)
   }
 
-  def convertSaxonProcessingInstruction(processingInstruction: SaxonProcessingInstruction): simple.ProcessingInstruction = {
+  def convertSaxonProcessingInstruction(
+      processingInstruction: SaxonProcessingInstruction): simple.ProcessingInstruction = {
     simple.Node.processingInstruction(processingInstruction.target, processingInstruction.data)
   }
 }

@@ -144,7 +144,7 @@ class ElemLikePropTest extends AnyFunSuite with Checkers {
 
   // Generators of test data
 
-  private val docParser = parse.DocumentParserUsingSax.newInstance
+  private val docParser = parse.DocumentParserUsingSax.newInstance()
 
   private val docs: Vector[Document] = {
     val uris = Vector(
@@ -174,11 +174,11 @@ class ElemLikePropTest extends AnyFunSuite with Checkers {
 
   private val genElemPredicate: Gen[(Elem => Boolean)] = {
     oneOf(Seq(
-      { elem: Elem => !elem.scope.filterKeys(Set("xs")).isEmpty },
-      { elem: Elem => elem.qname.localPart.contains("e") },
-      { elem: Elem => elem.findAllChildElems.size >= 10 },
-      { elem: Elem => elem.textChildren.size >= 10 },
-      { elem: Elem => !elem.attributes.isEmpty }))
+      { (elem: Elem) => !elem.scope.filterKeys(Set("xs")).isEmpty },
+      { (elem: Elem) => elem.qname.localPart.contains("e") },
+      { (elem: Elem) => elem.findAllChildElems.size >= 10 },
+      { (elem: Elem) => elem.textChildren.size >= 10 },
+      { (elem: Elem) => !elem.attributes.isEmpty }))
   }
 
   private implicit val arbritraryElem: Arbitrary[Elem] = Arbitrary(genElem)

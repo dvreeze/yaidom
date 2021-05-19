@@ -235,7 +235,7 @@ class QueryTest extends AbstractElemLikeQueryTest {
       )
     val resultDoc: Document = Document(resultElem)
 
-    val dbf = DocumentBuilderFactory.newInstance
+    val dbf = DocumentBuilderFactory.newInstance()
     val db = dbf.newDocumentBuilder
     val domDoc = db.newDocument()
 

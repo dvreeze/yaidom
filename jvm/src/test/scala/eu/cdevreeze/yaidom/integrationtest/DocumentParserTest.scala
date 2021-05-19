@@ -100,7 +100,7 @@ class DocumentParserTest extends AnyFunSuite {
          |""".stripMargin.trim
 
     val doc = ScalaXmlDocument(
-      scala.xml.parsing.ConstructingParser.fromSource(scala.io.Source.fromString(xml), preserveWS = true).document)
+      scala.xml.parsing.ConstructingParser.fromSource(scala.io.Source.fromString(xml), preserveWS = true).document())
 
     assertResult(List(QName("prod:product"), QName("prod:number"), QName("prod:size"))) {
       doc.documentElement.findAllElemsOrSelf.map(_.qname)
@@ -137,7 +137,7 @@ class DocumentParserTest extends AnyFunSuite {
          |""".stripMargin.trim
 
     val doc = ScalaXmlDocument(
-      scala.xml.parsing.ConstructingParser.fromSource(scala.io.Source.fromString(xml), preserveWS = true).document)
+      scala.xml.parsing.ConstructingParser.fromSource(scala.io.Source.fromString(xml), preserveWS = true).document())
 
     assertResult(List(QName("prod:product"), QName("prod:number"), QName("prod:size"))) {
       doc.documentElement.findAllElemsOrSelf.map(_.qname)

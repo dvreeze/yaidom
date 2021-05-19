@@ -21,7 +21,6 @@ import scala.reflect.ClassTag
 import eu.cdevreeze.yaidom
 import eu.cdevreeze.yaidom.core.EName
 import eu.cdevreeze.yaidom.core.Path
-import eu.cdevreeze.yaidom.indexed.IndexedClarkElem
 import eu.cdevreeze.yaidom.parse.DocumentParserUsingStax
 import eu.cdevreeze.yaidom.queryapi.ClarkNodes
 import eu.cdevreeze.yaidom.queryapi.ElemWithPath
@@ -81,40 +80,6 @@ abstract class AbstractUpdateTest extends AnyFunSuite {
       newRootElems.size
     }
     checkElemAfterMeasureUpdate(newRootElems.head.asInstanceOf[E])
-  }
-
-  test("testUpdateElemsOrSelf") {
-    val pathAwareClarkElem = IndexedClarkElem(yaidom.resolved.Elem.from(rootElem))
-
-    val paths: Set[Path] =
-      pathAwareClarkElem.filterElems(_.resolvedName == EName(XbrliNs, "measure")).map(_.path).toSet
-
-    val newRootElem = rootElem.updateElemsOrSelf(paths) {
-      case (e, p) => updateMeasure(e)
-    }
-
-    assertResult(newRootElem) {
-      IndexedClarkElem(newRootElem).underlyingElem
-    }
-
-    checkElemAfterMeasureUpdate(newRootElem)
-  }
-
-  test("testUpdateElemsWithNodeSeqOnLazyIndexedElem") {
-    val pathAwareClarkElem = IndexedClarkElem(yaidom.resolved.Elem.from(rootElem))
-
-    val paths: Set[Path] =
-      pathAwareClarkElem.filterElems(_.resolvedName == EName(XbrliNs, "measure")).map(_.path).toSet
-
-    val newRootElem = rootElem.updateElemsWithNodeSeq(paths) {
-      case (e, p) => Vector(updateMeasure(e))
-    }
-
-    assertResult(newRootElem) {
-      IndexedClarkElem(newRootElem).underlyingElem
-    }
-
-    checkElemAfterMeasureUpdate(newRootElem)
   }
 
   // Below, we update the unit IDs and references for unit U-Monetary.
@@ -252,7 +217,7 @@ abstract class AbstractUpdateTest extends AnyFunSuite {
   }
 
   private val rootElem: E = {
-    val docParser = DocumentParserUsingStax.newInstance
+    val docParser = DocumentParserUsingStax.newInstance()
     val uri = classOf[AbstractUpdateTest].getResource("sample-xbrl-instance.xml").toURI
     val doc = docParser.parse(uri)
     fromSimpleElem(doc.documentElement)

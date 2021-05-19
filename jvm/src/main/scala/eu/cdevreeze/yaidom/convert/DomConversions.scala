@@ -22,7 +22,7 @@ package eu.cdevreeze.yaidom.convert
  * These conversions are used in implementations of yaidom XML parsers and printers. They are also useful
  * in application code. One scenario in which these conversions are useful is as follows:
  * {{{
- * val dbf = DocumentBuilderFactory.newInstance
+ * val dbf = DocumentBuilderFactory.newInstance()
  * val db = dbf.newDocumentBuilder
  * val domDoc = db.parse(inputFile)
  *

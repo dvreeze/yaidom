@@ -161,7 +161,7 @@ class XQuery3UseCasesTest extends AbstractXQuery3UseCasesTest {
 
   private def fromSimpleDocument(d: Document): SaxonDocument = {
     val parseOptions = new ParseOptions
-    val docPrinter = DocumentPrinterUsingDom.newInstance
+    val docPrinter = DocumentPrinterUsingDom.newInstance()
     val xmlString = docPrinter.print(d)
 
     val is = new InputSource(new StringReader(xmlString))

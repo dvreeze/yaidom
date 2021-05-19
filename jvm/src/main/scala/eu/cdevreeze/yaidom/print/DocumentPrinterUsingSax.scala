@@ -92,7 +92,7 @@ final class DocumentPrinterUsingSax(
   }
 
   def omittingXmlDeclaration: DocumentPrinterUsingSax = {
-    val newTransformerHandlerCreator = { tf: SAXTransformerFactory =>
+    val newTransformerHandlerCreator = { (tf: SAXTransformerFactory) =>
       val transformerHandler = transformerHandlerCreator(tf)
       transformerHandler.getTransformer().setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes")
       transformerHandler

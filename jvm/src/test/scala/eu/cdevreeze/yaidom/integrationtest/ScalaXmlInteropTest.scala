@@ -562,7 +562,7 @@ class ScalaXmlInteropTest extends AnyFunSuite {
   private val trivialXmlWithNSUndeclarations: scala.xml.Elem =
     <root xmlns="urn:foo:bar">
       <a>
-        <b xmlns="">
+        <b xmlns={"".toString}>
           <c>
             <d xmlns="urn:foo:bar">text</d>
           </c>

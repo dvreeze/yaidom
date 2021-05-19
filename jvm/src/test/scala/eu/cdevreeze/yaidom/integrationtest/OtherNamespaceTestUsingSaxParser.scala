@@ -29,7 +29,7 @@ import eu.cdevreeze.yaidom.parse
 
 class OtherNamespaceTestUsingSaxParser extends AbstractOtherNamespaceTest {
 
-  val documentParser: parse.DocumentParser = parse.DocumentParserUsingSax.newInstance
+  val documentParser: parse.DocumentParser = parse.DocumentParserUsingSax.newInstance()
 
-  val documentParserForXml11: parse.DocumentParser = parse.DocumentParserUsingSax.newInstance
+  val documentParserForXml11: parse.DocumentParser = parse.DocumentParserUsingSax.newInstance()
 }

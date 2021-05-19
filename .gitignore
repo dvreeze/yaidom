@@ -12,6 +12,7 @@ temp/
 scalastyle-config.xml
 node_modules/
 .idea/
+.bsp/
 
 # /project/
 /project/boot
