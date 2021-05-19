@@ -65,7 +65,7 @@ lazy val yaidom = crossProject(JSPlatform, JVMPlatform)
 
     libraryDependencies += "net.sf.saxon" % "Saxon-HE" % "9.9.1-8",
 
-    libraryDependencies += "com.github.ben-manes.caffeine" % "caffeine" % "3.0.2",
+    libraryDependencies += "com.github.ben-manes.caffeine" % "caffeine" % "2.9.0",
 
     libraryDependencies += "junit" % "junit" % "4.13.2" % Test,
 
