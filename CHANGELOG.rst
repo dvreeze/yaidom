@@ -2,86 +2,126 @@
 CHANGELOG
 =========
 
+1.12.0
+======
 
-Remarks about the current element type in yaidom
-================================================
+This release supports Scala 3, and drops support for Scala 2.12. So only Scala 3 and Scala 2.13
+are supported. The JVM version must be at least version 8 (as confirmed by a local Java 8 build).
 
-The element query API of yaidom uses **type members** for the "current element" type in query API traits. Typically some form of F-bounded
-polymorphism is used in such cases to restrict the "current element" type to, well, the "current element" type, to the extent
-that this is possible.
+The most important (often breaking) changes are:
 
-Earlier yaidom versions used type parameters for the element type, and later yaidom versions switched to type members instead.
-This turned out to reduce the amount of boilerplate in practice, for example when using arbitrary element implementations in
-"yaidom dialects". Indeed the use of type members instead of type parameters turned out to be a good choice. Morever, we can still
-express pretty much the same with type members and type parameters (although type members cannot be used in self types).
+* Indexed elements are no longer generic, and only use simple elements as underlying elements
 
-After all:
+  * Generic indexed elements are not very useful (at least in the form they existed)
+  * The former generic indexed elements used F-bounded polymorphism in a somewhat sloppy manner
+  * The Scala 3 compiler, strict as it seems to be, could not handle these generic indexed elements
+  * The compiler crashed (arguably, that's a bug), with an "orphan type parameter" message
+  * Even if this is a compiler bug, in this case it was triggered by problematic "generic" code
+  * Given that the generic indexed elements were not needed anyway, they were removed
+  * So now only indexed elements with underlying simple elements are supported
+  * Be careful: equality on indexed elements may be different from what it was!
 
-* Type ``ElemApi`` (using a type member for the element type) is essentially type ``ElemApi[_]`` (using a type parameter for the element type)
-* Type ``ElemApi { type ThisElem = E }`` (using a type member for the element type) is essentially type ``ElemApi[E]`` (using a type parameter for the element type)
+* Circular dependencies among type variables in the element query API were fixed
+* Class NodeBuilder and friends have been deprecated
+* Many test cases were removed
 
-What if we had used type classes instead of type members or type parameters to model F-bounded polymorphism? In our case, it would not have helped much:
+  * In particular, the test cases for the removed generic indexed elements were obviously removed/replaced
+  * Also, the arguably less useful tests for using yaidom from Java were removed
+  * Test cases using scalameta were removed as well
 
-* How do type classes for element query function APIs help for native yaidom elements? What do these native yaidom element types without the query API look like?
-* How do these type classes help model node type hierarchies, supporting other kinds of nodes than just elements?
-* Even when exposing these type classes through generic OO APIs, we would still want to write specific optimized OO element APIs
-* After all, OO APIs can contain private redundant state, for optimal performance
-* In other words, custom OO element APIs can **encapsulate** performance improvements, without introducing any breaking changes
+* Several dependencies have been upgraded, to support Scala 3
+* Java serialization of (for example simple) elements should not be used, and is no longer tested
+* For Scala-JS, some dependencies for Scala 3 are the Scala 2.13 dependencies, unfortunately
+* Guided by the compiler, many small refactorings have been performed
 
-Given that yaidom is an important low-level dependency used in several critical production applications, the possibility to
-improve performance without breaking the API is quite essential. Note that with type classes we could still develop a custom
-SaxonElem implementation delegating to a custom Saxon-oriented type class instance, but what's the point of (query API) type classes then?
+  * For example, single parameters in function literals are now surrounded by parentheses, for consistency
+  * Function calls without parameters are now stricter w.r.t. the presence or absence of parentheses
+  * Stricter and/or more clear pattern matching
 
-So, using type members for the "current element type" in the yaidom element query API is still a good choice. No need for
-type parameters, nor for type classes. The purely abstract element query API traits even relax type safety to the point where
-the ThisElem type member is only restricted to be a "raw" sub-type of the enclosing trait. Only element implementations "fix" this type member
-to the concrete element type itself.
+* Small changes w.r.t. the use of scala-xml were performed
 
-Still, the need for release 1.10.2 of yaidom shows that not all is well. Implementation traits like ``ScopedElemLike`` have
-become part of the public API of custom element implementations (often outside of yaidom, sometimes in "yaidom dialects").
-This potentially makes it hard to optimize such custom element implementations in a non-breaking way.
+  * The parser is now by default more secure, disallowing DTDs, unless configured to accept them
+  * There seems to be a small issue w.r.t. the use of the empty string for namespace undeclarations in XML literals
 
-This is also an issue in a subtle way, when we look with javap into the class files of custom element implementations.
-Recall that the class files still contain generics in the method signatures (of methods like filterElemsOrSelf), and that erasure
-only affects the byte code, not the method declarations (to some extent). What we can see in class files are method signatures like:
+This release must be considered not to be backwards compatible. The breaking changes are
+(in SBT, run: yaidomJVM/*:mimaReportBinaryIssues):
 
-* ``def filterElemsOrSelf(p: ScopedElemLike => Boolean): immutable.IndexedSeq[ScopedElemLike]``
-
-Optimizing the custom element implementation by removing (and replacing) the ``ScopedElemLike`` mix-in would thus be a
-breaking change. In TQA (which uses yaidom), for class ``TaxonomyElem``, I would rather see a more stable "javap" method signature like:
-
-* ``def filterElemsOrSelf(p: TaxonomyElem => Boolean): immutable.IndexedSeq[TaxonomyElem]``
-
-There is a lesson to be learnt from this when further evolving the yaidom query API. Query API methods containing the ThisElem
-element type in the method signature should be implemented only in the concrete element class. For yaidom dialects this would
-be the common dialect element super-class. This may be at odds with the DRY principle, but API stability is more important here.
-
-Alternatively these query API methods are implemented in a query API trait, but overridden in the concrete element implementation,
-calling the super-type version of the method, but adapting the method signature through the override.
-
-So, evolving yaidom further should ideally be done as follows with respect to the "current element type" in the query API:
-
-* Keep using type members for the "current element type" (no type parameters, no type classes)
-* Restrict these type members to be sub-types of the enclosing query API trait, but do not add any more complex type constraints (not even self types)
-* Keep using the purely abstract element query API traits, with the above-mentioned relaxed type constraints on the element type member
-* Yet **remove and no longer use the partial implementation traits**, especially for methods containing the element type in the signature
-* Or: **keep partial implementation traits**, but encourage **overriding of most methods for better method signatures**
-
-Then we can achieve the following:
-
-* Easy (but sometimes cumbersome) implementation of different yaidom elements, including yaidom dialects (mostly outside of yaidom), like is the case now
-* Ability to **tweak performance** of (custom) element implementations, without affecting **API stability**
-
-It is the latter bullet point that needs more attention from now on.
-
-There is a moral to the story, especially when modelling complex typing scenarios like F-bounded polymorphism. Sometimes it
-makes sense to look at the **class files generated by the Scala compiler**, to get a feeling for what the Scala compiler sees
-when loading the class file in the absence of the corresponding source file.
-
-Related to this is that it makes sense to use **MiMa** on a regular basis in order to prevent any unwanted binary incompatibilities.
-For more background on binary (and source) compatibility, see `binary-compatibility`_.
-
-.. _`binary-compatibility`: https://docs.scala-lang.org/overviews/core/binary-compatibility-for-library-authors.html
+* static method stripUnusedNamespaces(eu.cdevreeze.yaidom.indexed.IndexedScopedNode#Elem,eu.cdevreeze.yaidom.utils.DocumentENameExtractor)eu.cdevreeze.yaidom.simple.Elem in class eu.cdevreeze.yaidom.utils.NamespaceUtils's type is different in current version, where it is (eu.cdevreeze.yaidom.indexed.IndexedNode#Elem,eu.cdevreeze.yaidom.utils.DocumentENameExtractor)eu.cdevreeze.yaidom.simple.Elem instead of (eu.cdevreeze.yaidom.indexed.IndexedScopedNode#Elem,eu.cdevreeze.yaidom.utils.DocumentENameExtractor)eu.cdevreeze.yaidom.simple.Elem
+  filter with: ProblemFilters.exclude[IncompatibleMethTypeProblem]("eu.cdevreeze.yaidom.utils.NamespaceUtils.stripUnusedNamespaces")
+* method stripUnusedNamespaces(eu.cdevreeze.yaidom.indexed.IndexedScopedNode#Elem,eu.cdevreeze.yaidom.utils.DocumentENameExtractor)eu.cdevreeze.yaidom.simple.Elem in object eu.cdevreeze.yaidom.utils.NamespaceUtils's type is different in current version, where it is (eu.cdevreeze.yaidom.indexed.IndexedNode#Elem,eu.cdevreeze.yaidom.utils.DocumentENameExtractor)eu.cdevreeze.yaidom.simple.Elem instead of (eu.cdevreeze.yaidom.indexed.IndexedScopedNode#Elem,eu.cdevreeze.yaidom.utils.DocumentENameExtractor)eu.cdevreeze.yaidom.simple.Elem
+  filter with: ProblemFilters.exclude[IncompatibleMethTypeProblem]("eu.cdevreeze.yaidom.utils.NamespaceUtils.stripUnusedNamespaces")
+* object eu.cdevreeze.yaidom.indexed.IndexedScopedNode#Comment does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[MissingClassProblem]("eu.cdevreeze.yaidom.indexed.IndexedScopedNode$Comment$")
+* class eu.cdevreeze.yaidom.indexed.IndexedDocument does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[MissingClassProblem]("eu.cdevreeze.yaidom.indexed.IndexedDocument")
+* object eu.cdevreeze.yaidom.indexed.IndexedScopedNode does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[MissingClassProblem]("eu.cdevreeze.yaidom.indexed.IndexedScopedNode$")
+* object eu.cdevreeze.yaidom.indexed.Elem does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[MissingClassProblem]("eu.cdevreeze.yaidom.indexed.Elem$")
+* object eu.cdevreeze.yaidom.indexed.AbstractIndexedClarkElem does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[MissingClassProblem]("eu.cdevreeze.yaidom.indexed.AbstractIndexedClarkElem$")
+* class eu.cdevreeze.yaidom.indexed.IndexedScopedNode#EntityRef does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[MissingClassProblem]("eu.cdevreeze.yaidom.indexed.IndexedScopedNode$EntityRef")
+* class eu.cdevreeze.yaidom.indexed.Elem does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[MissingClassProblem]("eu.cdevreeze.yaidom.indexed.Elem")
+* object eu.cdevreeze.yaidom.indexed.IndexedClarkNode#Elem does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[MissingClassProblem]("eu.cdevreeze.yaidom.indexed.IndexedClarkNode$Elem$")
+* object eu.cdevreeze.yaidom.indexed.IndexedScopedNode#Elem does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[MissingClassProblem]("eu.cdevreeze.yaidom.indexed.IndexedScopedNode$Elem$")
+* object eu.cdevreeze.yaidom.indexed.IndexedScopedNode#Text does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[MissingClassProblem]("eu.cdevreeze.yaidom.indexed.IndexedScopedNode$Text$")
+* class eu.cdevreeze.yaidom.indexed.IndexedScopedNode#ProcessingInstruction does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[MissingClassProblem]("eu.cdevreeze.yaidom.indexed.IndexedScopedNode$ProcessingInstruction")
+* interface eu.cdevreeze.yaidom.indexed.IndexedScopedNode#Node does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[MissingClassProblem]("eu.cdevreeze.yaidom.indexed.IndexedScopedNode$Node")
+* static method IndexedScopedElem()eu.cdevreeze.yaidom.indexed.IndexedScopedNode#Elem# in class eu.cdevreeze.yaidom.indexed.package does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[DirectMissingMethodProblem]("eu.cdevreeze.yaidom.indexed.package.IndexedScopedElem")
+* static method IndexedClarkElem()eu.cdevreeze.yaidom.indexed.IndexedClarkNode#Elem# in class eu.cdevreeze.yaidom.indexed.package does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[DirectMissingMethodProblem]("eu.cdevreeze.yaidom.indexed.package.IndexedClarkElem")
+* method apply(scala.Option,eu.cdevreeze.yaidom.indexed.IndexedScopedNode#Elem,scala.collection.immutable.IndexedSeq,scala.collection.immutable.IndexedSeq)eu.cdevreeze.yaidom.indexed.Document in object eu.cdevreeze.yaidom.indexed.Document's type is different in current version, where it is (scala.Option,eu.cdevreeze.yaidom.indexed.IndexedNode#Elem,scala.collection.immutable.IndexedSeq,scala.collection.immutable.IndexedSeq)eu.cdevreeze.yaidom.indexed.Document instead of (scala.Option,eu.cdevreeze.yaidom.indexed.IndexedScopedNode#Elem,scala.collection.immutable.IndexedSeq,scala.collection.immutable.IndexedSeq)eu.cdevreeze.yaidom.indexed.Documen
+  filter with: ProblemFilters.exclude[IncompatibleMethTypeProblem]("eu.cdevreeze.yaidom.indexed.Document.apply")
+* method apply(eu.cdevreeze.yaidom.indexed.IndexedScopedNode#Elem)eu.cdevreeze.yaidom.indexed.Document in object eu.cdevreeze.yaidom.indexed.Document in current version does not have a correspondent with same parameter signature among (eu.cdevreeze.yaidom.indexed.IndexedNode#Elem)eu.cdevreeze.yaidom.indexed.Document, (eu.cdevreeze.yaidom.simple.Document)eu.cdevreeze.yaidom.indexed.Document
+  filter with: ProblemFilters.exclude[IncompatibleMethTypeProblem]("eu.cdevreeze.yaidom.indexed.Document.apply")
+* class eu.cdevreeze.yaidom.indexed.IndexedScopedNode#Comment does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[MissingClassProblem]("eu.cdevreeze.yaidom.indexed.IndexedScopedNode$Comment")
+* object eu.cdevreeze.yaidom.indexed.IndexedScopedNode#ProcessingInstruction does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[MissingClassProblem]("eu.cdevreeze.yaidom.indexed.IndexedScopedNode$ProcessingInstruction$")
+* class eu.cdevreeze.yaidom.indexed.IndexedScopedNode#Elem does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[MissingClassProblem]("eu.cdevreeze.yaidom.indexed.IndexedScopedNode$Elem")
+* class eu.cdevreeze.yaidom.indexed.IndexedClarkNode#Elem does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[MissingClassProblem]("eu.cdevreeze.yaidom.indexed.IndexedClarkNode$Elem")
+* interface eu.cdevreeze.yaidom.indexed.IndexedScopedNode#CanBeDocumentChild does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[MissingClassProblem]("eu.cdevreeze.yaidom.indexed.IndexedScopedNode$CanBeDocumentChild")
+* interface eu.cdevreeze.yaidom.indexed.IndexedClarkNode#Node does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[MissingClassProblem]("eu.cdevreeze.yaidom.indexed.IndexedClarkNode$Node")
+* object eu.cdevreeze.yaidom.indexed.IndexedScopedNode#EntityRef does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[MissingClassProblem]("eu.cdevreeze.yaidom.indexed.IndexedScopedNode$EntityRef$")
+* class eu.cdevreeze.yaidom.indexed.IndexedScopedNode#Text does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[MissingClassProblem]("eu.cdevreeze.yaidom.indexed.IndexedScopedNode$Text")
+* the type hierarchy of class eu.cdevreeze.yaidom.indexed.Document is different in current version. Missing types {eu.cdevreeze.yaidom.indexed.IndexedDocument}
+  filter with: ProblemFilters.exclude[MissingTypesProblem]("eu.cdevreeze.yaidom.indexed.Document")
+* static method apply(eu.cdevreeze.yaidom.indexed.IndexedScopedNode#Elem)eu.cdevreeze.yaidom.indexed.Document in class eu.cdevreeze.yaidom.indexed.Document in current version does not have a correspondent with same parameter signature among (eu.cdevreeze.yaidom.simple.Document)eu.cdevreeze.yaidom.indexed.Document, (eu.cdevreeze.yaidom.indexed.IndexedNode#Elem)eu.cdevreeze.yaidom.indexed.Document
+  filter with: ProblemFilters.exclude[IncompatibleMethTypeProblem]("eu.cdevreeze.yaidom.indexed.Document.apply")
+* static method apply(scala.Option,eu.cdevreeze.yaidom.indexed.IndexedScopedNode#Elem,scala.collection.immutable.IndexedSeq,scala.collection.immutable.IndexedSeq)eu.cdevreeze.yaidom.indexed.Document in class eu.cdevreeze.yaidom.indexed.Document's type is different in current version, where it is (scala.Option,eu.cdevreeze.yaidom.indexed.IndexedNode#Elem,scala.collection.immutable.IndexedSeq,scala.collection.immutable.IndexedSeq)eu.cdevreeze.yaidom.indexed.Document instead of (scala.Option,eu.cdevreeze.yaidom.indexed.IndexedScopedNode#Elem,scala.collection.immutable.IndexedSeq,scala.collection.immutable.IndexedSeq)eu.cdevreeze.yaidom.indexed.Document
+  filter with: ProblemFilters.exclude[IncompatibleMethTypeProblem]("eu.cdevreeze.yaidom.indexed.Document.apply")
+* method withDocumentElement(eu.cdevreeze.yaidom.indexed.IndexedScopedNode#Elem)eu.cdevreeze.yaidom.indexed.Document in class eu.cdevreeze.yaidom.indexed.Document's type is different in current version, where it is (eu.cdevreeze.yaidom.indexed.IndexedNode#Elem)eu.cdevreeze.yaidom.indexed.Document instead of (eu.cdevreeze.yaidom.indexed.IndexedScopedNode#Elem)eu.cdevreeze.yaidom.indexed.Document
+  filter with: ProblemFilters.exclude[IncompatibleMethTypeProblem]("eu.cdevreeze.yaidom.indexed.Document.withDocumentElement")
+* class eu.cdevreeze.yaidom.indexed.IndexedClarkNode does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[MissingClassProblem]("eu.cdevreeze.yaidom.indexed.IndexedClarkNode")
+* object eu.cdevreeze.yaidom.indexed.IndexedClarkNode does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[MissingClassProblem]("eu.cdevreeze.yaidom.indexed.IndexedClarkNode$")
+* object eu.cdevreeze.yaidom.indexed.IndexedClarkNode#Text does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[MissingClassProblem]("eu.cdevreeze.yaidom.indexed.IndexedClarkNode$Text$")
+* method IndexedClarkElem()eu.cdevreeze.yaidom.indexed.IndexedClarkNode#Elem# in object eu.cdevreeze.yaidom.indexed.package does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[DirectMissingMethodProblem]("eu.cdevreeze.yaidom.indexed.package.IndexedClarkElem")
+* method IndexedScopedElem()eu.cdevreeze.yaidom.indexed.IndexedScopedNode#Elem# in object eu.cdevreeze.yaidom.indexed.package does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[DirectMissingMethodProblem]("eu.cdevreeze.yaidom.indexed.package.IndexedScopedElem")
+* class eu.cdevreeze.yaidom.indexed.IndexedScopedNode does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[MissingClassProblem]("eu.cdevreeze.yaidom.indexed.IndexedScopedNode")
+* class eu.cdevreeze.yaidom.indexed.AbstractIndexedClarkElem does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[MissingClassProblem]("eu.cdevreeze.yaidom.indexed.AbstractIndexedClarkElem")
+* class eu.cdevreeze.yaidom.indexed.IndexedClarkNode#Text does not have a correspondent in current version
+  filter with: ProblemFilters.exclude[MissingClassProblem]("eu.cdevreeze.yaidom.indexed.IndexedClarkNode$Text")
 
 
 1.11.0
