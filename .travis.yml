@@ -1,4 +1,5 @@
 
+dist: xenial
 language: scala
 
 install:
@@ -7,6 +8,8 @@ install:
   - nvm use stable
   - npm install
   - npm install jsdom
+
+# Unfortunately, a JDK 8 is missing here (this project must work on JDK 8)
 
 matrix:
   include:
