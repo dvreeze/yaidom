@@ -40,11 +40,11 @@ ThisBuild / publishTo := {
 ThisBuild / pomExtra := pomData
 ThisBuild / pomIncludeRepository := { _ => false }
 
-ThisBuild / libraryDependencies += "org.scala-lang.modules" %%% "scala-xml" % "2.0.0"
+// Scala-xml, scalatest and scalatestplus are common dependencies, but "%%%" does not seem to work well for JS now.
 
-ThisBuild / libraryDependencies += "org.scalatest" %%% "scalatest" % "3.2.9" % Test
-
-ThisBuild / libraryDependencies += "org.scalatestplus" %%% "scalacheck-1-15" % "3.2.9.0" % Test
+// ThisBuild / libraryDependencies += "org.scala-lang.modules" %%% "scala-xml" % "2.0.0"
+// ThisBuild / libraryDependencies += "org.scalatest" %%% "scalatest" % "3.2.9" % Test
+// ThisBuild / libraryDependencies += "org.scalatestplus" %%% "scalacheck-1-15" % "3.2.9.0" % Test
 
 lazy val root = project.in(file("."))
   .aggregate(yaidomJVM, yaidomJS)
@@ -61,6 +61,12 @@ lazy val yaidom = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Full)
   .in(file("."))
   .jvmSettings(
+    libraryDependencies += "org.scala-lang.modules" %%% "scala-xml" % "2.0.0",
+
+    libraryDependencies += "org.scalatest" %%% "scalatest" % "3.2.9" % Test,
+
+    libraryDependencies += "org.scalatestplus" %%% "scalacheck-1-15" % "3.2.9.0" % Test,
+
     // By all means, override this version of Saxon if needed, possibly with a Saxon-EE release!
 
     libraryDependencies += "net.sf.saxon" % "Saxon-HE" % "9.9.1-8",
@@ -102,13 +108,30 @@ lazy val yaidom = crossProject(JSPlatform, JVMPlatform)
     // Add support for the DOM in `run` and `test`
     jsEnv := new org.scalajs.jsenv.jsdomnodejs.JSDOMNodeJSEnv(),
 
-    libraryDependencies += "io.github.cquiroz" %%% "scala-java-time" % "2.3.0",
+    libraryDependencies ++= (CrossVersion.partialVersion(scalaVersion.value) match {
+      case (Some((3, _))) =>
+        Seq(
+          "org.scala-lang.modules" % "scala-xml_sjs1_3" % "2.0.0",
+          "org.scalatest" % "scalatest_sjs1_3" % "3.2.9" % Test,
+          "org.scalatestplus" % "scalacheck-1-15_sjs1_3" % "3.2.9.0" % Test,
 
-    // Hopefully for3Use2_13 soon not needed anymore
-    libraryDependencies += ("org.scala-js" %%% "scalajs-dom" % "1.1.0").cross(CrossVersion.for3Use2_13),
+          "io.github.cquiroz" % "scala-java-time_sjs1_3" % "2.3.0",
+          // Hopefully for3Use2_13 soon not needed anymore
+          "org.scala-js" % "scalajs-dom_sjs1_2.13" % "1.1.0",
+          // Hopefully for3Use2_13 soon not needed anymore
+          "com.lihaoyi" % "scalatags_sjs1_2.13" % "0.9.4" % Optional
+        )
+      case _ =>
+        Seq(
+          "org.scala-lang.modules" % "scala-xml_sjs1_2.13" % "2.0.0",
+          "org.scalatest" % "scalatest_sjs1_2.13" % "3.2.9" % Test,
+          "org.scalatestplus" % "scalacheck-1-15_sjs1_2.13" % "3.2.9.0" % Test,
 
-    // Hopefully for3Use2_13 soon not needed anymore
-    libraryDependencies += ("com.lihaoyi" %%% "scalatags" % "0.9.4" % Optional).cross(CrossVersion.for3Use2_13),
+          "io.github.cquiroz" % "scala-java-time_sjs1_2.13" % "2.3.0",
+          "org.scala-js" % "scalajs-dom_sjs1_2.13" % "1.1.0",
+          "com.lihaoyi" % "scalatags_sjs1_2.13" % "0.9.4" % Optional
+        )
+    }),
 
     Test / parallelExecution := false,
 
