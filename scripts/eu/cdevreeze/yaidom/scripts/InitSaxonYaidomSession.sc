@@ -2,9 +2,9 @@
 // Run amm in scripts folder
 // In amm session, use command "import $exec.eu.cdevreeze.yaidom.scripts.InitSaxonYaidomSession"
 
-// Taking yaidom version 1.12.0
+// Taking yaidom version 1.13.0
 
-import $ivy.`eu.cdevreeze.yaidom::yaidom:1.12.0`
+import $ivy.`eu.cdevreeze.yaidom::yaidom:1.13.0`
 
 // Imports that (must) remain available after this initialization script
 

@@ -2,6 +2,17 @@
 CHANGELOG
 =========
 
+1.13.0
+======
+
+This release fixes the broken 1.12.0 release for JavaScript. For the JVM, this release is
+exactly the same as version 1.12.0.
+
+In other words, for JS as target platform do not use preceding version 1.12.0, but use this
+1.13.0 one instead. In any case it is safer to use release 1.13.0 and to consider 1.12.0
+a broken release (even if it only affects JS).
+
+
 1.12.0
 ======
 
