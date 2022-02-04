@@ -19,6 +19,9 @@ ThisBuild / version      := "1.14.0-SNAPSHOT"
 ThisBuild / scalaVersion       := scalaVer
 ThisBuild / crossScalaVersions := crossScalaVer
 
+ThisBuild / semanticdbEnabled := true // enable SemanticDB
+ThisBuild / semanticdbVersion := scalafixSemanticdb.revision // only required for Scala 2.x
+
 ThisBuild / scalacOptions ++= (CrossVersion.partialVersion(scalaVersion.value) match {
   case (Some((3, _))) =>
     Seq("-unchecked", "-source:3.0-migration")
